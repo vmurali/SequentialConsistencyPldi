@@ -40,18 +40,27 @@ portions of the paper-and-pencil proof using PVS. However, neither proof
 establishes that the protocol is store atomic. Rather, they show that Cachet
 obeys the CRF memory model, which is not restricted to store-atomic behavior.
 
-
 \xxx{TODO: Correct This}
 
 There has been a lot of work in providing frameworks for axiomatic
-specifications of memory models \cite{alglave2012formal,alglave2014herding}
-and in providing axiomatic memory model specifications for real systems
-through analyis of empirically observed behavior of certain ``litmus tests''
-\cite{mador2012axiomatic,sarkar2012synchronising}. There has also been some
-work in providing operational semantics that describes the observed behavior of
-real hardware \cite{sarkar2011understanding}. Finally, there has been work
-formally relating the axiomatic specification of TSO to operational semantics
-of real x86 and Sparc machines \cite{x86tsocacm10}.
+specifications of memory models based on empirically observed behavior of
+certain ``litmus
+tests''\cite{alglave2012formal,alglave2014herding,Alglave:FMSD,Alglave:2010,Alglave11,Alglave:TACAS}.
+There has been some work in providing operational and axiomatic semantics that
+describes the observed behavior (based on certain ``litmus tests'' of real
+hardware
+\cite{mador2012axiomatic,sarkar2011understanding,sarkar2012synchronising}.
+Finally, there has been work formally relating the axiomatic specification of
+TSO to operational semantics \cite{x86tsocacm10}.
+
+%There has been a lot of work in providing frameworks for axiomatic
+%specifications of memory models \cite{alglave2012formal,alglave2014herding}
+%and in providing axiomatic memory model specifications for real systems
+%through analysis of empirically observed behavior of certain ``litmus tests''
+%\cite{mador2012axiomatic,sarkar2012synchronising}. There has also been some
+%work in providing operational semantics that describes the observed behavior of
+%real hardware \cite{sarkar2011understanding}. Finally, there has been work
+%formally relating the axiomatic specification of TSO to operational semantics\cite{x86tsocacm10}.
 
 %The plethora of work in the area of memory models indeed suggests that this is
 %a complex problem, exacerbated by the hardware architect's desire to increase
