@@ -27,8 +27,10 @@ For LTS $A$, we write $\io{A}{s}{s'}{\ell}$ as shorthand for $(s, \ell, s') \in
 A$, and we write $A_0$ for $A$'s initial state. The intuition is that $A$ is
 one process within a concurrent system. The label $\ell$ from set $\mathcal L$
 of labels is produced when $A$ participates in some IO exchange with another
-process; otherwise it is an empty or ``silent'' label $\epsilon$. As a
-shorthand, we sometimes omit labels for $\epsilon$ steps.
+process; otherwise it is an empty or ``silent'' label $\epsilon$. Note that the
+IO exchange can either be input, output or both, and its interpretation is
+dependent on the context. As a shorthand, we sometimes omit labels for
+$\epsilon$ steps.
 
 \subsection{Basic Constructions on LTSes}
 
