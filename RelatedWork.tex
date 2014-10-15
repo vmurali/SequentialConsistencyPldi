@@ -1,0 +1,117 @@
+\section{Related Work}
+\label{relatedWork}
+
+Formal verification has been used to verify multiprocessor
+systems, especially with model checking
+\cite{burch1994automatic,mcmillan1998verification}.
+
+More recently, Intel's execution cluster (\ie{} the ALU and its
+interface) has been formally verified using model checking
+\cite{kaivola2009replacing}.
+
+Theorem provers have also been used to verify microprocessors, \eg{} HOL has been
+used to verify an academic microprocessor AVI-1 \cite{windley1995formal}.
+Term-rewriting based techniques have been used to specify microprocessors, with
+the goal of making them more amenable to verification \cite{shen1999using}.
+
+%\murali{Next paragraph is all I know about this stuff, should probably be
+%removed}
+%\adam{What are you referring to with ``it'' in your comment?  I don't understand what this paragraph refers to.}
+%It has been verified using model checking \cite{qadeer2003verifying},
+%with a fixed number of processors and memory locations.  Model-checking has also
+%been used to verify communication fabrics \cite{chatterjee2012automatic}.
+
+
+Theorem provers have also been used in verifying cache coherence protocols.
+The correctness of the FLASH cache coherence protocol~\cite{flash} for a
+single-level hierarchy was proven with PVS~\cite{park} using a mapping, called
+``aggregation of transactions,'' from multiple localized transactions to a
+single global transaction, and finally using model checking to prove the correctness of
+the global transactions model. However, they do not provide a methodology to
+prove the aggregation of transactions for other protocols, which is where, we
+believe, the difficulty lies; in contrast, our modular proof relies on generic
+invariants, making it more adaptable to different protocols.
+
+Cachet~\cite{StoyShenArvind:Proofs}, another single-level cache coherence
+protocol, was proven to be implementable in the CRF memory
+model~\cite{Shen:CRF}. Shen \etal{} provided a paper-and-pencil proof showing
+Cachet does not violate the CRF memory model, while Stoy \etal{} implemented
+portions of the paper-and-pencil proof using PVS. However, neither proof
+establishes that the protocol is store atomic. Rather, they show that Cachet
+obeys the CRF memory model, which is not restricted to store-atomic behavior.
+
+
+%There has been a lot of work in providing frameworks for axiomatic
+%specifications of memory models \cite{alglave2012formal,alglave2014herding}
+%and in providing axiomatic memory model specifications for real systems
+%through analyis of empirically observed behavior of certain ``litmus tests''
+%\cite{mador2012axiomatic,sarkar2012synchronising}. There has also been some
+%work in providing operational semantics that describes the observed behavior of
+%real hardware \cite{sarkar2011understanding}. Finally, there has been work
+%formally relating the axiomatic specification of TSO to operational semantics
+%of real x86 and Sparc machines \cite{x86tsocacm10}.
+%
+%The plethora of work in the area of memory models indeed suggests that this is
+%a complex problem, exacerbated by the hardware architect's desire to increase
+%hardware performance at the cost of complicating the memory models further. There
+%are two aspects where our work can help in tackling this complex problem: (1) we
+%are proposing a modular approach for verifying systems in which the components,
+%namely the processors and the memory, can be verified against the memory model
+%contract independent of each other, and (2) we are also proposing a design
+%in which a system obeying sequential consistency is made into a high
+%performance machine through the use of speculative loads followed by
+%verification. The only downside is waiting for store acknowledgements, but this
+%wait does not preclude the machine from performing further computations for
+%future instructions without actually committing them. We are hoping to develop
+%both these ideas -- of extending our proof approach for more complex memory
+%models and designing real hardware which is sequentially consistent but has
+%high performance.
+%
+%
+%BELOW IS UNEDITTED FROM OLD PAPER
+
+
+%These are lifted as is from that guy. Need to figure out how to restate them, and make it more concise.
+%
+%For verification of high level specifications, modern industrial practice
+%consists of modeling small instances of the protocols, e.g., three CPUs
+%handling two addresses and one bit of data, in terms of interleaving atomic
+%steps, in guard/action languages such as Murphi [50] or TLA+ [84], and
+%exploring the reachable states through explicit state enumeration.
+%Symbolic methods, e.g., BDD [31] or SAT [129, 142], are yet to succeed for the
+%verification of cache coherence protocols.
+%Monolithic formal verification methods – methods that treat the protocol as a whole – have
+%been used fairly routinely for verifying cache coherence protocols from the early 1990s
+%[10 (2 nodes, murphi)]. However, these monolithic techniques will not be able to handle the very
+%large state space of hierarchical protocols. Compositional verification techniques are essential. 
+%
+%For coherence protocols which only consider one level (or nonhierarchical protocols),
+%various techniques have been proposed for the verification. These techniques basically
+%include explicit state enumeration [133] and symbolic model checking [102]
+%Opti-
+%mizations on these techniques include partial order reduction [24], symmetry reduction
+%[25, 72], compositional reasoning [96], predicate abstraction [22, 49, 82], etc. There is
+%also a large body of work on parameterized verification [42, 53, 54, 100, 117]. However,
+%none of them have shown the capability to verify hierarchical coherence protocols with
+%realistic complexity.
+%
+%McMillan et al. [97, 102] modeled a 2-level MSI coherence protocol based on the
+%Gigamax distributed multiprocessor [102]. In the protocol, bus snooping is used in both
+%levels. SMV [97] was used to verify this protocol with two clusters each having six
+%processors, for both safety and liveness properties. In terms of the complexity, many
+%realistic details are abstracted away from the protocol so that the protocol does not have
+%the typical complexity that a hierarchical coherence protocol has.
+%
+%=======
+%Theorem provers have also been used in verifying cache coherence protocols,
+%\eg{} FLASH~\cite{park} and Cachet~\cite{Shen:CRF, StoyShenArvind:Proofs} have
+%been proved using the PVS theorem prover. Both works prove correctness of a
+%single-level hierarchy while our work proves it for a multi-level hierarchy.
+%The work by Park \etal{} on FLASH proves a mapping, called ``aggregation of
+%transactions'', from multiple localized transactions to a single global
+%transaction with PVS, and uses model-checking to prove the correctness of the
+%global transactions model. However, they do not provide a methodology to prove
+%the aggregation of transactions for other protocols, which we believe to be very
+%difficult; in contrast, our modular proof relies on generic invariants making it
+%more naturally adaptable to different protocols.
+%>>>>>>> 96e9880a190d9acb6201b10e2b105d18c72f56aa

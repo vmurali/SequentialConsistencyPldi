@@ -1,0 +1,83 @@
+%=======================================================================
+% Latex template for SPAA 2012
+%=======================================================================
+
+% remember to compile with dvips -t letter for US letter style
+
+\documentclass[preprint,nocopyrightspace]{sigplanconf}
+%\documentclass{llncs} 
+%\documentclass[10pt]{IEEEtran}
+%\documentclass[times,10pt,twocolumn]{article} 
+
+% American letter size:
+%\textwidth6.5in \textheight9in \oddsidemargin 0pt \evensidemargin 0pt
+%\topmargin -47pt
+
+\usepackage[sort&compress]{natbib}
+\usepackage{bussproofs}
+\usepackage{ulem}
+%\usepackage[margin=0.5in]{geometry}
+\usepackage{colonequals}
+\usepackage{mathtools}
+\usepackage{times}
+\usepackage{color}
+\usepackage{comment}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{alltt}
+\usepackage{semantic}
+\usepackage{caption}
+\usepackage{subcaption}
+\DeclareCaptionType{copyrightbox}
+\captionsetup{compatibility=false}
+\usepackage{boxedminipage}
+\usepackage{listings}
+\usepackage{lstlangcoq}
+\usepackage{multirow}
+%\usepackage{cite}
+\usepackage{url}
+\usepackage{amsfonts}
+
+\usepackage[pdftex]{graphicx}
+\graphicspath{{figures/}}
+\DeclareGraphicsExtensions{.pdf,.jpg,.png}
+
+%{\obeyspaces\gdef {\ }}
+
+\begin{document}
+%\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+% Uncomment one of the following two, if you are not going for the 
+% traditional copyright transfer agreement.
+
+%\exclusivelicense                % ACM gets exclusive license to publish, 
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers, 
+                                  % short abstracts)
+
+\titlebanner{Draft}
+\preprintfooter{Modular Deductive Verification of Multiprocessor Hardware Designs}
+
+\input{Definitions}
+\input{Title}
+\input{Files}
+\input{Bibliography}
+
+%=========================================================================
+%  Appendix
+%=========================================================================
+
+%\pagebreak \small
+
+\begin{appendix}
+\input{Appendix}
+\end{appendix}
+
+\end{document}

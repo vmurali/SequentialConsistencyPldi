@@ -1,0 +1,48 @@
+- Use of LTS for describing hardware, and synthesis from LTS:
+LTS was chosen because it's a concise way of describing transition systems.
+Moreover, Bluespec System Verilog (BSV) takes a desciption of a system written
+as an LTS and translates that into efficient hardware. There is a BSV
+implementation of the paper's cache LTS shown in Figure 10 (Fast and
+cycle-accurate modeling of a multicore processor. ISPASS-2012).
+
+- Why is store-atomicity ubiquitous:
+Eventhough systems implement memory models weaker than sequential consistency,
+the notion of store-atomicity is ubiquitous in all systems, ie, any real
+multiprocessor system can be decomposed into multiple parts, one of which is
+the atomic-memory part, which is implemented using a hierarchy of coherent
+caches.
+
+The IRIW behavior can be explained as follows: Consider a
+system containing several in-order cores, each core connected to what we call
+as ''non-coherent cache'' NCC. All NCCs are connected to a global atomic
+memory. An NCC can read any location from memory and store it, and the core can
+use the data from NCC, if present. But stores from the core always happens to the
+global memory, and the NCC can discard the location anytime. So, in Reviewer A's example,
+first NCC of core 4 reads in the location x. Now the sequence of operations is
+Core 1: Wx1 (into global memory)
+Core 2: Rx (gets 1 from global memory)
+        Ry (gets 0 from initial value)
+Core 3: Wy1 (into global memory)
+Core 4: Ry (gets 1 from global memory)
+        Rx (gets 0 from NCC)
+
+Similarly, the second example about store buffers can be explained using a
+store buffer instead of the NCC, into which stores are written, and loads can
+read from. The sequence for this to explain the behavior is:
+Core 1: Wx1 (into store buffer, not to memory)
+        Ry (read from memory 0)
+Core 2: Wy1 (into store buffer, not to memory)
+        Rx (read from memory 0)
+
+This global memory is, in reality, implemented using cache coherent protocols.
+The separation of coherent caches implementing atomic memory semantics and the
+rest of the system is an important contribution of this paper; a version of
+this was presented in Arvind (Memory Model = Instruction Reordering + Store
+Atomicity, ISCA 2006), and this paper gives a formal proof of this separation, while
+extending this idea to speculating systems.
+
+We do acknowledge that more work is to be done to formally show exactly how
+weaker memory models can be modeled.
+
+- Choice of SC and performance of our model:
+

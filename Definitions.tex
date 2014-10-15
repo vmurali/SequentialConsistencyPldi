@@ -1,0 +1,196 @@
+
+\newcommand{\ndave}[1]{\color{blue}{#1: ---- \textbf{Nirav}}}
+\newcommand{\murali}[1]{\xxx{#1: ---- \textbf{Murali}}}
+\newcommand{\adam}[1]{\xxx{#1: ---- \textbf{Adam}}}
+
+%\spnewtheorem{thm}{Theorem}{\bfseries}{\normalfont}
+%\spnewtheorem{defn}{Definition}{\bfseries}{\normalfont}
+%\spnewtheorem{inv}{Invariant}{\bfseries}{\normalfont}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{defn}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{inv}{Invariant}
+
+\newcommand{\qs}{\mathit{qs}}
+\newcommand{\rs}{\mathit{rs}}
+\newcommand{\noSpec}{\mathsf{noSpec}}
+\newcommand{\f}{\text{noSpec}}
+\newcommand{\g}{\text{store}}
+\newcommand{\Id}{\mathit{Id}}
+\newcommand{\trans}[3]{(#2) \xrightarrow[\text{#1}]{} (#3) }
+\newcommand{\transn}[3]{(#2) \xrightarrow[\text{#1}]{}\\ (#3) }
+\newcommand{\transs}[3]{(#2) \xrightarrow[\text{#1}]{}^{*} (#3) }
+\newcommand{\transsn}[3]{(#2) \xrightarrow[\text{#1}]{}^{*}\\ (#3) }
+
+\newcommand{\smulti}[2]{#2^{#1}}
+\newcommand{\multi}[2]{(\{1\ldots #1\}\rightarrow #2)}
+\newcommand{\multit}[2]{\xrightarrow[\multi{#1}{#2}]{}}
+
+\newcommand{\toM}{\mathsf{ToM}}
+\newcommand{\toP}{\mathsf{ToP}}
+\newcommand{\iom}[5]{(#2) \xrightarrow[\text{#1}]{(#4, #5)} (#3) }
+\newcommand{\ioe}[3]{(#2) \xrightarrow[\text{#1}]{} (#3) }
+\newcommand{\ioxe}[3]{\left(\begin{array}{l}#2\end{array}\right) 
+\xrightarrow[\text{#1}]{} \left(\begin{array}{l}#3\end{array}\right) }
+\newcommand{\ioen}[3]{(#2) \xrightarrow[\text{#1}]{\epsilon}\\ (#3) }
+\newcommand{\ioens}[3]{(#2) {\xrightarrow[\text{#1}]{\epsilon}}^{*} (#3) }
+\newcommand{\ioensn}[3]{(#2) {\xrightarrow[\text{#1}]{\epsilon}}^{*}\\ (#3) }
+\newcommand{\ior}[4]{(#2) \xrightarrow[\text{#1}]{\text{ToM} (#4)} (#3) }
+\newcommand{\iol}[4]{(#2) \xrightarrow[\text{#1}]{\text{ToP} (#4)} (#3) }
+\newcommand{\iorn}[5]{(#2) \xrightarrow[\text{#1}]{#4, \text{ToM} (#5)} (#3) }
+\newcommand{\ioln}[5]{(#2) \xrightarrow[\text{#1}]{#4, \text{ToP} (#5)} (#3) }
+\newcommand{\io}[4]{(#2) \xrightarrow[\text{#1}]{#4} (#3) }
+\newcommand{\ios}[4]{(#2) {\xrightarrow[\text{#1}]{#4}}^{*} (#3) }
+
+%\newcommand{\iom}[5]{(#2, (#4)) \xrightarrow[\text{#1}]{} (#3, (#5)) }
+%\newcommand{\ioe}[3]{(#2, \epsilon) \xrightarrow[\text{#1}]{} (#3, \epsilon) }
+%\newcommand{\ioen}[3]{(#2, \epsilon) \xrightarrow[\text{#1}]{}\\ (#3, \epsilon) }
+%\newcommand{\ioens}[3]{(#2, \epsilon) \xrightarrow[\text{#1}]{}^{*} (#3, \epsilon) }
+%\newcommand{\ioensn}[3]{(#2, \epsilon) \xrightarrow[\text{#1}]{}^{*}\\ (#3, \epsilon) }
+%\newcommand{\ior}[4]{(#2, \epsilon) \xrightarrow[\text{#1}]{} (#3, (#4)) }
+%\newcommand{\iol}[4]{(#2, (#4)) \xrightarrow[\text{#1}]{} (#3, \epsilon) }
+%\newcommand{\io}[4]{(#2, h) \xrightarrow[\text{#1}]{} (#3, (#4) \coloncolon h) }
+
+\newcommand{\dt}{\mathit{d}}
+\newcommand{\ch}{\mathit{ch}}
+\newcommand{\s}{\mathit{cs}}
+\newcommand{\dst}{\mathit{dir}}
+\newcommand{\wt}{\mathit{w}}
+\newcommand{\wts}{\mathit{wts}}
+\newcommand{\dwt}{\mathit{dirw}}
+\newcommand{\dwts}{\mathit{dwts}}
+\newcommand{\compat}{\mathsf{dirCompat}}
+
+\newcommand{\Set}[1]{\text{Set}(#1)}
+\newcommand{\id}{\mathit{id}}
+\newcommand{\inp}{\mathit{ins}}
+\newcommand{\outp}{\mathit{outs}}
+\newcommand{\un}{\mathit{Simp}}
+\newcommand{\stream}[1]{\mathit{Stream}(#1)}
+\newcommand{\mem}{\text{Mem}}
+\newcommand{\cache}{\text{Cache}}
+\newcommand{\pc}{\mathit{pc}}
+\newcommand{\mult}{\text{Mult}}
+\newcommand{\simps}{\mathit{Simps}}
+\newcommand{\specs}{\mathit{Specs}}
+\newcommand{\dcs}{\mathit{Decs}}
+\newcommand{\dce}{\mathit{Dec}}
+\newcommand{\spe}{\mathit{Spec}}
+\newcommand{\wait}{\mathit{wait}}
+\newcommand{\sta}{\mathit{state}}
+\newcommand{\ptm}{\mathit{p2m}}
+\newcommand{\mtp}{\mathit{m2p}}
+\newcommand{\rob}{\mathit{rob}}
+\newcommand{\ppc}{\mathit{bp}}
+\newcommand{\curPpc}{\mathsf{curPpc}}
+\newcommand{\nextPpc}{\mathsf{nextPpc}}
+\newcommand{\add}{\mathsf{insert}}
+\newcommand{\compute}{\mathsf{compute}}
+\newcommand{\retire}{\mathsf{retire}}
+\newcommand{\commit}{\mathsf{commit}}
+\newcommand{\comm}{\text{Com}}
+
+\newcommand{\dec}{\mathsf{dec}}
+\newcommand{\exec}{\mathsf{exec}}
+\newcommand{\st}{\mathsf{St}}
+\newcommand{\nm}{\mathsf{Nm}}
+\newcommand{\req}{\mathsf{Rq}}
+\newcommand{\rep}{\mathsf{Rp}}
+\newcommand{\Tag}{\mathsf{Tag}}
+
+\newcommand{\proc}{\mathsf{Proc}}
+\newcommand{\prog}{\mathsf{prog}}
+\newcommand{\ld}{\mathsf{Ld}}
+\newcommand{\upd}{\mathsf{upd}}
+\newcommand{\updM}{\mathsf{updM}}
+\newcommand{\abort}{\mathsf{Abort}}
+\newcommand{\get}{\mathsf{get}}
+\newcommand{\setBp}{\mathsf{setNextPpc}}
+\newcommand{\set}{\mathsf{set}}
+\newcommand{\spc}{\mathsf{Spec}}
+\newcommand{\Next}{\mathsf{next}}
+
+\newcommand{\toProc}{\mathsf{toProc}}
+\newcommand{\fromProc}{\mathsf{fromProc}}
+%\spnewtheorem*{adefn}{Definition}
+%\spnewtheorem{thm}{Theorem}
+%\spnewtheorem*{athm}{Definition}
+\newcommand{\teq}{\mathsftt{=}}
+\newcommand{\eg}{\textit{e.g.,}}
+\newcommand{\etc}{\textit{etc.}}
+\newcommand{\ie}{\textit{i.e.,}}
+\newcommand{\etal}{\textit{et al.}}
+\newcommand{\viz}{\textit{viz},} 
+\newcommand{\xxx}[1]{{\color{red}{#1}}}
+%
+\newcommand{\Ld}{\mathsftt{Load}}
+\newcommand{\St}{\mathsftt{Store}}
+\newcommand{\fulllabel}[1]{\label{#1}\textit{#1}}
+\newcommand{\Ow}{\textit{O}}
+\newcommand{\sibling}{\textit{sibling}}
+\newcommand{\clean}{\textit{clean}}
+\newcommand{\emp}{\(\epsilon\)}
+\newcommand{\getReq}{\textit{getReq}}
+\newcommand{\match}{\mathsftt{match }}
+\newcommand{\with}{\mathsftt{ with}}
+\newcommand{\myend}{\mathsftt{end}}
+\newcommand{\mylet}{\mathsftt{let }}
+\newcommand{\myin}{\mathsftt{ in }}
+\newcommand{\myif}{\mathsftt{if }}
+\newcommand{\mythen}{\mathsftt{ then }}
+\newcommand{\myelse}{\mathsftt{ else }}
+\newcommand{\leaf}{\textit{leaf}}
+\newcommand{\pos}{\textit{seqNum}}
+\newcommand{\resp}{\rep}
+\newcommand{\addr}{\textit{addr}}
+\newcommand{\tme}{\textit{time}}
+\newcommand{\initData}{\textit{initData}}
+\newcommand{\fst}{\mathsftt{fst}}
+\newcommand{\snd}{\mathsftt{snd}}
+\newcommand{\Request}{\textit{ProcReq}}
+\newcommand{\Response}{\textit{ProcResp}}
+\newcommand{\reqFn}{\textit{reqFn}}
+\newcommand{\respFn}{\textit{respFn}}
+\newcommand{\addrQ}{\textit{addrP}}
+\newcommand{\desc}{\textit{desc}}
+\newcommand{\typ}{\textit{type}}
+\newcommand{\dataQ}{\textit{dataP}}
+\newcommand{\labelR}{\textit{labelR}}
+\newcommand{\procR}{\textit{procR}}
+\newcommand{\idxR}{\textit{indexR}}
+\newcommand{\dataR}{\textit{dataR}}
+\newcommand{\timeR}{\textit{timeR}}
+\newcommand{\from}{\textit{from}}
+\newcommand{\myto}{\textit{to}}
+\newcommand{\data}{\textit{data}}
+\newcommand{\Req}{\textit{Req}}
+\newcommand{\Resp}{\textit{Resp}}
+\newcommand{\Mo}{\textit{M}}
+\newcommand{\Sh}{\textit{S}}
+\newcommand{\In}{\textit{I}}
+\newcommand{\cpReq}{\textit{c2pReq}}
+\newcommand{\cpResp}{\textit{c2pResp}}
+\newcommand{\ptc}{\textit{p2c}}
+\newcommand{\False}{\mathit{False}}
+\newcommand{\True}{\mathit{True}}
+\newcommand{\Reqcp}{\textit{Req-c2p}}
+\newcommand{\Respcp}{\textit{Resp-c2p}}
+\newcommand{\Mpc}{\textit{Mesg-p2c}}
+\newcommand{\state}{\textit{state}}
+\newcommand{\parent}{\textit{parent}}
+\newcommand{\dstate}{\textit{dstate}}
+\newcommand{\waitS}{\textit{waitS}}
+\newcommand{\dwait}{\textit{dwait}}
+\newcommand{\dwaitS}{\textit{dwaitS}}
+\newcommand{\enq}{\mathsf{enq}}
+\newcommand{\deq}{\mathsf{deq}}
+\newcommand{\pop}{\mathsf{pop}}
+\newcommand{\avail}{\textit{avail}}
+\newcommand{\first}{\mathsf{first}}
+\newcommand{\ite}[3]{\mathsf{if}(#1) \; \mathsf{then} \; #2 \; \mathsf{else} \; #3}
+
+%\mathlig{@->}{\rightarrow}
+%\mathlig{@<}{\langle}
+%\mathlig{@>}{\rangle}
+%\mathlig{@|->}{\mapsto}

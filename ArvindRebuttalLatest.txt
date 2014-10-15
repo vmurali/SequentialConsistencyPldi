@@ -1,0 +1,94 @@
+We are thankful to the reviewers for their valuable and in-depth comments. We
+hope the following clarifications would make them more enthusiastic about
+advocating its publication in POPL.
+
+1. Store-atomicity is ubiquitous: Even though systems implement memory models
+weaker than sequential consistency (SC), real multiprocessor systems can be
+decomposed into multiple parts, one of which is an atomic-memory. In the
+simplest form, atomic memory is just a monolithic multiported global memory
+(GM), but more commonly, it is implemented using a hierarchy of coherent
+caches. Weak memory model behaviors can be understood in terms of local storage
+(LS) between each processor and GM. If the processor memory interface is drawn
+such that LS is part of GM, then GM will not behave like an atomic store. By
+making LS part of the processor model, we assert that all the nuances of the
+known weak memory models can be modeled as part of the processor description.
+We address the two examples cited by Reviewer A at the end. The proof of
+correctness of cache coherence is completely orthogonal to the semantics of the
+processor side and hence the memory model issues.
+
+2. Choice of SC: The processor description in Figure 7 implements SC. This
+description will have to be modified for weaker memory models, but the
+correctness criteria for ROB in Figure 6 will remain the same. For example, one
+may not even issue a verification load or issue it sooner. We acknowledge that
+more work needs to be done to formally model weaker memory models, including a
+treatment of fences.
+
+3. SC performance issues: In the current architecture literature, it's hotly
+debated whether weaker memory models can provide better performance than
+properly implemented SC. Our SC processor in Figure 7 has high performance
+because it is not restricted to sustain only a fixed number of (speculative)
+loads in flight. Furthermore, instructions dependent upon these loads can be
+processed out of order. A weaker memory model cannot improve upon this
+important aspect. The main restriction in our model is that a processor can
+issue only one store or one verification load which may be improvable by a
+weaker model.
+
+4. LTS for describing and synthesizing hardware:  A Bluespec program is a
+transition system and experience has shown that Bluespec descriptions can be
+both concise and generate efficient hardware. The cache coherence protocol of
+Figure 10 was initially implemented and synthesized into efficient hardware
+from Bluespec (Khan et al ISPASS-2012, see also Dave et al Memocode 2006). A
+Bluespec program can be transliterated into an LTS in Coq; currently, this is
+done manually.
+
+The processor LTS in Figure 7 has an abstract specification of the ROB and
+branch predictor with a clearly stated correctness criteria. To derive the
+actual hardware, the LTSes for these components have to be specified in much
+greater detail. Our ISA is general enough to encompass any CISC ISA including
+x86. However the complexity of the detailed LTSes for ROB etc will depend upon
+the specific ISA.
+
+5. Reusability of our Cache Coherence proof: MOSI, MOESI, Firefly etc. are very
+similar to MSI protocol, though their transition systems will be different. The
+way our proof is organized, we will have to prove Lemmas 5 and 6, and
+Invariants 2, 3, and 4 for each of these protocols; the rest of the proof will
+remain unchanged. In the current version, these lemmas and invariants account
+for x% of the proof. Also all these lemmas deal with less than 4 states and
+thus can be proven easily using model checking.
+
+------- 
+Examples For Reviewer A
+
+For explaining Reviewer A's IRIW behavior, consider a system containing several
+in-order cores, each core connected to what we call as ''non-coherent cache''
+NCC. All NCCs are connected to a global atomic memory. An NCC can read any
+location from memory and store it, and the core can use the data from NCC, if
+present. But stores from the core always happen to the global memory, and the
+NCC can discard the location that it has, anytime. So, in the example,
+initially, NCC of core 4 reads in the location x. Now the sequence of
+operations is
+Core 1: Wx1 (into global memory)
+Core 2: Rx (gets 1 from global memory)
+        Ry (gets 0 from global memory, initial value)
+Core 3: Wy1 (into global memory)
+Core 4: Ry (gets 1 from global memory)
+        Rx (gets 0 from NCC)
+
+Similarly, the second example about store buffers can be explained using a
+store buffer instead of the NCC, into which stores are written, and loads can
+read from. The sequence for this to explain the behavior is:
+Core 1: Wx1 (into store buffer, not to memory)
+        Ry (read from memory 0)
+Core 2: Wy1 (into store buffer, not to memory)
+        Rx (read from memory 0)
+
+This global memory is, in reality, implemented using cache coherent protocols.
+The separation of coherent caches implementing atomic memory semantics and the
+rest of the system is an important contribution of this paper; a version of
+this was presented in Arvind (Memory Model = Instruction Reordering + Store
+Atomicity, ISCA 2006), and this paper gives a formal proof of this separation,
+while extending this idea to speculating systems.
+
+
+
+

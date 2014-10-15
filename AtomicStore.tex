@@ -1,0 +1,27 @@
+\section{Enabling Practical Memory Subsystems: Atomic Store}
+
+The behavior of a memory system realizing different memory models or
+interfacing with different levels speculation from the processors would be
+dramatically different. For instance, a memory system realizing Total Store
+Order allows significantly the more memory requests to be in flight than in a
+sequential consistent system. As such one might expect that there should be
+relatively little sharing between designs.
+
+
+
+
+%% At a high-level, the physical interface of memory is fairly consistent
+%% regardless of the memory model or instruction execution scheme. The processor
+%% makes requests (loads and stores) and gets responses back from the
+%% memory. 
+
+
+Memory subsystems are designed to allow parallel operation 
+
+The most natural interface for a memory subsystem is to expect the interface to 
+
+
+
+Memory needs caches, highly pipelined. All worries happen at a single address. No ordering guarantees between two different addresses. This is a natural representation because. 
+
+Clearly this model is not SC. However, it is highly atuned to high-performance results.

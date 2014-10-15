@@ -1,0 +1,26 @@
+\section{Conclusions and Future Work}\label{sec:conclusion}
+
+In this paper we developed a modular proof structure for distributed
+shared-memory hardware systems, corresponding naturally to the modularization seen in
+hardware implementation. This makes it feasible for verification of the
+system to be carried out throughout the implementation process without
+disrupting the architect's design process.
+
+While we provide a clean interface for an SC system, we are working on
+encompassing relaxed memory models commonly used in a modern processors.
+
+Another direction that bears investigation is extending our results to
+cover finer-grained architectural details.
+However, the behaviors of microarchitectural structures,
+\ie{} register renaming structures \etc{}, vary significantly across
+implementations and can be quite complex. It is not clear if a
+practical modularization can be found that strikes a balance between flexibility and
+simplicity.
+
+Finally, to make full use of our results for implementations, hardware
+descriptions must be translated to and from our labeled transition system
+representation. As we implied in the discussion of our cache-coherence system,
+Bluespec SystemVerilog's rule-based representation is very close to LTSes and
+in some cases can be transliterated directly.  There has been work to generate
+circuits from Bluespec-like descriptions in Coq \cite{Braibant2013Fesi} and we
+are pursuing further automatization.

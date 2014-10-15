@@ -1,0 +1,81 @@
+\section{Architectural Implications}\label{sec:implications}
+
+We have demonstrated a high-performance implementation of SC with
+a distributed shared-memory system and speculative processors. However, here
+are some of the concerns that an architect of a high-performance multi-processor
+may have about our design:
+
+\begin{enumerate}
+\item Splitting each load into a speculative load and a verification
+load increases the number of requests to the L1 cache. While verification loads
+are extremely likely to hit in a cache and therefore have low latency,
+nevertheless they fundamentally increase cache pressure on L1. Can we
+eliminate some of this verification traffic?
+
+\item The correctness of our model with respect to sequential consistency
+crucially relies on the fact that a commit operation for only one load or store
+can be active per processor at a time. Can we pipeline commit requests, \ie{}
+have several of them issued at a time?
+
+\item In some designs, a processor does not receive an explicit acknowledgement
+for a store operation. Intuitively the store acknowledgment means that a store
+has been placed in a global order of all stores being issued to the memory, and
+this condition can potentially be determined even before the data is stored in
+any cache. Can this optimization be incorporated in our framework?
+\end{enumerate}
+
+A trick architects use to reduce the need for verification loads is to use the
+invalidation signal received by L1 (\eg{} in the MIPS R10000 processor~\cite{yeager1996mips}) 
+to invalidate speculative loads for that address in the reorder buffer. 
+The reason this works is that such a signal is an
+indicator of the fact that another processor has changed the value of that
+address before the load has been committed. This scheme is simultaneously
+incomplete, in that it does not alleviate the need for verification loads in the
+context of address speculation; and conservative, in that it invalidates loads
+whose values may not have changed in spite of a write into the corresponding
+cache line. Incorporating this solution will require a very small change in our
+processor interface, \viz{} that of including invalidation signals from L1
+caches.
+
+The solutions for the remaining two issues require making some extra
+assumptions about the memory interface. These assumptions can be enforced by
+having an extra module (Load Store Buffer, LSB) in front of the memory we have
+presented. The processor can issue a commit store request to the LSB and
+assume that it receives the acknowledgment straightaway, continuing to issue
+further commit requests to the LSB. A verification load request in the LSB
+still has to receive a response from L1. It will be sent to L1 only after all
+previous commit store requests in the LSB have been sent to L1. The formal
+proof of why this scheme works is beyond the scope of this paper.
+
+A more aggressive solution to maintaining the strict load-store orderings
+defined by SC is to change the memory model itself. Indeed, many processors use
+a more relaxed memory model; for instance, Intel x86 and Sparc use
+TSO~\cite{intel64and,weaver1994sparc}, ARM and PowerPC both use their own
+relaxed memory models~\cite{grisenthwaite2009arm,power2009version}.
+Two things need to be noted about all relaxed memory models. First, every SC
+behavior is
+always a legal behavior in a relaxed model, making our speculating processor
+correct in such a setting. Second, the ISA must be augmented with explicit
+memory fence instructions that prevent reorderings of memory instructions
+across fences, if the application demands preserving the order. Adding explicit memory fences is generally slower than implicitly
+having the restrictions within the memory model, but the belief is that
+explicit fences are only needed sparingly in practice and on the whole will
+give better performance than the equivalent SC system.
+%\murali{Starting from "two things", the rest seems out of place}
+
+In order to use our methodology for systems with relaxed memory models, we
+would have to provide an LTS description for each model. One can potentially
+adjust our processor model accordingly (for
+instance, more aggressive issue of even verification loads) and add the LSB described
+earlier. The details are not obvious, however. Alglave
+\etal{}~\cite{alglave2012formal,alglave2014herding} provide a framework for 
+axiomatic specification of memory models.  Axioms regarding relaxed memory
+models have also been proposed through analysis of empirically observed behavior
+of certain ``litmus tests''~\cite{mador2012axiomatic,sarkar2012synchronising}.
+There has also been work in providing operational semantics that describe the
+observed behavior of real hardware~\cite{sarkar2011understanding}, and proving
+the equivalence between the axiomatic specification of TSO and operational
+semantics of a simple in-order processor with a store buffer and instantaneous
+global memory~\cite{x86tsocacm10}. However, others have suggested
+simplifying memory models, in other words to implement SC in real
+hardware~\cite{hill1998multiprocessors}.

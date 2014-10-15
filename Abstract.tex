@@ -1,0 +1,18 @@
+We provide a modular proof of a high-performance implementation of Lamport's
+sequential consistency in a system with distributed memory. Unlike
+Lamport's reference operational model, a high-performance implementation
+processes many memory accesses concurrently. Processors employ
+\emph{speculative execution} to generate many concurrent loads to pipeline the
+memory system effectively. We define what it means for a speculative processor
+to be correct independently of the memory system. We then define a memory
+system with caches and show that our cache-coherence protocol preserves
+\emph{store atomicity} (independently of the processor), a property that all
+reasonable memories have in common.  We offer the first formal proof that when
+an atomic memory is connected to $n$ speculative processors, the system as a
+whole is sequentially consistent. The proof is composed modularly from proofs
+of the individual components. Additionally, the cache-coherent memory we
+present in this paper is the first fully verified system that supports
+arbitrary cache hierarchies. We describe all our components using labeled
+transition systems and machine-verify all our proofs using the Coq proof
+assistant.
+

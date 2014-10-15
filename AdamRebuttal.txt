@@ -1,0 +1,55 @@
+Reviewer A:
+
+We want to emphasize why the result about sequential consistency is important.
+Here we use "sequential consistency" as a name for the LTS in Figure 3, which
+actually completely specifies the observable behavior of a full multiprocessor
+system.  Thus, by proving a relationship with that LTS, we are proving what is
+perhaps the most natural version of "full functional correctness" in this
+domain.
+
+Regarding store atomicity and weak memory models: we define store atomicity as
+a property of main memory only, which is quite complex in its own right, with
+hierarchies of caches, etc.  There are additional cache-like elements attached
+to the individual processors, called by names like "store buffer".  If we
+consider these extra buffers as part of the memory, then you're certainly right
+that weak memory models don't guarantee atomic stores. However, weak-memory
+systems can be built on top of the same store-atomic main memory interface we
+give in the paper; it's only the processor-local store buffers that introduce
+weaker behavior.
+
+We agree, though, that we should include less speculation on adaptation to weak
+memory; and thanks for the bug reports on our discussion of related work.
+
+Reviewer B:
+
+We agree that the underlying LTS proof techniques are not new.  We view our
+contribution as more of demonstrating a new application in an area that badly
+needs techniques at this level of modularity.
+
+For both Reviewers B and C:
+
+Sorry for not explaining more of our rationale for considering these LTSes as
+practical hardware descriptions.  The cache-coherence algorithm, for instance,
+is directly transliterated out of [fill in self-contained paper references
+here].  We would like to have an automatic translation from Bluespec code, but
+we think the two abstraction levels are close enough that it is reasonable to
+draw conclusions from our manual translations.
+
+Reviewer C:
+
+Our main theorem uses termination as an arbitrary property that is sufficient
+to make the theorem interesting but still easily stated. That's for the same
+reason that many problems in computability theory are equivalent to the halting
+problem in suitable senses.
+
+Reviewer D:
+
+We apologize for not getting across the sense of the main theorem. Our
+optimized architecture actually does fulfill the SC spec, without any side
+conditions on programs!  The explanation of why is not trivial, and the proof
+carried out throughout the paper justifies the claim.
+
+We also view simplicity of the proof outline (at the level given in the paper)
+as a feature, not a bug, of the approach. The actual proof in Coq is much
+longer and more detailed (about 10,000 lines).
+
