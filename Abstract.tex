@@ -1,20 +1,20 @@
-We provide a framework for modular verification of multi-processor hardware
-systems with respect to memory model specification. In this framework, we make
-use of a key observation that eventhough different memory models have different
-overall system behaviors, they all share a coherent cache hierarchy. We prove
-that this coherent cache hierarchy implements the \emph{store atomicity}
-property, which makes it behave like an atomic instantaneous memory with
-respect to the rest of the system. We further modularize the proof by defining
-what is meant for a processor to be correct independently of the memory system.
-As a concrete instance of our framework, we walk through a modular proof of
-high-performance multi-processor implementation of Lamport's Sequential
-Consistency model. The processors employ \emph{speculative execution} to
-generate many concurrent loads to the memory sub-system, while obeying our
-correctness criteria. We offer the first formal proof that when an atomic
-memory is connected to $n$ speculative processors, the system as a whole is
-sequentially consistent.  Additionally, the cache-coherent memory we present in
-this paper is the first fully verified system that supports arbitrary cache
-hierarchies. Our framework involves describing all our components using labeled
-transition systems and we machine-verify all our proofs using the Coq proof
-assistant.
-
+We present a new framework for modular verification of hardware designs
+in the style of the Bluespec language.  That is, we formalize the idea of
+components in a hardware design, with well-defined input and output channels;
+and we show how to specify and verify components individually, with
+machine-checked proofs in the Coq proof assistant.  In doing so, we import
+to the world of hardware those modular reasoning principles that are
+well-known in software verification.  As a demonstration, we verify a
+fairly realistic implementation of a multicore shared-memory system.  The
+main modularity split is between a memory-system component and a processor
+component.  Both include nontrivial optimizations, with the memory system
+employing an arbitrary hierarchy of cache nodes that communicate with each
+other concurrently, and with the processor doing speculative execution of
+many concurrent read operations.  Nonetheless, we prove that the combined
+system implements sequential consistency.  One interesting aspect of the proof
+is that the memory component is well-specified to be reused for systems
+implementing a variety of weak memory models.  To our knowledge, our proof
+of that memory system is the first machine verification of a cache-coherence
+protocol parameterized over an arbitrary cache hierarchy, and our full-system
+proof is the first machine verification of sequential consistency for a
+multicore hardware design that includes memory and processors.
