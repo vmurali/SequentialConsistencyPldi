@@ -23,14 +23,16 @@ a set $X$ to have an extra ``halt'' element $H$. We also implicitly consider
 each LTS to be associated with an \emph{initial} state in $\mathcal S$.
 \end{defn}
 
-For LTS $A$, we write $\io{A}{s}{s'}{\ell}$ as shorthand for $(s, \ell, s') \in
-A$, and we write $A_0$ for $A$'s initial state. The intuition is that $A$ is
-one process within a concurrent system. The label $\ell$ from set $\mathcal L$
-of labels is produced when $A$ participates in some IO exchange with another
-process; otherwise it is an empty or ``silent'' label $\epsilon$. Note that the
-IO exchange can either be input, output or both, and its interpretation is
-dependent on the context. As a shorthand, we sometimes omit labels for
-$\epsilon$ steps.
+For LTS $A$, we write $\io{A}{s}{s'}{\ell}$ as shorthand for $(s,
+\ell, s') \in A$, and we write $A_0$ for $A$'s initial state. The
+intuition is that $A$ is one process within a concurrent system. The
+label $\ell$ from set $\mathcal L$ of labels is produced when $A$
+participates in some IO exchange with another process; otherwise it is
+an empty or ``silent'' label $\epsilon$.  As a shorthand, we sometimes
+omit labels for $\epsilon$ steps.  Note that the IO exchange can be
+input, output, or both, and its interpretation is dependent on the
+context.
+
 
 \subsection{Basic Constructions on LTSes}
 
@@ -115,7 +117,7 @@ one another. We will only need an asymmetrical notion of compatibility:
 For some label domain $\mathcal L$, let $f : \mathcal L \to \mathcal L^\epsilon$ 
 be a function that is able to replace labels with alternative
 labels, or erase them altogether. Let LTSes $A$ and $B$ have the same label
-sets $\mathcal L$. We say that
+set $\mathcal L$. We say that
 \textbf{$A$ trace-refines $B$ w.r.t. $f$}, or $A \sqsubseteq_f B$, if:
 \begin{multline*}
 \forall s_A, \eta. \; \io{$A^{*}$}{A_0}{s_A}{\eta} \Rightarrow \exists s_B. \;
@@ -189,7 +191,7 @@ system $A+B$ will be sound with respect to $A'+B'$.
 \label{Ref}
 \end{figure}
 
-\section{Decomposing a multi-processor system}
+\section{Decomposing a Multi-Processor System}
 \label{sec:store-atomicity}
 
 \begin{figure}
@@ -199,13 +201,13 @@ system $A+B$ will be sound with respect to $A'+B'$.
 \label{zoom}
 \end{figure}
 
-Any multi-processor component can be divided into 3 components as shown in
+Most any conventional multi-processor system can be divided into 3 components as shown in
 Figure \ref{zoom}. 
 We show the top-level system design at top right, and we zoom in on boxes standing for the
 memory system and a single processor ($P_i$).
 The processor component $P_i$ can be implemented in a
-variety of ways, from a simple in-order issue, to a complex out-of-order issue
-core, with aggressive speculation. The memory component is normally implemented
+variety of ways, from literal execution of instructions in program order, to complex speculation
+with instructions run simultaneously to exploit parallelism. The memory component is normally implemented
 using a hierarchy of caches, in order to increase the performance of the
 overall system, since the latency of accessing a memory directly is very slow
 compared to accessing a much smaller cache. The component between each
@@ -231,18 +233,30 @@ the processor $P_i$ they are connected to.
 \label{$M_m$}
 \end{figure}
 
-Independent of the memory models, the memory component always implements the
-\emph{store atomicity} property. This property can be understood using the
-behavior defined by the operational semantics of Figure \ref{$M_m$}. The
-different behaviors permitted by different memory models arise merely because
-of the (1) the reordering in the issue of memory instructions by the core $P_i$
-if it can issue instructions out-of-order and (2) the properties of the local
-buffers $B_i$ connected to each processor $P_i$. For instance, if $B_i$ was a
-store buffer, into which the stores from an in-order processor $P_i$ that are
-``committed'' are enqueued, and if any ``subsequent'' load from the same
-processor $P_i$ reads the latest value from the store buffer, then one can
-establish that such a multi-processor system implements the TSO
-\cite{x86tsocacm10} memory model.
+Popular instruction set architectures do not guarantee sequential
+consistency.  That is, their behavior makes it unsound to imagine that
+the different processors of a shared-memory system are running
+according to simple interleaving, where each instruction executes
+atomically.  However, we want to emphasize that, in every weak-memory
+system we are aware of, \emph{the main memory still exposes atomic
+  loads and stores}!  The weaker semantics arises only because of (1)
+reordering of memory instructions by the core $P_i$ and/or (2) the
+properties of the local buffers $B_i$ connected to each processor
+$P_i$.  For instance, if $B_i$ were a store buffer, into which the
+committed stores from an in-order processor $P_i$ are enqueued, and if
+any ``subsequent'' load from the same processor $P_i$ reads the latest
+value from the store buffer, then one can establish that such a
+multi-processor system implements the TSO~\cite{x86tsocacm10} memory
+model.
+
+So, we focus on this opportunity to simplify proof decomposition.  We
+will prove that our main memory component satisfies an intuitive
+\emph{store atomicity} property.  Despite the potential red herring of
+the word ``atomicity,'' this specification is appropriate even for
+implementation of weaker memory models than SC.  Store atomicity can
+be understood via the operational semantics of Figure \ref{$M_m$},
+describing an LTS that receives load and store requests ($\ld$ and
+$\st$) from processors and sends back load responses ($\ld\resp$).
 
 The memory component is composed of a \emph{hierarchy of caches}, where each
 cache node (labeled like ``L1,'' ``L2,'' etc.) communicates only with its
@@ -251,9 +265,9 @@ do our best to satisfy all memory requests, to avoid the latency of a
 round-trip with main memory.  With an L1 cache miss, we may still find a hit in
 a parent cache below the level of main memory, realizing a smaller but still
 significant speedup.  Therefore it is the responsibility of the hierarchy of
-caches, which form the memory sub-component, to implement the store atomicity
+caches, which forms the memory sub-component, to implement the store atomicity
 property. In fact, as we will prove in Section \ref{sec:cc}, the purpose of the
-cache coherence protocol is to establish this invariant for the memory
+cache-coherence protocol is to establish this invariant for the memory
 sub-component.  Concretely, we have verified a \emph{directory-based} protocol
 for coordinating an arbitrary tree of caches, where each node stores a
 conservative approximation of its children's states.
@@ -261,11 +275,11 @@ conservative approximation of its children's states.
 As an instance of the above decomposition, we will prove that a multi-processor
 system with no local buffering in between the processor and the memory
 components indeed implements sequential consistency. We implement a highly
-speculative processor which executes instructions and issues loads out of
+speculative processor that executes instructions and issues loads out of
 order, but commits instructions (once some ``verification'' is done) in order.
 
-The processor itself can be decomposed into several components. In the zoomed
-in version of Figure \ref{zoom}, we show a highly speculative, out-of-order
+The processor itself can be decomposed into several components. In the zoomed-in
+version of Figure \ref{zoom}, we show a highly speculative, out-of-order
 issue processor. We have the normal architectural state, such as values of
 registers.  Our proofs are generic over \emph{a family of instruction set
 architectures}, with parameters for opcode sets and functions for executing
@@ -281,11 +295,7 @@ the system of Figure~\ref{zoom}. As we will explain later, $P_\text{so}$
 represents the speculative out-of-order processor, $M_c$ the cache memory,
 $M_m$ the simple memory, $P_\text{ref}$ a simple decoupled processor, and
 SC the simple composition of P$^n_\text{ref}+ M_m$ executing each
-instruction atomically thus implementing sequential consistency. Notation
-$A^n$ is for $n$ copies of system $A$ running in parallel.
-$\sqsubseteq$ is a refinement operator, capturing a suitable notion of when
-one system implements another.  We go into more detail on the symbols from
-the figure in the rest of the paper.
+instruction atomically, thus implementing sequential consistency.
 
 Our current framework establishes theorems of the form ``if system $A$ has a run
 with some particular observable behavior, then system $B$ also has a run with
