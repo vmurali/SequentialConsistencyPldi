@@ -314,8 +314,8 @@ work.
 
 Our final theorem in this paper establishes that a particular complex hardware
 system implements sequential consistency (SC) properly.  We state the theorem
-in terms of the trace refinement relation $\sqsubseteq$ developed in the prior
-section.  Therefore, we need to define an LTS embodying SC.  The simpler this
+in terms of the trace refinement relation $\sqsubseteq$.
+Therefore, we need to define an LTS embodying SC.  The simpler this
 system, the better.  We do not need to worry about its performance properties,
 since we will prove that an optimized system remains faithful to it.
 
@@ -342,8 +342,8 @@ since we will prove that an optimized system remains faithful to it.
 \inference
 [St]
 {\dec(s,\pc) = (\st, a, v) & \exec(s, \pc, (\st)) = (\pc', s')}
-{\ior{P$_\text{ref}$}{s, \pc}
-{s', \pc'}{\st, a, v}}
+{\io{P$_\text{ref}$}{s, \pc}
+{s', \pc'}{(\st, a, v)}}
 \end{boxedminipage}
 
 \caption{LTS for a single reference processor (P$_{\text{ref}}$)}
@@ -351,7 +351,7 @@ since we will prove that an optimized system remains faithful to it.
 \end{figure}
 
 
-Figure \ref{Pref$} shows the LTS for a single processor which will be used as a
+Figure \ref{Pref$} shows the LTS for a single processor that will be used as a
 reference processor.  The definition is parametrized over details of an
 \emph{instruction set architecture} (ISA).  In particular, the ISA gives us
 some domains of architectural states $s$ (e.g., register files) and of program
@@ -372,10 +372,10 @@ responses from the memory system.  These inputs are $(\nm, x)$ and $\st$, which
 need no extra input from the memory; and $(\ld, x, v)$, where $v$ gives the
 contents of the requested memory cell.
 
-We can define sequential consistency using the simple memory defined in Figure
-\ref{$M_m$} as follows:
+We can define sequential consistency using the simple memory from Figure
+\ref{$M_m$} as follows, for $n$ processors:
 \begin{defn}
-$SC \triangleq P_\text{ref} + M_m$
+$SC \triangleq P^n_\text{ref} + M_m$
 \label{sc}
 \end{defn}
 
@@ -391,8 +391,15 @@ of the ISA to define the SC model.  Our final, optimized system is parametrized
 over an ISA in the same way.  In the course of the rest of this paper, we will
 define an optimized system $O$ and prove $O \sqsubseteq \text{SC}$.
 
-For a system of $n$ processors, our decoupled SC implementation is
-$\text{P$^n_{\text{ref}}$} + M_m$.
+Note that, in this setting, an operational specification like the LTS
+for SC is precisely the right characterization of \textbf{full functional
+  correctness} for a hardware design, much as a
+precondition-postcondition pair does that job in a partial-correctness
+Hoare logic.  Our SC LTS fully constrains observable behavior of a
+system to remain consistent with simple interleaving.  Similar
+operational models are possible as top-level specifications for
+systems following weaker memory models.
+
 
 \section{Speculative Out-Of-Order Processor}\label{sec:ooo}
 
