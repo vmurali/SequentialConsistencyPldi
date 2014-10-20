@@ -1,3 +1,22 @@
+%We provide a framework for modular verification of multi-processor hardware
+%systems with respect to memory model specification. In this framework, we make
+%use of a key observation that eventhough different memory models have different
+%overall system behaviors, they all share a coherent cache hierarchy. We prove
+%that this coherent cache hierarchy implements the \emph{store atomicity}
+%property, which makes it behave like an atomic instantaneous memory with
+%respect to the rest of the system. We further modularize the proof by defining
+%what is meant for a processor to be correct independently of the memory system.
+%As a concrete instance of our framework, we walk through a modular proof of
+%high-performance multi-processor implementation of Lamport's Sequential
+%Consistency model. The processors employ \emph{speculative execution} to
+%generate many concurrent loads to the memory sub-system, while obeying our
+%correctness criteria. We offer the first formal proof that when an atomic
+%memory is connected to $n$ speculative processors, the system as a whole is
+%sequentially consistent.  Additionally, the cache-coherent memory we present in
+%this paper is the first fully verified system that supports arbitrary cache
+%hierarchies. Our framework involves describing all our components using labeled
+%transition systems and we machine-verify all our proofs using the Coq proof
+%assistant.
 We present a new framework for modular verification of hardware designs
 in the style of the Bluespec language.  That is, we formalize the idea of
 components in a hardware design, with well-defined input and output channels;

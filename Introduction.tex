@@ -38,12 +38,32 @@ Modularity has long been understood as a key property for effective design and
 verification of such complex systems. For the designer, it allows a separation
 of concerns, increasing robustness by allowing the behavior encapsulated by a
 modular boundary to be realized by multiple implementations, any of which may be
-dropped into the system safely. It also allows a greater measure of
+dropped into the system safely. It also allows a greater
 parallelization of human design effort, improving development time. Similarly, verification is
 simplified, as modular interface agreements provide a natural lemma structure.
 This leads us towards a decomposition of the whole system verification
 task into lemmas of subsystems, which can be composed in a black-box manner to
 produce full-system theorems.
+
+%This works introduces an interface enabling true modular implementation and
+%verification of shared memory systems. We want our modular system to permit
+%\emph{black-box refinement}, that is, nothing beyond the interface contract can
+%be assumed about other modules.  That is, we should be able to describe a
+%modular decomposition where we may replace either the processor nodes, the
+%memory with locally verified alternatives without changing the correctness of
+%our whole system.  To this end, we identify a key property called \emph{store
+%atomicity} shared by the memory component of every memory model. This property
+%effectively restricts the behavior of the memory sub-system to that of an
+%\emph{atomic instantaneous memory}. We prove that this property is in fact what
+%is guaranteed using the cache coherence protocols in a multi-processor system
+%containing a hierarchy of caches, enabling replacement of the cache hierarchy
+%with an atomic instantaneous memory. Similarly, on the processor side, we
+%define what is meant to be a correct single processor. These invariants about
+%the processor and the memory sub-system remains constant across memory models.
+%We show a concrete instance of this framework by proving that a highly
+%speculative multi-processor system connected to a coherent cache hierarchy
+%implements the sequential consistency memory model.
+
 
 In this paper, we introduce \textbf{a new approach to modular,
   deductive verification of hardware designs} at the highest level of
