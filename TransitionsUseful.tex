@@ -162,44 +162,44 @@ $B'$ on identical alteration of the traces, then the composed
 system $A+B$ will be sound with respect to $A'+B'$.
 \end{theorem}
 
-\begin{figure}
-\small
-\centering
-\begin{boxedminipage}[c]{.48\textwidth}
+%\begin{figure}
+%\small
 %\centering
-\inference
-[Halt]
-{\theta(i) = (s, \pc) & \dec(s,\pc) = H}
-{\io{SC}{\theta,m}{H}{}}
-
-\inference
-[NonMem]
-{\theta(i) = (s, \pc) & \dec(s,\pc) = (\nm, x) \\ \exec(s, \pc, (\nm, x)) = (\pc', s')}
-{\io{SC}{\theta,m}{\theta[i \coloneqq (s', \pc')], m}{}}
-
-\inference
-[Load]
-{\theta(i) = (s,\pc) & \dec(s,\pc) = (\ld, x, a) \\ \exec(s, \pc, (\ld, x, m(a))) = (\pc', s')}
-{\io{SC}{\theta,m}{\theta[i\coloneqq(s',\pc')],m}{}}
-
-\inference
-[Store]
-{\theta(i) = (s,\pc) & \dec(s,\pc) = (\st, a, v) \\ \exec(s, \pc, (\st)) = (\pc', s')}
-{\io{SC}{\theta,m}{\theta[i\coloneqq(s',\pc')],m[a\coloneqq v]}{}}
-\end{boxedminipage}
-\caption{LTS for sequential consistency with $n$ simple processors}
-\label{Ref}
-\end{figure}
-
-\section{Decomposing a Multi-Processor System}
-\label{sec:store-atomicity}
-
-\begin{figure}
-\centering
-\includegraphics[scale=.43]{zoom}
-\caption{Components of a multi-processors system}
-\label{zoom}
-\end{figure}
+%\begin{boxedminipage}[c]{.48\textwidth}
+%%\centering
+%\inference
+%[Halt]
+%{\theta(i) = (s, \pc) & \dec(s,\pc) = H}
+%{\io{SC}{\theta,m}{H}{}}
+%
+%\inference
+%[NonMem]
+%{\theta(i) = (s, \pc) & \dec(s,\pc) = (\nm, x) \\ \exec(s, \pc, (\nm, x)) = (\pc', s')}
+%{\io{SC}{\theta,m}{\theta[i \coloneqq (s', \pc')], m}{}}
+%
+%\inference
+%[Load]
+%{\theta(i) = (s,\pc) & \dec(s,\pc) = (\ld, x, a) \\ \exec(s, \pc, (\ld, x, m(a))) = (\pc', s')}
+%{\io{SC}{\theta,m}{\theta[i\coloneqq(s',\pc')],m}{}}
+%
+%\inference
+%[Store]
+%{\theta(i) = (s,\pc) & \dec(s,\pc) = (\st, a, v) \\ \exec(s, \pc, (\st)) = (\pc', s')}
+%{\io{SC}{\theta,m}{\theta[i\coloneqq(s',\pc')],m[a\coloneqq v]}{}}
+%\end{boxedminipage}
+%\caption{LTS for sequential consistency with $n$ simple processors}
+%\label{Ref}
+%\end{figure}
+%
+%\section{Decomposing a Multi-Processor System}
+%\label{sec:store-atomicity}
+%
+%\begin{figure}
+%\centering
+%\includegraphics[scale=.43]{zoom}
+%\caption{Components of a multi-processors system}
+%\label{zoom}
+%\end{figure}
 
 Most any conventional multi-processor system can be divided into 3 components as shown in
 Figure \ref{zoom}. 
@@ -221,7 +221,7 @@ the processor $P_i$ they are connected to.
 \inference
 [Load]
 {}
-{\io{$M_m$}{m}{m}{(\ld\req,a),(\ld\resp,m(a))}}
+{\io{$M_m$}{m}{m}{(\ld\req,a),(\ld\resp,m(a)),\_}}
 
 \inference
 [Store]
@@ -330,18 +330,18 @@ since we will prove that an optimized system remains faithful to it.
 
 \inference
 [NM]
-{\dec(s,\pc) = (\nm, x) & \exec(s, \pc, (\nm, x)) = (\pc', s')}
+{\dec(s,\pc) = (\nm, x) & \exec(s, \pc, (\nm, x)) = (s', \pc')}
 {\ioe{P$_\text{ref}$}{s,\pc}{s', \pc'}}
 
 \inference
 [Ld]
-{\dec(s,\pc) = (\ld, x, a) & \exec(s, \pc, (\ld, x, v)) = (\pc', s')}
+{\dec(s,\pc) = (\ld, x, a) & \exec(s, \pc, (\ld, x, v)) = (s', \pc')}
 {\io{P$_\text{ref}$}{s, \pc}
-{s', \pc'}{(\ld\req, a), (\ld\resp, v)}}
+{s', \pc'}{(\ld\req, a), (\ld\resp, v), \Real}}
 
 \inference
 [St]
-{\dec(s,\pc) = (\st, a, v) & \exec(s, \pc, (\st)) = (\pc', s')}
+{\dec(s,\pc) = (\st, a, v) & \exec(s, \pc, (\st)) = (s', \pc')}
 {\io{P$_\text{ref}$}{s, \pc}
 {s', \pc'}{(\st, a, v)}}
 \end{boxedminipage}
@@ -358,14 +358,20 @@ some domains of architectural states $s$ (e.g., register files) and of program
 counters $\pc$.  A function $\dec(s, \pc)$ figures out which instruction $\pc$
 references in the current state, returning the instruction's ``decoded'' form.
 A companion function $\exec(s, \pc, \mathit{dec})$ actually executes the
-instruction, returning the next program counter $\pc'$ and the new state $s'$.
+instruction, returning the new state $s'$ and the next program counter $\pc'$.
 
 The legal instruction forms, which are outputs of $\dec$, are $(\nm, x)$, for
 an operation not accessing memory; $(\ld, x, a)$, for a memory load from
 address $a$; $(\st, a, v)$, for a memory store of value $v$ to address $a$; and
 $H$, for a ``halt'' instruction that moves the LTS to state $H$. The parameter
-$x$ above represents the rest of the instruction, including the
-opcode, registers, constants, \etc{}
+$x$ above represents the rest of the instruction, including the opcode,
+registers, constants, \etc{}
+
+The label generated for a load contains the request sent to the
+memory system, and the response obtained, as well as a label suffix $\Real$
+which denotes that the load is non-speculative (We will later discuss the
+alternative, $\Spec$ which arises in the load labels for our optimized
+speculative processor).
 
 The legal inputs to $\exec$ encode both a decoded instruction and any relevant
 responses from the memory system.  These inputs are $(\nm, x)$ and $\st$, which
@@ -382,7 +388,7 @@ $SC \triangleq P^n_\text{ref} + M_m$
 We define the initial state of SC as $(\theta_0, m_0)$, where $m_0$ is
 some initial memory fixed throughout our development, mapping every
 address to value $v_0$; and $\theta_0$ maps every processor ID to
-$(s_0, \pc_0)$, using architecture-specific default values $s_0$ and
+$(\pc_0, s_0)$, using architecture-specific default values $s_0$ and
 $\pc_0$.
 
 This LTS encodes Lamport's notion of SC, where processors take turns executing
@@ -398,7 +404,8 @@ precondition-postcondition pair does that job in a partial-correctness
 Hoare logic.  Our SC LTS fully constrains observable behavior of a
 system to remain consistent with simple interleaving.  Similar
 operational models are possible as top-level specifications for
-systems following weaker memory models.
+systems following weaker memory models, by giving the LTS for the \emph{Local
+Buffer} component and composing the three components simultaneously.
 
 
 \section{Speculative Out-Of-Order Processor}\label{sec:ooo}
@@ -477,7 +484,7 @@ present the LTS for speculating processors.
 \inference[SpecLd]
 {\get\spc\ld(\rob) = (\spc\ld,t,a)}
 {\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s,\pc,\upd\ld(\compute(\rob),t,v),\ppc}
-{(\ld\req, a), (\ld\resp, v)}}
+{(\ld\req, a), (\ld\resp, v), \Spec}}
 
 
 \inference[Abort]
@@ -499,11 +506,11 @@ present the LTS for speculating processors.
 
 \inference[LdGood]
 {\commit(\rob) = (\pc,\pc',(\ld,x,a,v,s'))}
-{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s',\pc',\retire(\rob),\ppc}{(\ld\req, a), (\ld\resp, v)}}
+{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s',\pc',\retire(\rob),\ppc}{(\ld\req, a), (\ld\resp, v), \Real}}
 
 \inference[LdBad]
-{\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) & v' \neq v & \exec(s,\pc,(\ld,x,v)) = (\pc'', s'')}
-{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s'',\pc'',\phi,\setBp(\ppc,\pc)}{(\ld\req, v), (\ld\resp,v)}}
+{\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) & v' \neq v & \exec(s,\pc,(\ld,x,v)) = (s'', \pc'')}
+{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s'',\pc'',\phi,\setBp(\ppc,\pc)}{(\ld\req, v), (\ld\resp,v), \Real}}
 \end{boxedminipage}
 
 \caption{Speculating, out-of-order issue processor}
@@ -514,8 +521,9 @@ Figure~\ref{Ooo} defines that LTS,
 P$_{\texttt{so}}$. This processor may issue arbitrary speculative
 loads, but it only ever \emph{commits} the next instruction in serial
 program order. 
-We will see the processor issue two kinds of loads, a speculative
-load ($\spc\ld$) and a commit or real load ($\ld$).  To maintain SC, every speculative
+We will see the processor issue two kinds of loads, a speculative load (with
+the label suffix $\Spec$) and a commit or real load (with the label suffix $\Real$).  To
+maintain SC, every speculative
 load must have a matching verification load later on, and we maintain
 the illusion that the program only depends on the results of
 verification loads, which, along with stores, \emph{must be issued in
@@ -552,12 +560,12 @@ $\io{P$_\text{so}^{*}$}{s_0,\pc_0,\phi,\ppc_0}{s,\pc,\rob,\ppc}{\eta} \Rightarro
 \begin{array}{ll}
 \commit(\rob) = (\pc, \pc', (\nm, s')) &\Rightarrow
 \exists x. \; \dec(s,\pc) = (\nm, x) \wedge \exec(s,\pc, (\nm,x)) =
-(\pc', s')\\
+(s', \pc')\\
 \commit(\rob) = (\pc, \pc', (\ld, x, a, v, s')) & \Rightarrow
-\dec(s,\pc) = (\ld, x,a) \wedge \exec(s,\pc, (\ld,x,v)) = (\pc', s')\\
+\dec(s,\pc) = (\ld, x,a) \wedge \exec(s,\pc, (\ld,x,v)) = (s',\pc')\\
 \commit(\rob) = (\pc, \pc', (\st, a, v, s')) &\Rightarrow
 \dec(s,\pc) = (\st, a,v) \wedge \exec(s,\pc, (\st)) =
-(\pc', s')\\
+(s',\pc')\\
 \commit(\rob) = H & \Rightarrow
 \dec(s, \pc) = H\\
 \end{array}
@@ -783,7 +791,7 @@ by not dequeuing the request.
 {\s(c,a) \geq S}
 {\io{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt}
-{\dt, \ch, \s, \dst, \wt, \dwt}{c,((\ld\req, a),(\ld\resp,v))}}
+{\dt, \ch, \s, \dst, \wt, \dwt}{c,((\ld\req, a),(\ld\resp,v)), \_}}
 \vspace{.1in}
 \inference[Store]
 {s(c,a) \geq M}
