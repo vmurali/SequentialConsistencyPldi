@@ -221,12 +221,12 @@ the processor $P_i$ they are connected to.
 \inference
 [Load]
 {}
-{\io{$M_m$}{m}{m}{(\ld\req,a),(\ld\resp,m(a)),\_}}
+{\io{$M_m$}{m}{m}{p, (\ld\req,a),(\ld\resp,m(a), \_)}}
 
 \inference
 [Store]
 {}
-{\io{$M_m$}{m}{m[a\coloneqq v]}{(\st, a, v)}}
+{\io{$M_m$}{m}{m[a\coloneqq v]}{p, (\st, a, v)}}
 
 \end{boxedminipage}
 \caption{LTS for a simple memory}
@@ -256,7 +256,8 @@ the word ``atomicity,'' this specification is appropriate even for
 implementation of weaker memory models than SC.  Store atomicity can
 be understood via the operational semantics of Figure \ref{$M_m$},
 describing an LTS that receives load and store requests ($\ld$ and
-$\st$) from processors and sends back load responses ($\ld\resp$).
+$\st$) from processors and sends back load responses ($\ld\resp$);
+$p$ is the processor which sends and receives the request.
 
 The memory component is composed of a \emph{hierarchy of caches}, where each
 cache node (labeled like ``L1,'' ``L2,'' etc.) communicates only with its
@@ -444,7 +445,7 @@ state.  The associated operations are:
 \begin{itemize}
 \item $\phi$, the state of an empty buffer.
 \item $\add(\pc, \rob)$, which appends the program instruction at location $\pc$ to the list of instructions that the buffer is allowed to consider executing.
-\item $\get\spc\ld(\rob)$, which returns an optional speculative load to issue
+\item $\get\spc\ld(\rob)$, which returns a set of speculative loads that can be issued to the memory system
 \item $\compute(\rob)$, which models a
 step of computation inside the buffer. For instance, it invokes the $\dec$
 and $\exec$ functions (as defined for SC) internally to obtain the next program
@@ -478,14 +479,13 @@ present the LTS for speculating processors.
 {\ioe{P$_\text{so}$}{s,\pc,\rob,\ppc}{s,\pc,\add(\curPpc(\ppc),\rob),\nextPpc(\ppc)}}
 
 \inference[Compute]
-{\get\spc\ld(\rob) = \epsilon}
+{}
 {\ioe{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s,\pc,\compute(\rob),\ppc}}
 
 \inference[SpecLd]
-{\get\spc\ld(\rob) = (\spc\ld,t,a)}
-{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s,\pc,\upd\ld(\compute(\rob),t,v),\ppc}
+{(\spc\ld,t,a) \in \get\spc\ld(\rob)}
+{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s,\pc,\upd\ld(\rob,t,v),\ppc}
 {(\ld\req, a), (\ld\resp, v), \Spec}}
-
 
 \inference[Abort]
 {\commit(\rob) = (\pc',\_,\_) & \pc' \neq \pc}
@@ -791,7 +791,7 @@ by not dequeuing the request.
 {\s(c,a) \geq S}
 {\io{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt}
-{\dt, \ch, \s, \dst, \wt, \dwt}{c,((\ld\req, a),(\ld\resp,v)), \_}}
+{\dt, \ch, \s, \dst, \wt, \dwt}{c,((\ld\req, a),(\ld\resp,v), \_)}}
 \vspace{.1in}
 \inference[Store]
 {s(c,a) \geq M}
