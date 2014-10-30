@@ -1,0 +1,301 @@
+\section{Specifying Sequential Consistency}\label{sec:sc}
+
+Our final theorem in this paper establishes that a particular complex hardware
+system implements sequential consistency (SC) properly.  We state the theorem
+in terms of the trace refinement relation $\sqsubseteq$.
+Therefore, we need to define an LTS embodying SC.  The simpler this
+system, the better.  We do not need to worry about its performance properties,
+since we will prove that an optimized system remains faithful to it.
+
+\begin{figure}
+\small
+\centering
+\begin{boxedminipage}[c]{.48\textwidth}
+\inference
+[Halt]
+{\dec(s,\pc) = H}
+{\io{P$_\text{ref}$}{s,\pc}{H}{}}
+
+\inference
+[NM]
+{\dec(s,\pc) = (\nm, x) & \exec(s, \pc, (\nm, x)) = (s', \pc')}
+{\ioe{P$_\text{ref}$}{s,\pc}{s', \pc'}}
+
+\inference
+[Ld]
+{\dec(s,\pc) = (\ld, x, a) & \exec(s, \pc, (\ld, x, v)) = (s', \pc')}
+{\io{P$_\text{ref}$}{s, \pc}
+{s', \pc'}{(\ld\req, a), (\ld\resp, v), \Real}}
+
+\inference
+[St]
+{\dec(s,\pc) = (\st, a, v) & \exec(s, \pc, (\st)) = (s', \pc')}
+{\io{P$_\text{ref}$}{s, \pc}
+{s', \pc'}{(\st, a, v)}}
+\end{boxedminipage}
+
+\caption{LTS for a single reference processor (P$_{\text{ref}}$)}
+\label{Pref$}
+\end{figure}
+
+
+Figure \ref{Pref$} shows the LTS for a single processor that will be used as a
+reference processor.  The definition is parametrized over details of an
+\emph{instruction set architecture} (ISA).  In particular, the ISA gives us
+some domains of architectural states $s$ (e.g., register files) and of program
+counters $\pc$.  A function $\dec(s, \pc)$ figures out which instruction $\pc$
+references in the current state, returning the instruction's ``decoded'' form.
+A companion function $\exec(s, \pc, \mathit{dec})$ actually executes the
+instruction, returning the new state $s'$ and the next program counter $\pc'$.
+
+The legal instruction forms, which are outputs of $\dec$, are $(\nm, x)$, for
+an operation not accessing memory; $(\ld, x, a)$, for a memory load from
+address $a$; $(\st, a, v)$, for a memory store of value $v$ to address $a$; and
+$H$, for a ``halt'' instruction that moves the LTS to state $H$. The parameter
+$x$ above represents the rest of the instruction, including the opcode,
+registers, constants, \etc{}
+
+The label generated for a load contains the request sent to the
+memory system, and the response obtained, as well as a label suffix $\Real$
+which denotes that the load is non-speculative (We will later discuss the
+alternative, $\Spec$ which arises in the load labels for our optimized
+speculative processor).
+
+The legal inputs to $\exec$ encode both a decoded instruction and any relevant
+responses from the memory system.  These inputs are $(\nm, x)$ and $\st$, which
+need no extra input from the memory; and $(\ld, x, v)$, where $v$ gives the
+contents of the requested memory cell.
+
+We can define sequential consistency using the simple memory from Figure
+\ref{$M_m$} as follows, for $n$ processors:
+\begin{defn}
+$SC \triangleq P^n_\text{ref} + M_m$
+\label{sc}
+\end{defn}
+
+We define the initial state of SC as $(\theta_0, m_0)$, where $m_0$ is
+some initial memory fixed throughout our development, mapping every
+address to value $v_0$; and $\theta_0$ maps every processor ID to
+$(\pc_0, s_0)$, using architecture-specific default values $s_0$ and
+$\pc_0$.
+
+This LTS encodes Lamport's notion of SC, where processors take turns executing
+nondeterministically in a simple interleaving.  We need know very few details
+of the ISA to define the SC model.  Our final, optimized system is parametrized
+over an ISA in the same way.  In the course of the rest of this paper, we will
+define an optimized system $O$ and prove $O \sqsubseteq \text{SC}$.
+
+Note that, in this setting, an operational specification like the LTS
+for SC is precisely the right characterization of \textbf{full functional
+  correctness} for a hardware design, much as a
+precondition-postcondition pair does that job in a partial-correctness
+Hoare logic.  Our SC LTS fully constrains observable behavior of a
+system to remain consistent with simple interleaving.  Similar
+operational models are possible as top-level specifications for
+systems following weaker memory models, by giving the LTS for the \emph{Local
+Buffer} component and composing the three components simultaneously.
+
+
+\section{Speculative Out-Of-Order Processor}\label{sec:ooo}
+
+The previous section divided a multiprocessor system into two rather
+simple components, processors and memories.  We are now ready to begin
+developing more complex, optimized versions of each piece, starting
+with processors.
+
+We implement a \emph{speculative} processor, which may create many
+simultaneous outstanding requests to the memory, as an optimization to
+increase parallelism.  Our processor proof is in some sense generic
+over correct speculation strategies.  We parametrize over two key
+components of a processor design: a \emph{branch predictor}, which
+makes guesses about processor-local control flow in advance of
+%receiving enough memory responses to resolve
+resolving conditional jumps; and a
+\emph{reorder buffer}, which decides what speculative instructions (like memory loads)
+are worth issuing at which moments (in effect \emph{reordering} later
+instructions to happen before earlier instructions have finished).
+
+The branch predictor is the simpler of the two components to model.
+We indicate branch-predictor state with metavariable $\ppc$.
+The operations on such state are $\curPpc(\ppc)$, to extract the
+current program-counter prediction; $\nextPpc(\ppc)$, to ask the
+predictor to step forward by one instruction; and $\setBp(\ppc, \pc)$,
+to reset prediction to begin at a known-accurate position $\pc$.  It
+turns out that we need to impose no explicit correctness criterion on
+branch predictors.  The processor uses predictions only as hints, and
+it always resets the predictor using $\setBp$ after detecting an
+inaccurate hint.
+
+The interface and formal contract of a reorder buffer are more
+involved.  We write $\rob$ as a metavariable for reorder buffer
+state.  The associated operations are:
+\begin{itemize}
+\item $\phi$, the state of an empty buffer.
+\item $\add(\pc, \rob)$, which appends the program instruction at location $\pc$ to the list of instructions that the buffer is allowed to consider executing.
+\item $\get\spc\ld(\rob)$, which returns a set of speculative loads that can be issued to the memory system
+\item $\compute(\rob)$, which models a
+step of computation inside the buffer. For instance, it invokes the $\dec$
+and $\exec$ functions (as defined for SC) internally to obtain the next program
+counter, state, \etc{} (only the speculative states are updated, not the actual states).
+\item $\upd\ld(\rob,t,v)$, which informs the buffer that the memory
+has returned result value $v$ for the speculative load with tag $t$.
+\item $\commit(\rob)$, which returns the next instruction in serial
+program order, if we have accumulated enough memory responses to execute it
+accurately, or returns
+$\epsilon$ otherwise.  When $\commit$ returns an instruction, it also
+returns the associated program counter plus the next program counter
+we would advance to afterward.
+ Furthermore, the instruction is
+extended with any relevant response from memory (used only for load
+instructions, obtained through $\upd\ld$) and with the new architectural state (\eg{} register
+file) after execution.
+\item $\retire(\rob)$, which informs the buffer that its $\commit$
+instruction was executed successfully, so it is time to move on to the
+next instruction.
+\end{itemize}
+
+We postpone characterization of correct reorder buffers until after we
+present the LTS for speculating processors.
+
+\begin{figure*}[t]
+\small
+\centering
+\begin{boxedminipage}[c]{.95\textwidth}
+\inference[Fetch]
+{}
+{\ioe{P$_\text{so}$}{s,\pc,\rob,\ppc}{s,\pc,\add(\curPpc(\ppc),\rob),\nextPpc(\ppc)}}
+
+\inference[Compute]
+{}
+{\ioe{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s,\pc,\compute(\rob),\ppc}}
+
+\inference[SpecLd]
+{(\spc\ld,t,a) \in \get\spc\ld(\rob)}
+{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s,\pc,\upd\ld(\rob,t,v),\ppc}
+{(\ld\req, a), (\ld\resp, v), \Spec}}
+
+\inference[Abort]
+{\commit(\rob) = (\pc',\_,\_) & \pc' \neq \pc}
+{\ioe{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s,\pc,\phi,\setBp(\ppc,\pc)}}
+
+\inference[Halt]
+{\commit(\rob) = H}
+{\ioe{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{H}}
+
+\inference[Nm]
+{\commit(\rob) = (\pc,\pc',(\nm,s'))}
+{\ioe{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s',\pc',\retire(\rob),\ppc}}
+
+\inference[St]
+{\commit(\rob) = (\pc,\pc',(\st,a,v,s'))}
+{\io{\text{P$_\text{so}$}}{s',\pc',\retire(\rob),\ppc}{s,\pc,\rob,\ppc}
+{\st, a, v}}
+
+\inference[LdGood]
+{\commit(\rob) = (\pc,\pc',(\ld,x,a,v,s'))}
+{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s',\pc',\retire(\rob),\ppc}{(\ld\req, a), (\ld\resp, v), \Real}}
+
+\inference[LdBad]
+{\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) & v' \neq v & \exec(s,\pc,(\ld,x,v)) = (s'', \pc'')}
+{\io{\text{P$_\text{so}$}}{s,\pc,\rob,\ppc}{s'',\pc'',\phi,\setBp(\ppc,\pc)}{(\ld\req, v), (\ld\resp,v), \Real}}
+\end{boxedminipage}
+
+\caption{Speculating, out-of-order issue processor}
+\label{Ooo}
+\end{figure*}
+
+Figure~\ref{Ooo} defines that LTS,
+P$_{\texttt{so}}$. This processor may issue arbitrary speculative
+loads, but it only ever \emph{commits} the next instruction in serial
+program order. 
+We will see the processor issue two kinds of loads, a speculative load (with
+the label suffix $\Spec$) and a commit or real load (with the label suffix $\Real$).  To
+maintain SC, every speculative
+load must have a matching verification load later on, and we maintain
+the illusion that the program only depends on the results of
+verification loads, which, along with stores, \emph{must be issued in
+serial program order}.
+
+When committing a
+previously issued speculative load instruction, the associated speculative
+memory load response is verified against the new commit load response. If the
+resulting values do not match, the processor terminates all past uncommitted
+speculation, by emptying the reorder buffer and resetting the
+next predicted program counter in the branch predictor to the correct next value. This step mimics
+the mechanism implemented in most modern-day processors, operating on the
+conservative assumption that the processor may have performed arbitrary
+incorrect speculation after receiving the inaccurate response from
+memory.  (Note that here ``inaccurate'' does not mean ``wrong at
+the time the response was received,'' but rather ``wrong at commit
+time'' or ``correct before, but not anymore.'')
+
+A full processor state is $(s, \pc, \rob, \ppc)$, comprising
+architectural state, the program counter, and the reorder buffer and branch
+predictor states. Its initial state is given by $(s_0, \pc_0, \phi, \ppc_0)$.
+The interface of this processor with memory is identical
+to that of the reference processor, but now we can exercise a memory
+system's transitions even for speculative loads.
+
+\begin{figure*}[t]
+\small
+\begin{inv}
+If $P_\text{so}$ reaches a state $(s, \pc, \rob, \ppc)$, \ie{}
+
+$\io{P$_\text{so}^{*}$}{s_0,\pc_0,\phi,\ppc_0}{s,\pc,\rob,\ppc}{\eta} \Rightarrow$
+\begin{displaymath}
+\left\{
+\begin{array}{ll}
+\commit(\rob) = (\pc, \pc', (\nm, s')) &\Rightarrow
+\exists x. \; \dec(s,\pc) = (\nm, x) \wedge \exec(s,\pc, (\nm,x)) =
+(s', \pc')\\
+\commit(\rob) = (\pc, \pc', (\ld, x, a, v, s')) & \Rightarrow
+\dec(s,\pc) = (\ld, x,a) \wedge \exec(s,\pc, (\ld,x,v)) = (s',\pc')\\
+\commit(\rob) = (\pc, \pc', (\st, a, v, s')) &\Rightarrow
+\dec(s,\pc) = (\st, a,v) \wedge \exec(s,\pc, (\st)) =
+(s',\pc')\\
+\commit(\rob) = H & \Rightarrow
+\dec(s, \pc) = H\\
+\end{array}
+\right.\end{displaymath}
+\label{rob}
+\end{inv}
+\vspace{-.5cm}
+\caption{Correctness of reorder buffer}
+\label{robfig}
+\end{figure*}
+
+Finally, we impose a general correctness condition on reorder
+buffers.  They must maintain Invariant~\ref{rob} in Figure~\ref{robfig}.
+Intuitively, whenever the buffer claims in a $\commit$
+output that a particular instruction is next to execute, causing
+certain state changes, that instruction must really be next in line according
+to how the program runs in the SC system, and running it must really cause
+those state changes.
+
+When this condition holds, we may conclude the correctness theorem for
+out-of-order processors.  We use a trace-transformation function
+$\noSpec$ that drops all speculative-load requests and responses.
+See Definition~\ref{refines} for a review of how we use such
+functions in framing trace refinement.  Intuitively, we prove that any
+behavior by the speculating processor can be matched by the simple
+processor, with speculative messages erased.
+
+\begin{theorem}
+\label{ocorrect}
+$\text{P$_\text{so}$} \sqsubseteq_\noSpec$ P$_\text{ref}$
+\end{theorem}
+\begin{proof}
+By induction on P$_\text{so}$ traces, using a proper abstraction
+function (which drops the speculative messages and the $\rob$ and $\ppc$ states) to relate the two systems.  Invariant~\ref{rob} is crucial to
+relate the reorder buffer's behavior with the simple in-order
+execution of P$_\text{ref}$.
+\end{proof}
+
+\begin{corollary}
+\label{ges}
+$\text{P$^n_\text{so}$} \sqsubseteq_{\noSpec^n}$ P$_\text{ref}^n$
+\end{corollary}
+\begin{proof}
+Direct consequence of Theorems~\ref{ocorrect} and~\ref{liftn} (where the
+latter is one of our preliminary results about $n$-repetition).
+\end{proof}

@@ -1,0 +1,382 @@
+\section{Cache-Based Memory System}\label{sec:cc}
+
+We now turn our attention toward a more efficient implementation of
+memory.  It is physically infeasible to connect many processors
+directly to a single memory with low enough latency to handle most
+memory requests quickly enough.  Instead, each processor will have its
+own \emph{L1 cache} of recently used memory cells.  Whenever possible, we
+want to service memory requests from processors' own caches, only
+contacting memory for addresses not found in the caches.  To further
+avoid contacting main memory, we create additional higher-level
+caches, connecting each L1 cache to an L2 cache, potentially
+connecting L2 caches to L3, etc., bottoming out in main memory at the
+root of our tree. The zoomed-in portion of the memory in Figure~\ref{zoom}
+diagrams the basic layout.
+
+Now we have concurrent interaction of many processors with many caches
+with main memory, and the relationship with the original $M_m$ system
+is far from direct.  However, this intricate concurrent execution is
+crucial to hiding the latency of main-memory access.
+Figure~\ref{cache} formalizes as an LTS $M_c$ the algorithm we implemented,
+for providing the memory abstraction on top of a cache hierarchy.
+We have what is called an \emph{invalidating directory-based hierarchical
+cache-coherence protocol}.  It is a transliteration of a realistic
+algorithm implemented in the Bluespec hardware description
+language~\cite{Bluespec:TFRG}. 
+
+We now try to explain aspects of this transition system at an
+intuitive level.  Thanks to the overall modular proof structure in
+this paper, it is not essential to understand the details of the cache
+system, to understand any other part of our development.  Therefore,
+some readers may want to skip this explanation upon first reading,
+skipping to the next section for a key theorem relating $M_c$ and $M_m$.
+
+We describe a state of the system using 8 fields: $\dt$, $\ch$, $\s$, $\dst$,
+$\wt$, $\dwt$, $\inp$, $\outp$. The $\inp$ and $\outp$ sets are the interfaces
+to the processors and are exactly the same as in the simple memory LTS
+(Figure~\ref{$M_m$}). The rest are summarized in Figure~\ref{fields}.
+
+%We describe a state of the system using 6 fields: $\dt$, $\ch$, $\s$, $\dst$,
+%$\wt$, $\dwt$ which are summarized in Figure~\ref{fields}.
+We use $\parent(c,p)$ to denote that $p$ is the parent of $c$ and $\leaf(c)$ to 
+denote that $c$ is a leaf or L1 cache.
+
+\begin{figure}
+\centering
+\begin{tabular}{|l|p{5.5cm}|}
+\hline
+$\dt(c,a)$ & Data in cache $c$ for address $a$\\
+$\s(c,a)$ & Coherence state of cache $c$ for address $a$\\
+$\dst(p,c,a)$ & Directory state of cache $p$ for child $c$ and address $a$\\
+$\wt(c,a)$ & Gives cache $c$'s desired coherence state to upgrade to (for address $a$), or $\epsilon$ if none\\
+$\dwt(p,c,a)$ & Gives cache $p$'s desired coherence state for its child $c$ to downgrade to (for address $a$), or $\epsilon$ if none\\
+$\ch$ & Channels between nodes in the system\\
+\hline
+\end{tabular}
+\caption{Fields in a cache-based memory system}
+\label{fields}
+\end{figure}
+
+Fields $\dt, \s$ are maps over pairs of cache names and memory addresses.
+The $\dt$ map assigns each pair a memory-cell value, and the $\s$ map
+assigns each pair a coherence state.  A coherence state is $M, S$ or
+$I$, broadly representing permissions to modify, read, or do nothing
+with an address, respectively, the decreasing permissions denoted by $M > S > I$. This interpretation of permissions is
+accurate at the leaf caches connected to the processors (\ie{} L1 caches),
+but the interpretation is subtly different at the higher level caches.
+
+Mapping $\wt$ goes from cache name and address to either $\epsilon$ or a
+coherence state.  It denotes what permission the cache is waiting for,
+if any.  That is, a cache may have decided to \emph{upgrade} its
+coherence state for some address to a more permissive value, but the
+cache is waiting for acknowledgment from another cache before
+finalizing the upgrade.
+
+Since we have a directory-based protocol, the $\s$ and
+$\wt$ maps have mirror-image counterparts $\dst$ and $\dwt$.
+The former maps triples of parent name, child name, and address to
+coherence state. It represents the parent's notion of the
+coherence state of the child for that address. We later prove that this notion
+is always conservative, \ie{} if the parent assumes that a child does not have
+a particular permission, then it is guaranteed in this system that the child
+will not have that permission.  The $\dwt$ field also represents a mapping from parent
+name, child name, and address to either $\epsilon$ or coherence state. It
+denotes whether the parent is waiting for any downgrade response from the
+corresponding child, and if so, the coherence state that the child must
+downgrade to as well.
+
+All communication channels in the system are represented by field $\ch$.
+The channels are asymmetric as
+follows. Channels going from parent to children (indexed by the names of the
+parent and child) maintain FIFO order of messages between the same parent-child
+pair. They carry both request messages (asking the child to downgrade) and
+response messages (acknowledging that the child can upgrade). Channels going
+from children to their parents are further split into request and response
+channels, thus indexed by tuples (child name, parent name, request or response).
+These channels need not maintain the FIFO order for messages between the same
+child-parent pair (notice the use of $\coloncolon$ to add and remove elements
+from the parent to child channel, as opposed to $\uplus$ for the 
+child to parent channel). The reason is that only one request or one response is
+sent for a particular address between a child-parent pair -- this invariant can
+be proved for the LTS in  Figure \ref{cache}. The order between a request and
+response message sent from the same child to its parent is lost, but our
+protocol ensures that nothing bad happens as a result.  Notice rules
+ParentRecvRsp and ParentRecvReq in Figure \ref{cache}, each of which looks at the
+previous coherence state of the incoming message and compares it with its own
+directory state to decide whether to process the message.
+
+Here is an intuition on how the transitions work in the common case.  A cache
+can decide, spontaneously, to upgrade its coherence state, in which case it
+sends an upgrade request to its parent. The parent then makes a local decision
+on whether to send a response to the requesting child or not, based on its
+directory approximation and its own coherence state $\s$. If $\s$ is lower than
+the requested upgrade, then it cannot handle the request, and instead must
+decide to upgrade $\s$.  Once the parent's $\s$ is not lower than the requested
+upgrade, it makes sure that the rest of its children are ``compatible'' with
+the requested upgrade (given by $\compat$ definition below).  If not, the
+parent must send requests to the incompatible children to downgrade. Finally, when
+the $\s$'s upgrade and children's downgrade responses are all received, the
+original request can be responded to. The transitions for sending requests are
+allowed to happen spontaneously without any trigger. An L1 cache can process a
+load request or a store request only if it is in at least the \Sh{} state or
+\Mo{} state, respectively, for the requested address; otherwise it must
+spontaneously request to upgrade.
+
+\begin{defn}
+\begin{displaymath}
+\compat(p, c, x, a) = \left\{
+\begin{array}{ll}
+\forall c' \neq c. \; \dst(p,c',a) = I &: x = M\\
+\forall c' \neq c. \; \dst(p,c',a) \le S &: x = S\\
+\end{array}
+\right.
+\end{displaymath}
+\end{defn}
+
+The reason for having separate request and response channels for the same
+child-parent pair is to avoid deadlocks. Throughout the protocol, we maintain
+the invariant
+that a downgrade request from the parent always gets priority, \ie{} if a child
+is waiting for an upgrade response, it must still try to satisfy a downgrade
+request from the parent. If both the parent and the child are waiting
+for their respective responses, there will be a deadlock. This tie cannot
+be broken arbitrarily: if the parent concedes and starts processing a child's
+request, then it may have to send downgrade requests to other children to make
+the states compatible, but the other children may have sent upgrade requests
+and remain waiting, leading to a deadlock. The only way to break the
+vicious waiting cycle is for the children to concede and respond when they get
+downgrade requests. Of course, they have to downgrade the states of their own
+children first, and this process goes on recursively until the downgrade requests
+reach the leaf caches, which can respond immediately.
+
+A complication arises because a cache can voluntarily decide to downgrade its
+state.  This transition is used to model invalidation of cache lines to make
+room for a different location (we permit a cache to downgrade from $M$ to $S$
+instead of only to $I$).
+As a result, the parent's $\dst$ and the
+corresponding $\s$ of the child may go out of sync, leading to the parent
+requesting a child to downgrade when it already has. To handle this situation,
+the child has to drop the downgrade request when it has already downgraded to
+the required state (Rule DropReq in Figure \ref{cache}), to avoid deadlocks
+by not dequeuing the request.
+
+\input{TransitionsUsefulCache1}
+
+\section{Proof that the MSI Protocol Preserves Store Atomicity}\label{sec:ccproof}
+\label{safety}
+
+We must prove the following theorem, \ie{} the cache-based system is sound with
+respect to the simple memory.
+\begin{theorem}
+\label{ccorrect}
+$M_c \sqsubseteq M_m$
+\end{theorem}
+
+The key property we need for this proof is what we define as
+``store atomicity'' below. Throughout this section, we say
+\emph{time} to denote the number of transitions that occurred before reaching
+the specified state.
+
+\begin{defn}
+Store atomicity is defined as the following property:
+For a load (or speculative load) request $\toM(\ld, a)$ (or $\toM(\spc\ld, t, a)$)
+from any processor, the response sent at time $T$
+$\toP(\ld, v)$ (or $\toP(\spc\ld, t, v)$) should be such that
+\begin{enumerate}
+\item $v = v_0$ (the initial value of any memory address) and no store
+  request $\toM(\st, a, v')$ has been processed at any time $T'$ such
+  that $T' < T$ or
+\item There is a store request $\toM(\st, a, v)$ that was processed at time $T_q$ such that
+$T_q < T$ and no other store
+request $\toM(\st, a, v')$ was processed at any time $T'$ such that $T_q < T' < T$.
+\end{enumerate}
+\label{sa}
+\end{defn}
+
+We can easily show that any system obeying store atomicity
+is sound with respect to $M_m$. Intuitively, the store atomicity
+property precisely describes the property of a memory, \viz{} that if a store
+happens, then that location gets updated such that any subsequent load gets
+back the updated value.
+
+The proof that $M_c$ obeys store atomicity is involved enough to deserve a
+section's worth of explanation, which we now turn to.
+
+We first reduce the proof of store atomicity to several lemmas.
+We believe that other invalidation-based
+protocols with inclusive caches (\ie{} those cache hierarchies where a parent
+cache contains all the locations that any of its children contains) like MESI,
+MOSI, and MOESI also satisfy our lemmas, making their verification
+easier by reusing most of our MSI proof; we omit the discussion of extension of
+this proof to other protocols for space reasons.
+
+The lemmas
+presented below hold after any number of transitions
+starting from the initial state.
+
+While we have proofs in Coq for each lemma, our discussion will be mainly
+informal for brevity. All the proofs can be found in our supplementary material.
+
+Intuitively our protocol is correct because it is guaranteed that any cache that attempts to
+handle a load request has the ``latest'' value.
+
+\begin{lemma}
+\textit{latestValue}:
+At any time $T$, a cache $c$ that is \clean{} (defined below) for an address
+$a$ will have the most up-to-date value for that address, \ie{}
+\begin{enumerate}
+\item $\dt(c,a) = v_0$ and no store request $\toM(\st, a, v)$ has been processed at
+any time $T'$ such that $T' < T$ or
+\item There is a store request $\toM(\st, a, v)$ that was processed at time $T_q$ such that
+$T_q < T \wedge \dt(c,a) = v$ and no other store
+request $\toM(\st, a, v')$ was processed at any time $T'$ such that $T_q < T' < T$.
+\end{enumerate}
+\label{latestValue}
+\end{lemma}
+
+\vspace{-.15in}
+
+\begin{defn}
+\textit{clean}: A cache is said to be \textit{clean} for an address $a$ if and only if
+the state of the cache for that address is at least \Sh{} and the directory 
+state for any of its children is at most \Sh.
+\label{clean}
+\end{defn}
+
+It is pretty intuitive to prove the store atomicity property given
+Lemma~\ref{latestValue}. A leaf cache can respond to a request only when it
+has the required permission, at which point it is guaranteed to have the latest
+value, because it is \textit{clean} (as it has no children).
+
+Lemma~\ref{latestValue} requires further decomposition into more
+lemmas.
+
+\begin{lemma}
+\textit{nonAncestorCompatible}: For two distinct caches $c_1$ and $c_2$ such
+that neither is an ancestor of the other in the cache-tree hierarchy (where
+the ancestor relation is the reflexive-transitive closure of the parent relation),
+for each address $a$, $\s(c_1,a)$ and $\s(c_2,a)$ are
+\textit{compatible} (defined below).
+\label{nonAncestorCompatible}
+\end{lemma}
+\begin{defn}
+\textit{compatible}: Values of states $x_1$ and $x_2$ are \textit{compatible}
+iff whenever either $x_1$ or $x_2$ is \Mo{}, the other is \In.
+\label{compatible}
+\end{defn}
+
+It is easy to see that any two states $y_1 \le x_1$ and $y_2 \le x_2$ are also
+compatible if $x_1$ and $x_2$ are compatible.
+
+\begin{lemma}
+\textit{noTransitWrite}: Whenever data for an address $a$ is in transit (\ie{}
+$\forall T. \; T_s \le T \le T_r$ where $T_s$ is the time of sending the data and
+$T_r$ the time of receiving the data), no cache can process a store request for
+$a$, and the data must be sent from a \textit{clean} cache.
+\label{noTransitWrite}
+\end{lemma}
+
+\begin{lemma}
+\textit{conservative}: The state of an address in a cache is never greater than
+the corresponding entry in its parent's directory.
+\label{conservative}
+\end{lemma}
+
+\begin{lemma}
+\textit{localCompatibility1}:
+The state of a cache is never less than its directory entry for any of
+its children.
+\label{localCompatibility1}
+\end{lemma}
+\begin{lemma}
+\textit{localCompatibility2}: Let $c_1$ and $c_2$ be distinct caches with the
+same parent $p$. Then, $\s(c_1, a)$ and $\s(c_2, a)$ are
+\textit{compatible}.
+\label{localCompatibility2}
+\end{lemma}
+
+Lemmas~\ref{conservative} and~\ref{localCompatibility1} imply a
+$\ge$ relation between the states of a parent and its child for any address.
+Since the ancestor relation is the reflexive-transitive closure of the parent
+relation, the $\ge$ relation is preserved between the states of two caches $p$
+and $c$ where $p$ is the ancestor of $c$.
+
+Any two caches $c_1, c_2$ neither of which is an ancestor of the other have a
+lowest common ancestor $x$, which has
+two distinct children $x_1$ and $x_2$ such that they are the ancestors of $c_1$
+and $c_2$ respectively. For any address $a$, $\s(x_1, a)$ and
+$\s(x_2, a)$ are compatible by Lemma~\ref{localCompatibility2}. From
+the previous paragraph about the relation between the states of a cache and its
+ancestor, it follows that $c_1$ and $c_2$ are also compatible, proving
+Lemma~\ref{nonAncestorCompatible}.
+
+Using Lemmas~\ref{nonAncestorCompatible} and~\ref{noTransitWrite}, one can
+prove Lemma~\ref{latestValue}. The proof is by induction on time $T$; we assume
+that any \clean{} (node, address) pair has the latest value until time
+$T$. Consider a (node, addr) pair at time $T+1$.
+If the pair was \clean{} at $T$, then no cache,
+save itself (because of Lemma~\ref{nonAncestorCompatible}), can process any
+store request for that address, thus continuing to be \clean{} and having the latest value.
+And if the pair was not \clean{} at time $T$, it will receive data from a cache
+that is \clean{} for the (node, address) pair, and no store
+request can be processed when the data is in transit (by
+Lemma~\ref{noTransitWrite}). Therefore, by the induction hypothesis the cache will
+continue to have the latest value whenever it is \clean{} for an address at time $T+1$.
+
+Analyzing a parent-child pair will suffice in proving
+Lemmas~\ref{localCompatibility1} and \ref{localCompatibility2}.  Proof of
+Lemma~\ref{noTransitWrite} is similar to the proof of
+Lemma~\ref{nonAncestorCompatible}.
+
+\section{The Final Result}\label{sec:finalresult}
+
+With our two main results about optimized processors and memories, it
+is now straightforward to complete the correctness proof of the
+composed optimized system.
+
+First, we need to know that, whenever the simple memory can generate
+some trace of messages, it could also generate the same trace with all
+speculative messages removed.  We need this property to justify the
+introduction of speculation, during our final series of refinements
+from the optimized system to SC.
+
+\begin{theorem}
+\label{mcorrect}
+$M_m \sqsubseteq_{\noSpec^n} M_m$
+\end{theorem}
+\begin{proof}
+By induction on traces, with an identity abstraction function.
+\end{proof}
+
+That theorem turns out to be the crucial ingredient to justify placing
+a speculative processor in-context with simple memory.
+
+\begin{theorem}
+\label{ocorrect1}
+$\text{P$^n_\text{so}$} + M_m \sqsubseteq \text{P$^n_\text{ref}$} + M_m$
+\end{theorem}
+\begin{proof}
+Follows from Theorem \ref{liftplus} (one of our preliminary results
+about $+$), Corollary \ref{ges}, and Theorem \ref{mcorrect}.
+\end{proof}
+
+The last theorem kept the memory the same while refining the
+processor.  The next one does the opposite, switching out memory.
+
+\begin{theorem}
+\label{ocorrect2}
+$\text{P$^n_\text{so}$} + M_c \sqsubseteq \text{P$^n_\text{so}$} + M_m$
+\end{theorem}
+\begin{proof}
+Follows from Theorems \ref{ccorrect} and \ref{liftplus} plus reflexivity of $\sqsubseteq$ (Theorem \ref{transitive}).
+\end{proof}
+
+\begin{theorem}
+\label{ofull}
+$\text{P$^n_\text{so}$} + M_c \sqsubseteq SC$
+\end{theorem}
+\begin{proof}
+We twice apply $\sqsubseteq$ transitivity (Theorem \ref{transitive}) to
+%connect Theorems \ref{ocorrect2} and \ref{ocorrect1}, and use Definition \ref{sc} of $SC$
+connect Theorems \ref{ocorrect2}, \ref{ocorrect1}, and \ref{scthm}.
+\end{proof}
