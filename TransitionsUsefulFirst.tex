@@ -1,5 +1,27 @@
 \section{Labeled Transition Systems}\label{sec:lts}
 
+\begin{figure*}
+\centering
+\begin{boxedminipage}{.53\textwidth}
+\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==$None$);$
+
+\hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
+
+\textbf{endrule}
+\end{boxedminipage}
+\begin{boxedminipage}{\textwidth}
+\inference[]
+{\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
+{\ioxe{$M_c$}
+{\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
+{\dt, \ch[ (c, p, \req) \coloneqq
+(a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,\\
+\wt[(c,a)\coloneqq x], \dwt, \inp, \outp}}
+\end{boxedminipage}
+\caption{Rule in Bluespec and its corresponding LTS transliteration}
+\label{both}
+\end{figure*}
+
 We make extensive use of the general theory of labeled transition
 systems, a semantics approach especially relevant to communicating
 concurrent systems.  As we are formalizing processors for
@@ -197,28 +219,6 @@ written in Bluespec. As an example consider an inference rule in LTS and the
 corresponding code in Bluespec in Figure \ref{both}. This code was actually
 written for the PowerPC system \cite{Khan:PowerPc} (we will be using this rule
 later in the paper when we describe the coherent caches).
-
-\begin{figure*}
-\centering
-\begin{boxedminipage}{.53\textwidth}
-\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==$None$);$
-
-\hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
-
-\textbf{endrule}
-\end{boxedminipage}
-\begin{boxedminipage}{\textwidth}
-\inference[]
-{\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
-{\ioxe{$M_c$}
-{\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
-{\dt, \ch[ (c, p, \req) \coloneqq
-(a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,\\
-\wt[(c,a)\coloneqq x], \dwt, \inp, \outp}}
-\end{boxedminipage}
-\caption{Rule in Bluespec and its corresponding LTS transliteration}
-\label{both}
-\end{figure*}
 
 \section{Decomposing a Multi-Processor System}
 \label{sec:store-atomicity}
