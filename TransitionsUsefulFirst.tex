@@ -201,7 +201,7 @@ later in the paper when we describe the coherent caches).
 \begin{figure*}
 \centering
 \begin{boxedminipage}{.53\textwidth}
-\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==None);$
+\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==$None$);$
 
 \hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
 
