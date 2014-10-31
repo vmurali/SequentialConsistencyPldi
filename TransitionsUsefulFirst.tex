@@ -191,6 +191,35 @@ system $A+B$ will be sound with respect to $A'+B'$.
 %\label{Ref}
 %\end{figure}
 %
+It is worth noting that the LTS notation described above, along with the
+composition operators are very similar to the semantics of hardware designs
+written in Bluespec. As an example consider an inference rule in LTS and the
+corresponding code in Bluespec in Figure \ref{both}. This code was actually
+written for the PowerPC system \cite{Khan:PowerPc} (we will be using this rule
+later in the paper when we describe the coherent caches).
+
+\begin{figure*}
+\centering
+\begin{boxedminipage}{.53\textwidth}
+\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==None);$
+
+\hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
+
+\textbf{endrule}
+\end{boxedminipage}
+\begin{boxedminipage}{\textwidth}
+\inference[]
+{\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
+{\ioxe{$M_c$}
+{\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
+{\dt, \ch[ (c, p, \req) \coloneqq
+(a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,\\
+\wt[(c,a)\coloneqq x], \dwt, \inp, \outp}}
+\end{boxedminipage}
+\caption{Rule in Bluespec and its corresponding LTS transliteration}
+\label{both}
+\end{figure*}
+
 \section{Decomposing a Multi-Processor System}
 \label{sec:store-atomicity}
 
