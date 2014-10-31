@@ -70,16 +70,6 @@ of the ISA to define the SC model.  Our final, optimized system is parametrized
 over an ISA in the same way.  In the course of the rest of this paper, we will
 define an optimized system $O$ and prove $O \sqsubseteq \text{SC}$.
 
-Note that, in this setting, an operational specification like the LTS
-for SC is precisely the right characterization of \textbf{full functional
-  correctness} for a hardware design, much as a
-precondition-postcondition pair does that job in a partial-correctness
-Hoare logic.  Our SC LTS fully constrains observable behavior of a
-system to remain consistent with simple interleaving.  Similar
-operational models are possible as top-level specifications for
-systems following weaker memory models, by giving the LTS for the \emph{Local
-Buffer} component and composing the three components simultaneously.
-
 However, we are not interested merely in verifying the particular system $O$.
 Instead, we want to structure our proof \emph{modularly}, so that different
 common hardware components can be verified separately, and, in a black-box
@@ -92,6 +82,16 @@ to reuse memory proofs for different kinds of processors.
 
 To support this style of modular decomposition, we need to introduce a few
 intermediate systems.
+
+Note that, in this setting, an operational specification like the LTS
+for SC is precisely the right characterization of \textbf{full functional
+  correctness} for a hardware design, much as a
+precondition-postcondition pair does that job in a partial-correctness
+Hoare logic.  Our SC LTS fully constrains observable behavior of a
+system to remain consistent with simple interleaving.  Similar
+operational models are possible as top-level specifications for
+systems following weaker memory models, by giving the LTS for the \emph{Local
+Buffer} component and composing the three components simultaneously.
 
 \begin{figure}
 \centering

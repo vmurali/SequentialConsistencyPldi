@@ -43,7 +43,7 @@ denote that $c$ is a leaf or L1 cache.
 
 \begin{figure}
 \centering
-\begin{tabular}{|l|p{5.5cm}|}
+\begin{tabular}{|l|p{6cm}|}
 \hline
 $\dt(c,a)$ & Data in cache $c$ for address $a$\\
 $\s(c,a)$ & Coherence state of cache $c$ for address $a$\\
@@ -324,7 +324,7 @@ Lemma~\ref{noTransitWrite}). Therefore, by the induction hypothesis the cache wi
 continue to have the latest value whenever it is \clean{} for an address at time $T+1$.
 
 Analyzing a parent-child pair will suffice in proving
-Lemmas~\ref{localCompatibility1} and \ref{localCompatibility2}.  Proof of
+Lemmas~\ref{conservative}, \ref{localCompatibility1} and \ref{localCompatibility2}.  Proof of
 Lemma~\ref{noTransitWrite} is similar to the proof of
 Lemma~\ref{nonAncestorCompatible}.
 
