@@ -94,6 +94,7 @@ systems following weaker memory models, by giving the LTS for the \emph{Local
 Buffer} component and composing the three components simultaneously.
 
 \begin{figure}
+\small
 \centering
 \begin{boxedminipage}[c]{.48\textwidth}
 \inference
@@ -119,13 +120,13 @@ Buffer} component and composing the three components simultaneously.
 {s, \pc, \top}{\st, a, v}}
 
 \inference
-[LdRep]
+[LdRp]
 {\dec(s,\pc) = (\ld, x, a) & \exec(s, \pc, (\ld, x, v)) = (\pc', s')}
 {\iol{P$_\text{ref}$}{s, \pc, \top}
 {s', \pc', \bot}{\ld, v}}
 
 \inference
-[StRep]
+[StRp]
 {\dec(s,\pc) = (\st, a, v) & \exec(s, \pc, (\st)) = (\pc', s')}
 {\iol{P$_\text{ref}$}{s, \pc, \top}
 {s', \pc', \bot}{\st}}
