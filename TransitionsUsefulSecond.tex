@@ -67,7 +67,7 @@ need no extra input from the memory; and $(\ld, x, v)$, where $v$ gives the
 contents of the requested memory cell.
 
 We can define sequential consistency using the simple memory from Figure
-\ref{$M_m$} as follows, for $n$ processors:
+\ref{M_m} as follows, for $n$ processors:
 \begin{defn}
 $SC \triangleq P^n_\text{ref} + M_m$
 \label{sc}
@@ -204,17 +204,16 @@ present the LTS for speculating processors.
 \label{Ooo}
 \end{figure*}
 
-Figure~\ref{Ooo} defines that LTS,
-P$_{\texttt{so}}$. This processor may issue arbitrary speculative
-loads, but it only ever \emph{commits} the next instruction in serial
-program order. 
-We will see the processor issue two kinds of loads, a speculative load (with
-the label suffix $\Spec$) and a commit or real load (with the label suffix $\Real$).  To
-maintain SC, every speculative
-load must have a matching verification load later on, and we maintain
-the illusion that the program only depends on the results of
-verification loads, which, along with stores, \emph{must be issued in
-serial program order}.
+Figure~\ref{Ooo} defines that LTS, P$_{\texttt{so}}$. This processor may issue
+arbitrary speculative loads (with label suffix $\Spec$), but it only ever
+\emph{commits} the next instruction in serial program order. These loads are
+issued non-deterministically from any load instruction after its address is
+computed.  This non-deterministic issue is going to be necessary when the
+memory LTS $M_m$ is replaced by caches.  To maintain SC, every speculative load
+must have a matching verification load later on (with label suffix $\Real$),
+and we maintain the illusion that the program only depends on the results of
+verification loads, which, along with stores, \emph{must be issued in serial
+program order}.
 
 When committing a
 previously issued speculative load instruction, the associated speculative

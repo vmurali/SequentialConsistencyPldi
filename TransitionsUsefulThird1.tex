@@ -31,13 +31,13 @@ system, to understand any other part of our development.  Therefore,
 some readers may want to skip this explanation upon first reading,
 skipping to the next section for a key theorem relating $M_c$ and $M_m$.
 
-%We describe a state of the system using 8 fields: $\dt$, $\ch$, $\s$, $\dst$,
-%$\wt$, $\dwt$, $\inp$, $\outp$. The $\inp$ and $\outp$ sets are the interfaces
-%to the processors and are exactly the same as in the simple memory LTS
-%(Figure~\ref{$M_m$}). The rest are summarized in Figure~\ref{fields}.
+We describe a state of the system using 8 fields: $\dt$, $\ch$, $\s$, $\dst$,
+$\wt$, $\dwt$, $\inp$, $\outp$. The $\inp$ and $\outp$ sets are the interfaces
+to the processors and are exactly the same as in the simple memory LTS
+(Figure~\ref{$M_m$}). The rest are summarized in Figure~\ref{fields}.
 
-We describe a state of the system using 6 fields: $\dt$, $\ch$, $\s$, $\dst$,
-$\wt$, $\dwt$ which are summarized in Figure~\ref{fields}.
+%We describe a state of the system using 6 fields: $\dt$, $\ch$, $\s$, $\dst$,
+%$\wt$, $\dwt$ which are summarized in Figure~\ref{fields}.
 We use $\parent(c,p)$ to denote that $p$ is the parent of $c$ and $\leaf(c)$ to 
 denote that $c$ is a leaf or L1 cache.
 
@@ -150,8 +150,7 @@ the child has to drop the downgrade request when it has already downgraded to
 the required state (Rule DropReq in Figure \ref{cache}), to avoid deadlocks
 by not dequeuing the request.
 
-%\input{TransitionsUsefulCache1}
-\input{TransitionsUsefulCache}
+\input{TransitionsUsefulCache1}
 
 \subsection{Proof that the MSI Protocol Preserves Store Atomicity}\label{sec:ccproof}
 \label{safety}
@@ -170,16 +169,16 @@ the specified state.
 
 \begin{defn}
 Store atomicity is defined as the following property:
-For a real or speculative load request-response pair $p, ((\ld, a), (\ld, v), \_)$
-sent from processor $p$ at time $T$
+For a load (or speculative load) request $\toM(\ld, a)$ (or $\toM(\spc\ld, t, a)$)
+from any processor, the response sent at time $T$
+$\toP(\ld, v)$ (or $\toP(\spc\ld, t, v)$) should be such that
 \begin{enumerate}
-\item $v = v_0$ (the initial value of any memory address) and no store request
-$p', (\st, a, v')$ has been sent from any processor $p'$ at any time $T'$ such
-that $T' < T$ or
-\item There is a store request $p', (\st, a, v)$ that was sent from some
-processor $p'$ at time $T_q$ such that $T_q < T$ and no other store request
-$p'', (\st, a, v')$ was sent by any processor $p''$ at any time $T'$ such that
-$T_q < T' < T$.
+\item $v = v_0$ (the initial value of any memory address) and no store
+  request $\toM(\st, a, v')$ has been processed at any time $T'$ such
+  that $T' < T$ or
+\item There is a store request $\toM(\st, a, v)$ that was processed at time $T_q$ such that
+$T_q < T$ and no other store
+request $\toM(\st, a, v')$ was processed at any time $T'$ such that $T_q < T' < T$.
 \end{enumerate}
 \label{sa}
 \end{defn}
@@ -208,12 +207,11 @@ starting from the initial state.
 At any time $T$, a cache $c$ that is \clean{} (defined below) for an address
 $a$ will have the most up-to-date value for that address, \ie{}
 \begin{enumerate}
-\item $\dt(c,a) = v_0$ and no store request $p, (\st, a, v)$ has been received
-from any processor $p$ at any time $T'$ such that $T' < T$ or
-\item There is a store request $p, (\st, a, v)$ that was received from
-processor $p$ at time $T_q$ such that $T_q < T \wedge \dt(c,a) = v$ and no
-other store request $p', (\st, a, v')$ was received from any processor $p'$ at
-any time $T'$ such that $T_q < T' < T$.
+\item $\dt(c,a) = v_0$ and no store request $\toM(\st, a, v)$ has been processed at
+any time $T'$ such that $T' < T$ or
+\item There is a store request $\toM(\st, a, v)$ that was processed at time $T_q$ such that
+$T_q < T \wedge \dt(c,a) = v$ and no other store
+request $\toM(\st, a, v')$ was processed at any time $T'$ such that $T_q < T' < T$.
 \end{enumerate}
 \label{latestValue}
 \end{lemma}
@@ -227,7 +225,6 @@ state for any of its children is at most \Sh.
 \label{clean}
 \end{defn}
 
-\vspace{-.1in}
 It is pretty intuitive to prove the store atomicity property given
 Lemma~\ref{latestValue}. A leaf cache can respond to a request only when it
 has the required permission, at which point it is guaranteed to have the latest
@@ -326,6 +323,6 @@ $\text{P$^n_\text{so}$} + M_c \sqsubseteq SC$
 \end{theorem}
 \begin{proof}
 We twice apply $\sqsubseteq$ transitivity (Theorem \ref{transitive}) to
-connect Theorems \ref{ocorrect2} and \ref{ocorrect1}, and use Definition \ref{sc} of $SC$
-%connect Theorems \ref{ocorrect2}, \ref{ocorrect1}, and \ref{scthm}.
+%connect Theorems \ref{ocorrect2} and \ref{ocorrect1}, and use Definition \ref{sc} of $SC$
+connect Theorems \ref{ocorrect2}, \ref{ocorrect1}, and \ref{scthm}.
 \end{proof}

@@ -25,7 +25,7 @@ addresses, and one bit of data. Symbolic model checking techniques have fared
 slightly better: McMillan \etal{} have verified a 2-level MSI protocol based on
 the Gigamax distributed multiprocessor using SMV~\cite{gigamax}. Optimizations
 on these techniques (\eg{} partial order reduction~\cite{part}, symmetry
-reduction~\cite{sym1, sym2}, compositional reasoning~\cite{comp}, \etc{}) scale
+reduction~\cite{sym1, sym2}, compositional reasoning~\cite{comp, Mccomp, mcc}, \etc{}) scale
 the approach further, but they are still unable to handle realistic
 hierarchical protocols. We might hope to achieve higher assurance and
 understanding of design ideas by verifying \emph{infinite families} of hardware
@@ -134,7 +134,7 @@ verification.
   algorithms, based on \emph{labeled transition systems}.
 We are able to verify
   the several components of a modern processor 
-\adam{(Figure~\ref{zoom} OK to have a forward reference to this figure?}
+%\adam{(Figure~\ref{zoom} OK to have a forward reference to this figure?}
 against general formal interfaces,
   enabling mixing and matching of different realizations of each interface,
   without doing any new proofs that peek beneath abstraction boundaries.

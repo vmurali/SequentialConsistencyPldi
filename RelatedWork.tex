@@ -14,14 +14,6 @@ used to verify an academic microprocessor AVI-1 \cite{windley1995formal}.
 Term-rewriting based techniques have been used to specify microprocessors, with
 the goal of making them more amenable to verification \cite{shen1999using}.
 
-%\murali{Next paragraph is all I know about this stuff, should probably be
-%removed}
-%\adam{What are you referring to with ``it'' in your comment?  I don't understand what this paragraph refers to.}
-%It has been verified using model checking \cite{qadeer2003verifying},
-%with a fixed number of processors and memory locations.  Model-checking has also
-%been used to verify communication fabrics \cite{chatterjee2012automatic}.
-
-
 Theorem provers have also been used in verifying cache coherence protocols.
 The correctness of the FLASH cache coherence protocol~\cite{flash} for a
 single-level hierarchy was proven with PVS~\cite{park} using a mapping, called
@@ -39,8 +31,6 @@ Cachet does not violate the CRF memory model, while Stoy \etal{} implemented
 portions of the paper-and-pencil proof using PVS. However, neither proof
 establishes that the protocol is store atomic. Rather, they show that Cachet
 obeys the CRF memory model, which is not restricted to store-atomic behavior.
-
-\xxx{TODO: Correct This}
 
 There has been a lot of work in providing frameworks for axiomatic
 specifications of memory models based on empirically observed behavior of
