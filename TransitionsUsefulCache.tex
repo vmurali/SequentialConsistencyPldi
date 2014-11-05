@@ -11,31 +11,32 @@
 {\io{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt}
 {\dt, \ch, \s, \dst, \wt, \dwt}{c,((\ld\req, a),(\ld\resp,v), \_)}}
-\vspace{.1in}
+\vspace{.05in}
 \inference[Store]
 {s(c,a) \geq M}
 {\io{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt}
 {\dt[(c, a) \coloneqq v], \ch, \s, \dst, \wt, \dwt}{c,(\st,a,v)}}
 
+\vspace{.05in}
 \textbf{Child Upgrade}
 
 \inference[ChildSendReq]
 {\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
-{\ioxe{$M_c$}
-{\dt, \ch, \s, \dst, \wt, \\ \dwt}
-{\dt, \ch[ (c, p, \req) \coloneqq (a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,\\
-\wt[(c,a)\coloneqq x], \dwt}}
-\vspace{.1in}
+{\io{$M_c$}
+{\dt, \ch, \s, \dst, \wt, \dwt}
+{\dt, \ch[ (c, p, \req) \coloneqq (a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,
+\wt[(c,a)\coloneqq x], \dwt}{}}
+\vspace{.05in}
 \inference[ParentRecvReq]
 {\parent(c,p) & \ch(c, p, \req) = \{(a, y, x)\} \uplus \rs & \s(p, a) \geq x
-\\ \compat(p, c, x, a) & \dwt(p,c,a) = \epsilon & \dst(p,c,a) \le y}
+ \compat(p, c, x, a) & \dwt(p,c,a) = \epsilon & \dst(p,c,a) \le y}
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst,\\ \wt, \dwt}
 {\dt, \ch[(c,p,\req) \coloneqq \rs][(p, c) \coloneqq (\resp, (a, \dst(p,c,a), x,\\ \;\;\;\;
-\ite{\dst(p,c,a) = I}{\dt(p,a)}{\_})) \coloncolon \ch(p,c)], \\ \s, \dst[(p,c, a)\coloneqq x],
+\ite{\dst(p,c,a) = I}{\dt(p,a)}{\_})) \coloncolon \ch(p,c)], \s, \dst[(p,c, a)\coloneqq x],
 \wt, \dwt}}
-\vspace{.1in}
+\vspace{.05in}
 \inference[ChildRecvRsp]
 {\parent(c,p) & \ch(p, c) = \rs \coloncolon (\resp, (a, y, x, v))}
 {\ioxe{$M_c$}
@@ -43,24 +44,25 @@
 {\dt[(c,a) \coloneqq \ite{y = I}{v}{\dt(c,a)}], \ch[(p,c) \coloneqq \rs], \s[(c,a) \coloneqq x], \dst,\\
 \wt[(c,a)\coloneqq \ite{\wt(c,a) \le x}{\epsilon}{\wt(c,a)}], \dwt}}
 
+\vspace{.05in}
 \textbf{Parent Downgrade}
 
 \inference[ParentSendReq]
 {\parent(c,p) & \dst(p,c,a) > x & \dwt(p,c,a) = \epsilon}
-{\ioxe{$M_c$}
-{\dt, \ch, \s, \dst, \wt, \\ \dwt}
-{\dt, \ch[(p, c)\coloneqq (\req, (a, \dst(p, c, a), x)) \coloncolon \ch(p,c)], \s, \dst,\\
-\wt, \dwt[(p, c,a)\coloneqq x]}}
-\vspace{.1in}
+{\io{$M_c$}
+{\dt, \ch, \s, \dst, \wt, \dwt}
+{\dt, \ch[(p, c)\coloneqq (\req, (a, \dst(p, c, a), x)) \coloncolon \ch(p,c)], \s, \dst,
+\wt, \dwt[(p, c,a)\coloneqq x]}{}}
+\vspace{.05in}
 \inference[ChildRecvReq]
 {\parent(c,p) & \ch(p, c) = \rs \coloncolon (\req, (a, y, x)) & (\forall i. \; \parent(i, c) \Rightarrow \dst(c, i, a) \le x)
 & \s(c,a) > x}
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst,\\ \wt, \dwt}
 {\dt, \ch[(p,c) \coloneqq \rs][(c, p,\resp) \coloneqq (a, \s(c,a), x,\\ \;\;\;\;
-\ite{\dst(c,a) = M}{\dt(c,a)}{\_}) \uplus \ch(c,p,\resp)], \\ \s[(c,a)\coloneqq x], \dst,
+\ite{\dst(c,a) = M}{\dt(c,a)}{\_}) \uplus \ch(c,p,\resp)], \s[(c,a)\coloneqq x], \dst,
 \wt, \dwt}}
-\vspace{.1in}
+\vspace{.05in}
 \inference[ParentRecvRsp]
 {\parent(c,p) & \ch(c,p,\resp) = \{(a, y, x, v)\} \uplus \rs & \dst(p,c,a) = y}
 {\ioxe{$M_c$}
@@ -68,6 +70,7 @@
 {\dt[(p,a) \coloneqq \ite{y = M}{v}{\dt(p,a)}], \ch[(c,p,\resp) \coloneqq \rs], \s, \dst[(p,c,a) \coloneqq x],\\
 \wt, \dwt[(p,c,a)\coloneqq \ite{\dwt(p,c,a) \ge x}{\epsilon}{\dwt(p,c,a)}]}}
 
+\vspace{.05in}
 \textbf{Voluntary downgrade for replacement}
 
 \inference[VolResp]
@@ -76,9 +79,10 @@
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst,\\ \wt, \dwt}
 {\dt, \ch[(c, p,\resp) \coloneqq (a, \s(c,a), x,\\ \;\;\;\;
-\ite{\s(c,a) = M}{\dt(c,a)}{\_}) \uplus \ch(c,p,\resp)], \\ \s[(c,a)\coloneqq x], \dst,
+\ite{\s(c,a) = M}{\dt(c,a)}{\_}) \uplus \ch(c,p,\resp)], \s[(c,a)\coloneqq x], \dst,
 \wt, \dwt}}
 
+\vspace{.05in}
 \textbf{Dropping request because of voluntary downgrade}
 
 \inference[DropReq]

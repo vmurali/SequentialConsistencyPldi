@@ -10,13 +10,14 @@
 \textbf{endrule}
 \end{boxedminipage}
 \begin{boxedminipage}{\textwidth}
+\small
 \inference[]
 {\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
-{\ioxe{$M_c$}
+{\io{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
 {\dt, \ch[ (c, p, \req) \coloneqq
-(a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,\\
-\wt[(c,a)\coloneqq x], \dwt, \inp, \outp}}
+(a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,
+\wt[(c,a)\coloneqq x], \dwt, \inp, \outp}{}}
 \end{boxedminipage}
 \caption{Rule in Bluespec and its corresponding LTS transliteration}
 \label{both}
