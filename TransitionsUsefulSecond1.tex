@@ -210,10 +210,10 @@ $\upd((s, \pc, \_), \mathit{rs}) =$
 \begin{math}
 \;\;\;\;\;\left\{
 \begin{array}{ll}
-s', \pc' &: (\ld, v) \in \mathit{rs} \wedge \dec(pc, s) = (\ld, x, a) \wedge\\
-\multicolumn{2}{r}{\exec(pc, s, (\ld, x, v)) = (s',\pc'))}\\
-s', \pc' &: (\st) \in \mathit{rs} \wedge \dec(pc, s) = (\st, a, v) \wedge\\
-\multicolumn{2}{r}{\exec(pc, s, (\st)) = (s',\pc')}\\
+s', \pc' &: (\ld, v) \in \mathit{rs} \wedge \dec(s, \pc) = (\ld, x, a) \wedge\\
+\multicolumn{2}{r}{\exec(s, \pc, (\ld, x, v)) = (s',\pc'))}\\
+s', \pc' &: (\st) \in \mathit{rs} \wedge \dec(s, \pc) = (\st, a, v) \wedge\\
+\multicolumn{2}{r}{\exec(s, \pc, (\st)) = (s',\pc')}\\
 s, \pc &: \text{otherwise if } \dec(pc,s) \neq H\\
 H &: \text{otherwise}
 \end{array}
