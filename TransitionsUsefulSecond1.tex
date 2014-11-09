@@ -12,17 +12,17 @@
 
 \inference
 [NonMem]
-{\theta(i) = (s, \pc) & \dec(s,\pc) = (\nm, x) \\ \exec(s, \pc, (\nm, x)) = (\pc', s')}
+{\theta(i) = (s, \pc) & \dec(s,\pc) = (\nm, x) \\ \exec(s, \pc, (\nm, x)) = (s',\pc')}
 {\io{SC}{\theta,m}{\theta[i \coloneqq (s', \pc')], m}{}}
 
 \inference
 [Load]
-{\theta(i) = (s,\pc) & \dec(s,\pc) = (\ld, x, a) \\ \exec(s, \pc, (\ld, x, m(a))) = (\pc', s')}
+{\theta(i) = (s,\pc) & \dec(s,\pc) = (\ld, x, a) \\ \exec(s, \pc, (\ld, x, m(a))) = (s',\pc')}
 {\io{SC}{\theta,m}{\theta[i\coloneqq(s',\pc')],m}{}}
 
 \inference
 [Store]
-{\theta(i) = (s,\pc) & \dec(s,\pc) = (\st, a, v) \\ \exec(s, \pc, (\st)) = (\pc', s')}
+{\theta(i) = (s,\pc) & \dec(s,\pc) = (\st, a, v) \\ \exec(s, \pc, (\st)) = (s',\pc')}
 {\io{SC}{\theta,m}{\theta[i\coloneqq(s',\pc')],m[a\coloneqq v]}{}}
 \end{boxedminipage}
 \caption{LTS for SC with $n$ simple processors}
@@ -43,7 +43,7 @@ architectural states $s$ (e.g., register files) and of program counters $\pc$.
 A function $\dec(s, \pc)$ figures out which instruction $\pc$ references in the
 current state, returning the instruction's ``decoded'' form.  A companion
 function $\exec(s, \pc, \mathit{dec})$ actually executes the instruction,
-returning the next program counter $\pc'$ and the new state $s'$.
+returning the new state $s'$ and the next program counter $\pc'$.
 
 The legal instruction forms, which are outputs of $\dec$, are $(\nm, x)$, for
 an operation not accessing memory; $(\ld, x, a)$, for a memory load from
@@ -105,7 +105,7 @@ Buffer} component and composing the three components simultaneously.
 
 \inference
 [NM]
-{\dec(s,\pc) = (\nm, x) & \exec(s, \pc, (\nm, x)) = (\pc', s')}
+{\dec(s,\pc) = (\nm, x) & \exec(s, \pc, (\nm, x)) = (s', \pc')}
 {\ioe{P$_\text{ref}$}{s,\pc,\bot}{s', \pc', \bot}}
 
 \inference
@@ -122,13 +122,13 @@ Buffer} component and composing the three components simultaneously.
 
 \inference
 [LdRp]
-{\dec(s,\pc) = (\ld, x, a) & \exec(s, \pc, (\ld, x, v)) = (\pc', s')}
+{\dec(s,\pc) = (\ld, x, a) & \exec(s, \pc, (\ld, x, v)) = (s',\pc')}
 {\iol{P$_\text{ref}$}{s, \pc, \top}
 {s', \pc', \bot}{\epsilon, \ld, v}}
 
 \inference
 [StRp]
-{\dec(s,\pc) = (\st, a, v) & \exec(s, \pc, (\st)) = (\pc', s')}
+{\dec(s,\pc) = (\st, a, v) & \exec(s, \pc, (\st)) = (s',\pc')}
 {\iol{P$_\text{ref}$}{s, \pc, \top}
 {s', \pc', \bot}{\st}}
 \end{boxedminipage}
@@ -211,9 +211,9 @@ $\upd((s, \pc, \_), \mathit{rs}) =$
 \;\;\;\;\;\left\{
 \begin{array}{ll}
 s', \pc' &: (\ld, v) \in \mathit{rs} \wedge \dec(pc, s) = (\ld, x, a) \wedge\\
-\multicolumn{2}{r}{\exec(pc, s, (\ld, x, v)) = (\pc', s'))}\\
+\multicolumn{2}{r}{\exec(pc, s, (\ld, x, v)) = (s',\pc'))}\\
 s', \pc' &: (\st) \in \mathit{rs} \wedge \dec(pc, s) = (\st, a, v) \wedge\\
-\multicolumn{2}{r}{\exec(pc, s, (\st)) = (\pc', s')}\\
+\multicolumn{2}{r}{\exec(pc, s, (\st)) = (s',\pc')}\\
 s, \pc &: \text{otherwise if } \dec(pc,s) \neq H\\
 H &: \text{otherwise}
 \end{array}
@@ -365,7 +365,7 @@ present the LTS for speculating processors.
 {\iox{\text{P$_\text{so}$}}{s,\pc,\top,\\\rob,\ppc}{s',\pc',\bot,\\\retire(\rob),\ppc}{\text{ToP}(\epsilon, \ld,v)}}
 
 \inference[LdRpBad]
-{\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) \\ v' \neq v & \exec(s,\pc,(\ld,x,v)) = (\pc'', s'')}
+{\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) \\ v' \neq v & \exec(s,\pc,(\ld,x,v)) = (s'',\pc'')}
 {\iox{\text{P$_\text{so}$}}{s,\pc,\top,\\\rob,\ppc}{s'',\pc'',\bot,\phi,\\\setBp(\ppc,\pc)}{\text{ToP}(\epsilon, \ld, v)}}
 
 
@@ -427,12 +427,12 @@ $\io{P$_\text{so}^{*}$}{s_0,\pc_0,\bot,\phi,\ppc_0}{s,\pc,\wait,\rob,\ppc}{\eta}
 \begin{array}{ll}
 \commit(\rob) = (\pc, \pc', (\nm, s')) &\Rightarrow
 \exists x. \; \dec(s,\pc) = (\nm, x) \wedge \exec(s,\pc, (\nm,x)) =
-(\pc', s')\\
+(s',\pc')\\
 \commit(\rob) = (\pc, \pc', (\ld, x, a, v, s')) & \Rightarrow
-\dec(s,\pc) = (\ld, x,a) \wedge \exec(s,\pc, (\ld,x,v)) = (\pc', s')\\
+\dec(s,\pc) = (\ld, x,a) \wedge \exec(s,\pc, (\ld,x,v)) = (s',\pc')\\
 \commit(\rob) = (\pc, \pc', (\st, a, v, s')) &\Rightarrow
 \dec(s,\pc) = (\st, a,v) \wedge \exec(s,\pc, (\st)) =
-(\pc', s')\\
+(s',\pc')\\
 \commit(\rob) = H & \Rightarrow
 \dec(s, \pc) = H\\
 \end{array}
