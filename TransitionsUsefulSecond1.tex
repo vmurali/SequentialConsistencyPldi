@@ -203,6 +203,7 @@ For a system of $n$ processors, our decoupled SC implementation is
 $\text{P$^n_{\text{ref}}$} + M_m$.
 
 \begin{figure*}[t]
+\small
 \begin{math}
 \upd((s, \pc, \_), \mathit{rs}) =
 \left\{
@@ -269,11 +270,11 @@ resolving conditional jumps; and a
 are worth issuing at which moments (in effect \emph{reordering} later
 instructions to happen before earlier instructions have finished).
 
-The branch predictor is the simpler of the two components to model.
+The branch predictor is the simpler of the two components.
 We indicate branch-predictor state with metavariable $\ppc$.
 The operations on such state are $\curPpc(\ppc)$, to extract the
 current program-counter prediction; $\nextPpc(\ppc)$, to ask the
-predictor to step forward by one instruction; and $\setBp(\ppc, \pc)$,
+predictor to get the program-counter for the next instruction; and $\setBp(\ppc, \pc)$,
 to reset prediction to begin at a known-accurate position $\pc$.  It
 turns out that we need to impose no explicit correctness criterion on
 branch predictors.  The processor uses predictions only as hints, and
@@ -420,6 +421,7 @@ If $P_\text{so}$ reaches a state $(s, \pc, \wait, \rob, \ppc)$, \ie{}\hspace{.2c
 $\io{P$_\text{so}^{*}$}{s_0,\pc_0,\bot,\phi,\ppc_0}{s,\pc,\wait,\rob,\ppc}{\eta} \Rightarrow$
 
 \begin{math}
+\small
 \;\;\;\;\;\;\;\;\left\{
 \begin{array}{ll}
 \commit(\rob) = (\pc, \pc', (\nm, s')) &\Rightarrow

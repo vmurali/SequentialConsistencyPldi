@@ -62,6 +62,7 @@ transition relation with the following inference rules. We treat $n$-tuples as
 functions keyed on numeric positions, and we write $\theta[i := v]$ for
 updating $n$-tuple $\theta$ to overwrite the $i$th position with value $v$, and
 we treat any label $(i, \epsilon)$ as $\epsilon$.
+\small
 $$\inference[i]
 {\theta(i) = a & \io{$A$}{a}{a'}{\ell} & a' \neq H}
 {\io{$\smulti{n}{A}$}{\theta}{\theta[i:=a']}{i,\ell}}
@@ -84,6 +85,7 @@ $\mathcal S_B$ respectively, the \textbf{communicating composition} $A + B$ is
 a new LTS with states $\mathcal S_A \times \mathcal S_B$ and an empty label set,
 defined as follows:
 \vspace{-.2in}\begin{center}
+\small
 $$\inference[$A$]
 {\io{$A$}{a}{a'}{} & a' \neq H}
 {\io{$A + B$}{a, b}{a', b}{}}
