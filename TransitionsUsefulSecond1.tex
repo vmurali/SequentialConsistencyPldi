@@ -109,13 +109,13 @@ Buffer} component and composing the three components simultaneously.
 {\ioe{P$_\text{ref}$}{s,\pc,\bot}{s', \pc', \bot}}
 
 \inference
-[LdReq]
+[LdRq]
 {\dec(s,\pc) = (\ld, x, a)}
 {\ior{P$_\text{ref}$}{s, \pc, \bot}
 {s, \pc, \top}{\epsilon, \ld, a}}
 
 \inference
-[StReq]
+[StRq]
 {\dec(s,\pc) = (\st, a, v)}
 {\ior{P$_\text{ref}$}{s, \pc, \bot}
 {s, \pc, \top}{\st, a, v}}
@@ -138,6 +138,7 @@ Buffer} component and composing the three components simultaneously.
 \end{figure}
 
 \begin{figure*}
+\small
 \centering
 \begin{boxedminipage}[c]{.48\textwidth}
 \inference
@@ -347,31 +348,32 @@ next instruction.
 We postpone characterization of correct reorder buffers until after we
 present the LTS for speculating processors.
 
-\begin{figure*}[t]
+\begin{figure}[t]
+\small
 \centering
 \begin{boxedminipage}[c]{.95\textwidth}
 \inference[Fetch]
 {}
-{\ioe{P$_\text{so}$}{s,\pc,\wait,\rob,\ppc}{s,\pc,\wait,\add(\curPpc(\ppc),\rob),\nextPpc(\ppc)}}
+{\ioxe{P$_\text{so}$}{\hspace{-.2cm}s,\pc,\wait,\\\rob,\ppc}{\hspace{-.2cm}s,\pc,\wait,\add(\curPpc(\ppc),\\\;\;\;\rob),\nextPpc(\ppc)}}
 
 \inference[Compute]
 {\compute(\rob) = (\rob',\epsilon)}
 {\ioe{\text{P$_\text{so}$}}{s,\pc,\wait,\rob,\ppc}{s,\pc,\wait,\rob',\ppc}}
 
-\inference[SpecLdReq]
+\inference[SpLdRq]
 {\compute(\rob) = (\rob',(\spc\ld,t,a))}
 {\ior{\text{P$_\text{so}$}}{s,\pc,\wait,\rob,\ppc}{s,\pc,\wait,\rob',\ppc}
 {t,\ld, a}}
 
-\inference[SpecLdRep]
+\inference[SpLdRp]
 {t \neq \epsilon}
-{\iol{\text{P$_\text{so}$}}{s,\pc,\wait,\rob,\ppc}
-{s,\pc,\wait,\upd\ld(\rob, t, v),\ppc
-}{t,\ld,v}}
+{\iox{\text{P$_\text{so}$}}{s,\pc,\wait,\\\rob,\ppc}
+{s,\pc,\wait,\\\upd\ld(\rob, t, v),\ppc
+}{\text{ToP}(t,\ld,v)}}
 
 \inference[Abort]
 {\commit(\rob) = (\pc',\_,\_) & \pc' \neq \pc}
-{\ioe{\text{P$_\text{so}$}}{s,\pc,\wait,\rob,\ppc}{s,\pc,\wait,\phi,\setBp(\ppc,\pc)}}
+{\ioxe{\text{P$_\text{so}$}}{s,\pc,\wait,\\\rob,\ppc}{s,\pc,\wait,\phi,\\\setBp(\ppc,\pc)}}
 
 \inference[Halt]
 {\commit(\rob) = H}
@@ -381,32 +383,32 @@ present the LTS for speculating processors.
 {\commit(\rob) = (\pc,\pc',(\nm,s'))}
 {\ioe{\text{P$_\text{so}$}}{s,\pc,\bot,\rob,\ppc}{s',\pc',\bot,\retire(\rob),\ppc}}
 
-\inference[StReq]
+\inference[StRq]
 {\commit(\rob) = (\pc,\pc',(\st,a,v,s'))}
 {\ior{\text{P$_\text{so}$}}{s,\pc,\bot,\rob,\ppc}{s,\pc,\top,\rob,\ppc}
 {\st, a, v}}
 
-\inference[LdReq]
+\inference[LdRq]
 {\commit(\rob) = (\pc,\pc',(\ld,x,a,v,s'))}
 {\ior{\text{P$_\text{so}$}}{s,\pc,\bot,\rob,\ppc}{s,\pc,\top,\rob,\ppc}{\epsilon, \ld, a}}
-\inference[StRep]
+\inference[StRp]
 {\commit(\rob) = (\pc,\pc',(\st,a,v,s'))}
 {\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s',\pc',\bot,\retire(\rob),\ppc}{\st}}
 
-\inference[LdRepGood]
+\inference[LdRpGood]
 {\commit(\rob) = (\pc,\pc',(\ld,x,a,v,s'))}
-{\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s',\pc',\bot,\retire(\rob),\ppc}{\epsilon, \ld,v}}
+{\iox{\text{P$_\text{so}$}}{s,\pc,\top,\\\rob,\ppc}{s',\pc',\bot,\\\retire(\rob),\ppc}{\text{ToP}(\epsilon, \ld,v)}}
 
-\inference[LdRepBad]
-{\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) & v' \neq v & \exec(s,\pc,(\ld,x,v)) = (\pc'', s'')}
-{\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s'',\pc'',\bot,\phi,\setBp(\ppc,\pc)}{\epsilon, \ld, v}}
+\inference[LdRpBad]
+{\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) \\ v' \neq v & \exec(s,\pc,(\ld,x,v)) = (\pc'', s'')}
+{\iox{\text{P$_\text{so}$}}{s,\pc,\top,\\\rob,\ppc}{s'',\pc'',\bot,\phi,\\\setBp(\ppc,\pc)}{\text{ToP}(\epsilon, \ld, v)}}
 
 
 \end{boxedminipage}
 
 \caption{Speculating, out-of-order issue processor}
 \label{Ooo}
-\end{figure*}
+\end{figure}
 
 Figure~\ref{Ooo} defines that LTS,
 P$_{\texttt{so}}$. This processor may issue arbitrary speculative
