@@ -149,7 +149,7 @@ in the PowerPC system.
 \;\;\uplus \ch(c,p,\req)], \s, \dst,\\
 \wt[(c,a)\coloneqq x], \dwt,\inp, \outp}{}}
 \end{boxedminipage}
-\caption{Rule in Bluespec and its corresponding LTS transliteration}
+\caption{Bluespec rule and its corresponding LTS rule}
 \label{both}
 \end{figure}
 
@@ -186,7 +186,7 @@ decomposition of any multi-processor system independently of the memory model
 that it implements, and we discuss the store-atomicity property of the memory
 sub-component. In Section~\ref{sec:sc} we
 give a simple formal model of sequential consistency.  The
-following sections refine the two main subcomponents from Figure~\ref{zoom}.
+following sections refine the two main subcomponents of our multi-processor system.
 Section~\ref{sec:ooo} discusses definition and verification of a speculative
 processor model, and Section~\ref{sec:cc}
 defines and proves our hierarchical cache-coherence protocol.  Finally, in
