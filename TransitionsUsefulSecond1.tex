@@ -258,7 +258,7 @@ H &: \text{otherwise}
 \begin{theorem}
 $\text{P$^n_{\text{ref}}$} + M_m \sqsubseteq SC$\label{scthm}
 \end{theorem}
-\begin{proof}
+\begin{prf}
 \vspace{-.1cm}
 By induction on traces of the decoupled system.  We need to choose an
 abstraction function $f$ from states of the complex system to states of
@@ -283,7 +283,7 @@ Therefore, the apparently ambiguous definition of $\upd$ is actually
 well-founded.  The only interesting case in the proof arises when the memory adds a
 response to $rs$; one has to show that the SC system can lead to the same
 (projected) state.
-\end{proof}
+\end{prf}
 
 \section{Speculative Out-Of-Order Processor}\label{sec:ooo}
 
@@ -496,18 +496,18 @@ processor, with speculative messages erased.
 \label{ocorrect}
 $\text{P$_\text{so}$} \sqsubseteq_\noSpec$ P$_\text{ref}$
 \end{theorem}
-\begin{proof}
+\begin{prf}
 By induction on P$_\text{so}$ traces, using a proper abstraction
 function (which drops the speculative messages and the $\rob$ and $\ppc$ states) to relate the two systems.  Invariant~\ref{rob} is crucial to
 relate the reorder buffer's behavior with the simple in-order
 execution of P$_\text{ref}$.
-\end{proof}
+\end{prf}
 
 \begin{corollary}
 \label{ges}
 $\text{P$^n_\text{so}$} \sqsubseteq_{\noSpec^n}$ P$_\text{ref}^n$
 \end{corollary}
-\begin{proof}
-Direct consequence of Theorems~\ref{ocorrect},~\ref{liftn} (where the
+\begin{prf}
+Direct consequence of Theorems~\ref{ocorrect},~\ref{liftn} (the
 latter is one of our preliminary results about $n$-repetition).
-\end{proof}
+\end{prf}

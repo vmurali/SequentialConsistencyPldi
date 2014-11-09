@@ -48,8 +48,9 @@ denote that $c$ is a leaf or L1 cache.
 $\dt(c,a)$ & Data in cache $c$ for address $a$\\
 $\s(c,a)$ & Coherence state of cache $c$ for address $a$\\
 $\dst(p,c,a)$ & Directory state of cache $p$ for child $c$ and address $a$\\
-$\wt(c,a)$ & Gives cache $c$'s desired coherence state to upgrade to (for address $a$), or $\epsilon$ if none\\
-$\dwt(p,c,a)$ & Gives cache $p$'s desired coherence state for its child $c$ to downgrade to (for address $a$), or $\epsilon$ if none\\
+$\wt(c,a)$ & State cache $c$ is waiting to upgrade to for address $a$, or $\epsilon$\\ %Gives cache $c$'s desired coherence state to upgrade to (for address $a$), or $\epsilon$ if none\\
+$\dwt(p,c,a)$ & State cache $p$ is waiting its child $c$ to downgrade to for address $a$, or $\epsilon$\\
+%$\dwt(p,c,a)$ & Gives cache $p$'s desired coherence state for its child $c$ to downgrade to (for address $a$), or $\epsilon$ if none\\
 $\ch$ & Channels between nodes in the system\\
 \hline
 \end{tabular}
@@ -115,7 +116,7 @@ spontaneously requests an upgrade for that address.
 
 \begin{defn}
 $\compat(p, c, x, a) =$
-\vspace{.3cm}
+%\vspace{.3cm}
 
 \begin{math}
 \left\{
@@ -293,9 +294,9 @@ from the optimized system to SC.
 \label{mcorrect}
 $M_m \sqsubseteq_{\noSpec^n} M_m$
 \end{theorem}
-\begin{proof}
+\begin{prf}
 By induction on traces, with an identity abstraction function.
-\end{proof}
+\end{prf}
 
 That theorem turns out to be the crucial ingredient to justify placing
 a speculative processor in-context with simple memory.
@@ -304,10 +305,10 @@ a speculative processor in-context with simple memory.
 \label{ocorrect1}
 $\text{P$^n_\text{so}$} + M_m \sqsubseteq \text{P$^n_\text{ref}$} + M_m$
 \end{theorem}
-\begin{proof}
+\begin{prf}
 Follows from Theorem \ref{liftplus} (one of our preliminary results
 about $+$), Corollary \ref{ges}, and Theorem \ref{mcorrect}.
-\end{proof}
+\end{prf}
 
 The last theorem kept the memory the same while refining the
 processor.  The next one does the opposite, switching out memory.
@@ -316,16 +317,16 @@ processor.  The next one does the opposite, switching out memory.
 \label{ocorrect2}
 $\text{P$^n_\text{so}$} + M_c \sqsubseteq \text{P$^n_\text{so}$} + M_m$
 \end{theorem}
-\begin{proof}
+\begin{prf}
 Follows from Theorems \ref{ccorrect} and \ref{liftplus} plus reflexivity of $\sqsubseteq$ (Theorem \ref{transitive}).
-\end{proof}
+\end{prf}
 
 \begin{theorem}
 \label{ofull}
 $\text{P$^n_\text{so}$} + M_c \sqsubseteq SC$
 \end{theorem}
-\begin{proof}
+\begin{prf}
 We twice apply $\sqsubseteq$ transitivity (Theorem \ref{transitive}) to
 %connect Theorems \ref{ocorrect2} and \ref{ocorrect1}, and use Definition \ref{sc} of $SC$
 connect Theorems \ref{ocorrect2}, \ref{ocorrect1}, and \ref{scthm}.
-\end{proof}
+\end{prf}

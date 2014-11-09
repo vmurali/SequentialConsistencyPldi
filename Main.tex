@@ -38,6 +38,17 @@
 \usepackage{url}
 \usepackage{amsfonts}
 
+\usepackage{thmtools}
+\declaretheoremstyle[%
+  spaceabove=-6pt,%
+  spacebelow=6pt,%
+  headfont=\normalfont\itshape,%
+  postheadspace=1em,%
+  qed=\qedsymbol%
+]{mystyle} 
+\declaretheorem[name={Proof},style=mystyle,unnumbered,
+]{prf}
+
 \usepackage[pdftex]{graphicx}
 \graphicspath{{figures/}}
 \DeclareGraphicsExtensions{.pdf,.jpg,.png}
