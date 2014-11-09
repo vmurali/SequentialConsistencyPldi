@@ -203,9 +203,6 @@ lemmas, making their verification easier by reusing most of our MSI proof; we
 omit the discussion of extension of this proof to other protocols for space
 reasons.
 
-The following lemmas hold in the state reached after any number of transitions
-starting from the initial state.
-
 \begin{lemma}
 \textit{latestValue}:
 At any time $T$, a cache $c$ that is \clean{} (defined below) for an address
@@ -232,10 +229,9 @@ state for any of its children is at most \Sh.
 It is pretty intuitive to prove the store atomicity property given
 Lemma~\ref{latestValue}. A leaf cache can respond to a request only when it
 has the required permission, at which point it is guaranteed to have the latest
-value, because it is \textit{clean} (as it has no children).
-
-Lemma~\ref{latestValue} requires further decomposition into more
-lemmas.
+value, because it is \textit{clean} (as it has no children). To prove Lemma
+\ref{latestValue}, it has to be decomposed futher into the following, each of
+which holds at any time.
 
 \begin{lemma}
 \textit{nonAncestorCompatible}: For two distinct caches $c_1$ and $c_2$ such
@@ -246,7 +242,7 @@ for each address $a$, $\s(c_1,a)$ and $\s(c_2,a)$ are
 \label{nonAncestorCompatible}
 \end{lemma}
 \begin{defn}
-\textit{compatible}: Values of states $x_1$ and $x_2$ are \textit{compatible}
+\textit{compatible}: States $x_1$ and $x_2$ are \textit{compatible}
 iff whenever either $x_1$ or $x_2$ is \Mo{}, the other is \In.
 \label{compatible}
 \end{defn}
@@ -260,8 +256,8 @@ $a$, and the data must be sent from a \textit{clean} cache.
 \end{lemma}
 
 \begin{lemma}
-\textit{conservative}: The state of an address in a cache is never greater than
-the corresponding entry in its parent's directory.
+\textit{conservative}: A cache's state for an address is never greater than
+the corresponding state in its parent's directory.
 \label{conservative}
 \end{lemma}
 

@@ -24,7 +24,7 @@
 {\theta(i) = (s,\pc) & \dec(s,\pc) = (\st, a, v) \\ \exec(s, \pc, (\st)) = (\pc', s')}
 {\io{SC}{\theta,m}{\theta[i\coloneqq(s',\pc')],m[a\coloneqq v]}{}}
 \end{boxedminipage}
-\caption{LTS for sequential consistency with $n$ simple processors}
+\caption{LTS for SC with $n$ simple processors}
 \label{Ref}
 \end{figure}
 
@@ -62,7 +62,7 @@ address to value $v_0$; and $\theta_0$ maps every processor ID to
 $(s_0, \pc_0)$, using architecture-specific default values $s_0$ and
 $\pc_0$.
 
-%\medskip
+\medskip
 
 This LTS encodes Lamport's notion of SC, where processors take turns executing
 nondeterministically in a simple interleaving.  We need know very few details
@@ -238,7 +238,7 @@ For a system of $n$ processors, our decoupled SC implementation is
 $\text{P$^n_{\text{ref}}$} + M_m$.
 
 \begin{figure*}[t]
-\begin{displaymath}
+\begin{math}
 \upd((s, \pc, \_), \mathit{rs}) =
 \left\{
 \begin{array}{ll}
@@ -250,7 +250,7 @@ s, \pc &: \text{otherwise if } \dec(pc,s) \neq H\\
 H &: \text{otherwise}
 \end{array}
 \right.
-\end{displaymath}
+\end{math}
 \caption{Mapping of states from $(\text{P$^n_\text{ref}$} + M_m)$ to SC}
 \label{smap}
 \end{figure*}
@@ -259,7 +259,7 @@ H &: \text{otherwise}
 $\text{P$^n_{\text{ref}}$} + M_m \sqsubseteq SC$\label{scthm}
 \end{theorem}
 \begin{prf}
-\vspace{-.1cm}
+%\vspace{-.1cm}
 By induction on traces of the decoupled system.  We need to choose an
 abstraction function $f$ from states of the complex system to states of
 the simple system.  This function must be inductive in the
@@ -450,8 +450,7 @@ to that of the reference processor.
 
 \begin{figure*}[t]
 \begin{inv}
-If $P_\text{so}$ reaches a state $(s, \pc, \wait, \rob, \ppc)$, \ie{}
-
+If $P_\text{so}$ reaches a state $(s, \pc, \wait, \rob, \ppc)$, \ie{}\hspace{.2cm}
 $\io{P$_\text{so}^{*}$}{s_0,\pc_0,\bot,\phi,\ppc_0}{s,\pc,\wait,\rob,\ppc}{\eta} \Rightarrow$
 
 \begin{math}
