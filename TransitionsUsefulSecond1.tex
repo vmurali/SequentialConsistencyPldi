@@ -190,13 +190,12 @@ responses from memory back to the processor.
 A state of P$_{\text{ref}}$ is a triple $(s, \pc, \wait)$, giving the current architectural
 state $s$ and program counter $\pc$, as well as a Boolean flag $\wait$
 indicating whether the processor is blocked waiting for a response from the
-memory system.
-
-As in the SC model, we change the state of the processor to $H$ whenever
-$\dec$ returns $H$.  Note that there is some subtlety in the design of
-this semantics regarding halting; we plan ahead to be sure we will be able to prove the
-appropriate simulation facts.  Those proofs would be harder if, \eg{}
-a processor could halt while it is still waiting for a memory response.
+memory system. As in the SC model, we change the state of the processor to $H$
+whenever $\dec$ returns $H$. 
+%Note that there is some subtlety in the design of
+%this semantics regarding halting; we plan ahead to be sure we will be able to prove the
+%appropriate simulation facts.  Those proofs would be harder if, \eg{}
+%a processor could halt while it is still waiting for a memory response.
 
 As initial state for system $P_\text{ref}$, we use $(s_0, \pc_0, \bot)$.
 
@@ -223,9 +222,9 @@ $(\emptyset, \emptyset, m_0)$, with empty queues.
 Note that we have used $\uplus$ for inserting (or removing) from the buffers
 $\inp$ and $\outp$. The intent is to convey that $\inp$ and $\outp$ are treated
 as unordered sets. We will later use $\coloncolon$ for inserting (or removing)
-from FIFO buffers. Intuitively, the unordered requests/responses set suffices
-even for requests/responses for the same address because the processor always
-waits for a response before sending the next request.
+from FIFO buffers. %Intuitively, the unordered requests/responses set suffices
+%even for requests/responses for the same address because the processor always
+%waits for a response before sending the next request.
 %\medskip
 
 Now we can compose these LTSes to produce an implementation of SC.  Rule SpLoad

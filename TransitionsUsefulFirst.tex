@@ -52,10 +52,7 @@ intuition is that $A$ is one process within a concurrent system. The
 label $\ell$ from set $\mathcal L$ of labels is produced when $A$
 participates in some IO exchange with another process; otherwise it is
 an empty or ``silent'' label $\epsilon$.  As a shorthand, we sometimes
-omit labels for $\epsilon$ steps.  Note that the IO exchange can be
-input, output, or both, and its interpretation is dependent on the
-context.
-
+omit labels for $\epsilon$ steps.
 
 \subsection{Basic Constructions on LTSes}
 
@@ -221,7 +218,7 @@ corresponding code in Bluespec in Figure \ref{both}. This code was actually
 written for the PowerPC system \cite{Khan:PowerPc} (we will be using this rule
 later in the paper when we describe the coherent caches).
 
-\section{Decomposing a Multi-Processor System}
+\section{Decomposing a Share Memory Multi-Processor System}
 \label{sec:store-atomicity}
 
 \begin{figure}
@@ -231,7 +228,7 @@ later in the paper when we describe the coherent caches).
 \label{zoom}
 \end{figure}
 
-Most any conventional multi-processor system can be divided into 3 components as shown in
+Any conventional multi-processor system can be logically divided into 3 components as shown in
 Figure \ref{zoom}. 
 We show the top-level system design at top right, and we zoom in on boxes standing for the
 memory system and a single processor ($P_i$).
@@ -239,8 +236,8 @@ The processor component $P_i$ can be implemented in a
 variety of ways, from literal execution of instructions in program order, to complex speculation
 with instructions run simultaneously to exploit parallelism. The memory component is normally implemented
 using a hierarchy of caches, in order to increase the performance of the
-overall system, since the latency of accessing a memory directly is very slow
-compared to accessing a much smaller cache. The component between each
+overall system, since the latency of accessing a memory directly is large
+compared to that of accessing a much smaller cache. The component between each
 processor and the global memory sub-system contains local buffers, $B_i$, specific to
 the processor $P_i$ they are connected to. 
 
