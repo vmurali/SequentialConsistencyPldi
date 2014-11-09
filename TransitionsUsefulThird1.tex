@@ -48,8 +48,8 @@ denote that $c$ is a leaf or L1 cache.
 $\dt(c,a)$ & Data in cache $c$ for address $a$\\
 $\s(c,a)$ & Coherence state of cache $c$ for address $a$\\
 $\dst(p,c,a)$ & Directory state of cache $p$ for child $c$ and address $a$\\
-$\wt(c,a)$ & State cache $c$ is waiting to upgrade to for address $a$, or $\epsilon$\\ %Gives cache $c$'s desired coherence state to upgrade to (for address $a$), or $\epsilon$ if none\\
-$\dwt(p,c,a)$ & State cache $p$ is waiting its child $c$ to downgrade to for address $a$, or $\epsilon$\\
+$\wt(c,a)$ & State that cache $c$ is waiting to upgrade to, for address $a$, or $\epsilon$\\ %Gives cache $c$'s desired coherence state to upgrade to (for address $a$), or $\epsilon$ if none\\
+$\dwt(p,c,a)$ & State that cache $p$ is waiting its child $c$ to downgrade to, for address $a$, or $\epsilon$\\
 %$\dwt(p,c,a)$ & Gives cache $p$'s desired coherence state for its child $c$ to downgrade to (for address $a$), or $\epsilon$ if none\\
 $\ch$ & Channels between nodes in the system\\
 \hline
@@ -234,15 +234,17 @@ value, because it is \textit{clean} (as it has no children). To prove Lemma
 which holds at any time.
 
 \begin{lemma}
-\textit{nonAncestorCompatible}: For two distinct caches $c_1$ and $c_2$ such
-that neither is an ancestor of the other in the cache-tree hierarchy (where
-the ancestor relation is the reflexive-transitive closure of the parent relation),
-for each address $a$, $\s(c_1,a)$ and $\s(c_2,a)$ are
-\textit{compatible} (defined below).
+\textit{nonAncestorCompatible}: For two distinct caches $c_1$ and $c_2$, neither of which is the
+ancestor of the other in the cache-tree,
+%such
+%that neither is an ancestor of the other in the cache-tree hierarchy (where
+%the ancestor relation is the reflexive-transitive closure of the parent relation),
+coherence states $\s(c_1,a)$ and $\s(c_2,a)$ are
+\textit{compatible} (defined below) for every address $a$.
 \label{nonAncestorCompatible}
 \end{lemma}
 \begin{defn}
-\textit{compatible}: States $x_1$ and $x_2$ are \textit{compatible}
+\textit{compatible}: Coherence states $x_1$ and $x_2$ are \textit{compatible}
 iff whenever either $x_1$ or $x_2$ is \Mo{}, the other is \In.
 \label{compatible}
 \end{defn}
