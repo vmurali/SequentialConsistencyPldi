@@ -18,28 +18,18 @@
 {\outp(i) = \mathit{rs} \uplus \{r\}}
 {\ioln{$M_c$}{\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}{\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp[i \coloneqq \mathit{rs}]}{i}{r}}
 \vspace{.1in}
-\inference[SpecLoad]
-{\inp(c) = \{(\spc\ld, t, a)\} \uplus \rs & \s(c,a) \geq S}
-{\ioxe{$M_c$}
-{\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
-{
-\dt, \ch, \s, \dst, \wt, \dwt, \inp[c \coloneqq \rs],\\
-\outp[c \coloneqq \outp(c) \uplus \{(\spc\ld, t, \dt(c, a))\}]
-}}
-\vspace{.1in}
 \inference[Load]
-{\inp(c) = \{(\ld, a)\} \uplus \rs & \s(c,a) \geq S}
+{\inp(c) = \{(t, \ld, a)\} \uplus \rs & \s(c,a) \geq S}
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
-{\dt, \ch, \s, \dst, \wt, \dwt, \inp[c \coloneqq \rs], \\
-\outp[c \coloneqq \outp(c) \uplus \{(\ld, \dt(c, a))\}]}}
+{\dt, \ch, \s, \dst, \wt, \dwt, \inp[c \coloneqq \rs], 
+\outp[c \coloneqq \outp(c) \uplus \{(t, \ld, \dt(c, a))\}]}}
 \vspace{.1in}
 \inference[Store]
 {\inp(c) = \{(\st, a, v)\} \uplus \rs & \s(c,a) \geq M}
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
 {\dt[(c, a) \coloneqq v], \ch, \s, \dst, \wt, \dwt, \inp[c \coloneqq \rs],
-  \\
 \outp[c \coloneqq \outp(c) \uplus \{(\st)\}]}}
 
 \textbf{Child Upgrade}
@@ -48,14 +38,14 @@
 {\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \\ \dwt, \inp, \outp}
-{\dt, \ch[ (c, p, \req) \coloneqq (a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,\\
+{\dt, \ch[ (c, p, \req) \coloneqq (a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,
 \wt[(c,a)\coloneqq x], \dwt, \inp, \outp}}
 \vspace{.1in}
 \inference[ParentRecvReq]
 {\parent(c,p) & \ch(c, p, \req) = \{(a, y, x)\} \uplus \rs & \s(p, a) \geq x
 \\ \compat(p, c, x, a) & \dwt(p,c,a) = \epsilon & \dst(p,c,a) \le y}
 {\ioxe{$M_c$}
-{\dt, \ch, \s, \dst,\\ \wt, \dwt, \inp, \outp}
+{\dt, \ch, \s, \\\dst, \wt, \dwt,\\ \inp, \outp}
 {\dt, \ch[(c,p,\req) \coloneqq \rs][(p, c) \coloneqq (\resp, (a, \dst(p,c,a), x,\\ \;\;\;\;
 \ite{\dst(p,c,a) = I}{\dt(p,a)}{\_})) \coloncolon \ch(p,c)], \\ \s, \dst[(p,c, a)\coloneqq x],
 \wt, \dwt, \inp, \outp}}
@@ -81,8 +71,11 @@
 & \s(c,a) > x}
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst,\\ \wt, \dwt, \inp, \outp}
-{\dt, \ch[(p,c) \coloneqq \rs][(c, p,\resp) \coloneqq (a, \s(c,a), x,\\ \;\;\;\;
-\ite{\dst(c,a) = M}{\dt(c,a)}{\_}) \uplus \ch(c,p,\resp)], \\ \s[(c,a)\coloneqq x], \dst,
+{\dt, \ch[(p,c) \coloneqq \rs][(c, p,\resp) \coloneqq (a, \s(c,a), x,
+%\\ \;\;\;\;
+\ite{\dst(c,a) = M}{\dt(c,a)}{\_})\\
+ \uplus \ch(c,p,\resp)],
+ \s[(c,a)\coloneqq x], \dst,
 \wt, \dwt, \inp, \outp}}
 \vspace{.1in}
 \inference[ParentRecvRsp]
@@ -99,7 +92,8 @@
 & \s(c,a) > x}
 {\ioxe{$M_c$}
 {\dt, \ch, \s, \dst,\\ \wt, \dwt, \inp, \outp}
-{\dt, \ch[(c, p,\resp) \coloneqq (a, \s(c,a), x,\\ \;\;\;\;
+{\dt, \ch[(c, p,\resp) \coloneqq (a, \s(c,a), x,
+%\\ \;\;\;\;
 \ite{\s(c,a) = M}{\dt(c,a)}{\_}) \uplus \ch(c,p,\resp)], \\ \s[(c,a)\coloneqq x], \dst,
 \wt, \dwt, \inp, \outp}}
 
@@ -108,7 +102,7 @@
 \inference[DropReq]
 {\parent(c,p) & \ch(p, c) = \rs \coloncolon (\req, (a, y, x)) & 
  \s(c,a) \le x}
-{\ioxe{$M_c$}
+{\ioe{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
 {\dt, \ch[(p,c) \coloneqq \rs], \s, \dst,
 \wt, \dwt, \inp, \outp}}

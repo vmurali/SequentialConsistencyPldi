@@ -111,7 +111,7 @@ Buffer} component and composing the three components simultaneously.
 [LdReq]
 {\dec(s,\pc) = (\ld, x, a)}
 {\ior{P$_\text{ref}$}{s, \pc, \bot}
-{s, \pc, \top}{\ld, a}}
+{s, \pc, \top}{\epsilon, \ld, a}}
 
 \inference
 [StReq]
@@ -123,7 +123,7 @@ Buffer} component and composing the three components simultaneously.
 [LdRp]
 {\dec(s,\pc) = (\ld, x, a) & \exec(s, \pc, (\ld, x, v)) = (\pc', s')}
 {\iol{P$_\text{ref}$}{s, \pc, \top}
-{s', \pc', \bot}{\ld, v}}
+{s', \pc', \bot}{\epsilon, \ld, v}}
 
 \inference
 [StRp]
@@ -149,17 +149,17 @@ Buffer} component and composing the three components simultaneously.
 {\outp(i) = \mathit{rs} \uplus \{r\}}
 {\ioln{$M_m$}{\inp, \outp, m}{\inp, \outp[i \coloneqq \mathit{rs}], m}{i}{r}}
 
-\inference
-[SpLoad]
-{\inp(i) = \mathit{qs} \uplus \{\spc\ld,t,a\}}
-{\io{$M_m$}{\inp, \outp, m}{i, \inp[i \coloneqq \mathit{qs}], \outp[i \coloneqq
-(\spc\ld, t, m(a)) \uplus \outp(i)], m}{}}
+%\inference
+%[SpLoad]
+%{\inp(i) = \mathit{qs} \uplus \{\spc\ld,t,a\}}
+%{\io{$M_m$}{\inp, \outp, m}{i, \inp[i \coloneqq \mathit{qs}], \outp[i \coloneqq
+%(\spc\ld, t, m(a)) \uplus \outp(i)], m}{}}
 
 \inference
 [Load]
-{\inp(i) = \mathit{qs} \uplus \{\ld,a\}}
+{\inp(i) = \mathit{qs} \uplus \{t, \ld,a\}}
 {\io{$M_m$}{\inp, \outp, m}{i, \inp[i \coloneqq \mathit{qs}], \outp[i \coloneqq
-(\ld, m(a)) \uplus \outp(i)], m}{}}
+(t, \ld, m(a)) \uplus \outp(i)], m}{}}
 
 \inference
 [Store]
@@ -203,15 +203,17 @@ As initial state for system $P_\text{ref}$, we use $(s_0, \pc_0, \bot)$.
 
 Figure~\ref{$M_m$} defines a simple memory, meant to be composed with P$_{\text{ref}}$
 processors.  The input-output interface of this memory $M_m$ is largely what
-one would expect from the P$_{\text{ref}}$ definition.  However, in anticipation of the
-more complex processor we will define later, we add requests and responses for
-\emph{speculative loads}.  These are load operations that a processor may
-attempt, before it knows that the program will actually need the result.  Many
-speculative loads from a single processor may be in flight at once, improving
-performance via parallelism.  A request to memory like $(\spc\ld, t, a)$ asks
+one would expect from the P$_{\text{ref}}$ definition. 
+%However, in anticipation of the
+%more complex processor we will define later, we add requests and responses for
+%\emph{speculative loads}.  These are load operations that a processor may
+a%ttempt, before it knows that the program will actually need the result.  Many
+s%peculative loads from a single processor may be in flight at once, improving
+p%erformance via parallelism. 
+A request to memory like $(t, \ld, a)$ asks
 for the value of memory cell $a$, associating a \emph{tag} $t$ that the
 processor can use to match responses to requests.  Those responses take the
-form $(\spc\ld, t, v)$, giving the value $v$ of the requested memory address.
+form $(t, \ld, v)$, giving the value $v$ of the requested memory address.
 
 A memory state is a triple $(\inp, \outp, m)$, giving not just the
 memory $m$ itself, but also queues $\inp$ and $\outp$ for receiving
@@ -219,17 +221,18 @@ processor requests and batching up responses to processors,
 respectively.  We define the initial state of the $M_m$ LTS as
 $(\emptyset, \emptyset, m_0)$, with empty queues.
 
-Note that we have used $\uplus$ for inserting (or removing) from the buffers
-$\inp$ and $\outp$. The intent is to convey that $\inp$ and $\outp$ are treated
-as unordered sets. We will later use $\coloncolon$ for inserting (or removing)
-from FIFO buffers. %Intuitively, the unordered requests/responses set suffices
+%Note that we have used $\uplus$ for inserting (or removing) from the buffers
+%$\inp$ and $\outp$. The intent is to convey that $\inp$ and $\outp$ are treated
+%as unordered sets. We will later use $\coloncolon$ for inserting (or removing)
+%from FIFO buffers. Intuitively, the unordered requests/responses set suffices
 %even for requests/responses for the same address because the processor always
 %waits for a response before sending the next request.
 %\medskip
 
-Now we can compose these LTSes to produce an implementation of SC.  Rule SpLoad
-in Figure~\ref{$M_m$} will be irrelevant in this particular composition, since
-P$_{\text{ref}}$ never does speculation.
+Now we can compose these LTSes to produce an implementation of SC. 
+% Rule SpLoad
+%in Figure~\ref{$M_m$} will be irrelevant in this particular composition, since
+%P$_{\text{ref}}$ never does speculation.
 
 For a system of $n$ processors, our decoupled SC implementation is
 $\text{P$^n_{\text{ref}}$} + M_m$.
@@ -324,7 +327,7 @@ and an optional speculative load to issue. For instance, it invokes the $\dec$
 and $\exec$ functions (as defined for SC) internally to obtain the next program
 counter, state, \etc{} (but the actual states are not updated).
 \item $\upd\ld(\rob,t,v)$, which informs the buffer that the memory
-has returned result value $v$ for the speculative load with tag $t$.
+has returned result value $v$ for the speculative load with tag $t \neq \epsilon$.
 \item $\commit(\rob)$, which returns the next instruction in serial
 program order, if we have accumulated enough memory responses to execute it
 accurately, or returns
@@ -357,13 +360,13 @@ present the LTS for speculating processors.
 \inference[SpecLdReq]
 {\compute(\rob) = (\rob',(\spc\ld,t,a))}
 {\ior{\text{P$_\text{so}$}}{s,\pc,\wait,\rob,\ppc}{s,\pc,\wait,\rob',\ppc}
-{\spc\ld, t, a}}
+{t,\ld, a}}
 
 \inference[SpecLdRep]
-{}
+{t \neq \epsilon}
 {\iol{\text{P$_\text{so}$}}{s,\pc,\wait,\rob,\ppc}
 {s,\pc,\wait,\upd\ld(\rob, t, v),\ppc
-}{\spc\ld,t,v}}
+}{t,\ld,v}}
 
 \inference[Abort]
 {\commit(\rob) = (\pc',\_,\_) & \pc' \neq \pc}
@@ -384,18 +387,18 @@ present the LTS for speculating processors.
 
 \inference[LdReq]
 {\commit(\rob) = (\pc,\pc',(\ld,x,a,v,s'))}
-{\ior{\text{P$_\text{so}$}}{s,\pc,\bot,\rob,\ppc}{s,\pc,\top,\rob,\ppc}{\ld, a}}
+{\ior{\text{P$_\text{so}$}}{s,\pc,\bot,\rob,\ppc}{s,\pc,\top,\rob,\ppc}{\epsilon, \ld, a}}
 \inference[StRep]
 {\commit(\rob) = (\pc,\pc',(\st,a,v,s'))}
 {\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s',\pc',\bot,\retire(\rob),\ppc}{\st}}
 
 \inference[LdRepGood]
 {\commit(\rob) = (\pc,\pc',(\ld,x,a,v,s'))}
-{\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s',\pc',\bot,\retire(\rob),\ppc}{\ld,v}}
+{\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s',\pc',\bot,\retire(\rob),\ppc}{\epsilon, \ld,v}}
 
 \inference[LdRepBad]
 {\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) & v' \neq v & \exec(s,\pc,(\ld,x,v)) = (\pc'', s'')}
-{\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s'',\pc'',\bot,\phi,\setBp(\ppc,\pc)}{\ld, v}}
+{\iol{\text{P$_\text{so}$}}{s,\pc,\top,\rob,\ppc}{s'',\pc'',\bot,\phi,\setBp(\ppc,\pc)}{\epsilon, \ld, v}}
 
 
 \end{boxedminipage}
@@ -409,7 +412,7 @@ P$_{\texttt{so}}$. This processor may issue arbitrary speculative
 loads, but it only ever \emph{commits} the next instruction in serial
 program order. 
 We will see the processor issue two kinds of loads, a speculative
-load ($\spc\ld$) and a commit or real load ($\ld$).  To maintain SC, every speculative
+load (whose tag is not $\epsilon$) and a commit or real load (whose tag is $\epsilon$).  To maintain SC, every speculative
 load must have a matching verification load later on, and we maintain
 the illusion that the program only depends on the results of
 verification loads, which, along with stores, \emph{must be issued in
@@ -435,8 +438,9 @@ instruction being committed, and the reorder buffer and branch
 predictor states. Its initial state is given by $(s_0, \pc_0, \bot, \phi, \ppc_0)$.
 The interface of this processor with memory (\ie{}
 communication labels with $\toM, \toP$) is identical
-to that of the reference processor, but now we can exercise a memory
-system's transitions for speculative loads.
+to that of the reference processor.
+% but now we can exercise a memory
+%system's transitions for speculative loads.
 
 %The processor state is represented in the form $(s,\pc,\wait,\rob,\ppc)$, where
 %the extra states compared to the decoupled processor of Figure~\ref{Pref$}. The
@@ -482,7 +486,7 @@ those state changes.
 
 When this condition holds, we may conclude the correctness theorem for
 out-of-order processors.  We use a trace-transformation function
-$\noSpec$ that drops all speculative-load requests and responses.
+$\noSpec$ that drops all speculative-load requests and responses (\ie{} those load requests and responses whose tags are $\epsilon$).
 See Definition~\ref{refines} for a review of how we use such
 functions in framing trace refinement.  Intuitively, we prove that any
 behavior by the speculating processor can be matched by the simple
