@@ -59,51 +59,26 @@ optimized version for the simple version in a black-box way within a design,
 with a full guarantee of soundness.
 
 LTSes as hardware descriptions are an established
-idea~\cite{HoeArvind:TRSSynthesis1, Hoe:TCAD}, and there are compilers that
+idea \cite{HoeArvind:TRSSynthesis1, Hoe:TCAD}, and there are compilers that
 convert LTSes into efficient hardware.  Our work is based on the Bluespec
-language~\cite{BSV:LangRef, Bluespec:TFRG}, which served as the model for the
+language \cite{BSV:LangRef, Bluespec:TFRG}, which served as the model for the
 formalism of this paper.  Bluespec models hardware components as atomic rules
 of a transition system over state elements, and there is a commercial compiler
 to synthesize such codes into register transfer-level circuits (i.e., Verilog code) with
 competitive performance.  Our cache-coherent memory system is directly
 transliterated from a Bluespec
-implementation~\cite{DNA:CoherenceImplementation} used to implement a
-cycle-accurate simulator for a multi-processor PowerPC system~\cite{Khan:PowerPc}. The hardware synthesized
+implementation \cite{DNA:CoherenceImplementation} used to implement a
+cycle-accurate simulator for a multi-processor PowerPC system \cite{Khan:PowerPc}. The hardware synthesized
 from that implementation is rather efficient: an 8-core system with a 2-level
 cache hierarchy can run 55 million instructions per second on the BEE FPGA
-board\cite{bee2}. Figure \ref{both} gives an example of an LTS inference rule
+board \cite{bee2}. Figure \ref{both} gives an example of an LTS inference rule
 transliterated directly from an actual Bluespec rule used in the PowerPC
-system. In Bluespec notation, only those state elements whose value changes are
-mentioned on the RHS of a rule; in
-contrast LTSes employ a more functional notation. (The meaning of this rule
-will become clear in Section \ref{sec:caches})
-
-\begin{figure}[t]
-\centering
-\begin{boxedminipage}{\columnwidth}
-\small
-\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==$None$);$
-
-\hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
-
-\textbf{endrule}
-\end{boxedminipage}
-\begin{boxedminipage}{\columnwidth}
-\small
-\inference[]
-{\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
-{\ioxe{$M_c$}
-{\dt, \ch, \s,\\ \dst, \wt, \dwt,\\ \inp, \outp}
-{\dt, \ch[ (c, p, \req) \coloneqq(a, \s(c, a),x)\\
-\;\;\uplus \ch(c,p,\req)], \s, \dst,\\
-\wt[(c,a)\coloneqq x], \dwt,\inp, \outp}{}}
-\end{boxedminipage}
-\caption{Bluespec rule and its corresponding LTS rule}
-\label{both}
-\end{figure}
+system; its meaning will become clear in Section \ref{sec:cc}. In Bluespec
+notation, only those state elements whose values change are mentioned in the
+rule; in contrast LTSes employ a more functional notation.
 
 The main contributions of this paper are:
-
+\vspace{-.3cm}
 \begin{itemize} 
 \item Identification of an interface between the processor and the memory
 components of a multi-processor system that enables modular implementation and
@@ -139,6 +114,30 @@ Section~\ref{sec:cc} defines and proves our hierarchical cache-coherence
 protocol.  Finally, in Section~\ref{sec:finalresult} we show the whole-system
 modular proof of our complex system, and end with some conclusions in
 Sections~\ref{sec:conclusion}.
+
+\begin{figure}[t]
+\centering
+\begin{boxedminipage}{\columnwidth}
+\small
+\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==$None$);$
+
+\hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
+
+\textbf{endrule}
+\end{boxedminipage}
+\begin{boxedminipage}{\columnwidth}
+\small
+\inference[]
+{\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
+{\ioxe{$M_c$}
+{\dt, \ch, \s,\\ \dst, \wt, \dwt,\\ \inp, \outp}
+{\dt, \ch[ (c, p, \req) \coloneqq(a, \s(c, a),x)\\
+\;\;\uplus \ch(c,p,\req)], \s, \dst,\\
+\wt[(c,a)\coloneqq x], \dwt,\inp, \outp}{}}
+\end{boxedminipage}
+\caption{Bluespec rule and its corresponding LTS rule}
+\label{both}
+\end{figure}
 
 %% The goal of this work is to introduce an interface enabling true modular
 %% implementation and verification of shared memory systems. That is, we should be

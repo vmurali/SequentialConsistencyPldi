@@ -3,7 +3,7 @@ style of the Bluespec language.  That is, we formalize the idea of components
 in a hardware design, with well-defined input and output channels; and we show
 how to specify and verify components individually, with machine-checked proofs
 in the Coq proof assistant.  As a demonstration, we verify a fairly realistic
-implementation of a multicore shared-memory system consisting of two types of
+implementation of a multicore shared-memory system with two types of
 components:  memory-system and processor.  Both components include nontrivial
 optimizations, with the memory system employing an arbitrary hierarchy of cache
 nodes that communicate with each other concurrently, and with the processor
