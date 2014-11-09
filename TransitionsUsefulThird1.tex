@@ -114,14 +114,17 @@ loads only for addresses which are in \Sh{} or \Mo{} state in L1; otherwise L1
 spontaneously requests an upgrade for that address.
 
 \begin{defn}
-\begin{displaymath}
-\compat(p, c, x, a) = \left\{
+$\compat(p, c, x, a) =$
+\vspace{.3cm}
+
+\begin{math}
+\left\{
 \begin{array}{ll}
 \forall c' \neq c. \; \dst(p,c',a) = I &: x = M\\
 \forall c' \neq c. \; \dst(p,c',a) \le S &: x = S\\
 \end{array}
 \right.
-\end{displaymath}
+\end{math}
 \end{defn}
 
 The reason for having separate request and response channels for the same

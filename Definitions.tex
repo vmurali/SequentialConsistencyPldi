@@ -3,6 +3,18 @@
 \newcommand{\murali}[1]{\xxx{#1: ---- \textbf{Murali}}}
 \newcommand{\adam}[1]{\xxx{#1: ---- \textbf{Adam}}}
 
+\setlength{\belowcaptionskip}{-10pt}
+\newtheoremstyle{exampstyle}
+  {.5\topsep} % Space above
+  {.5\topsep} % Space below
+  {} % Body font
+  {} % Indent amount
+  {\bfseries} % Theorem head font
+  {.} % Punctuation after theorem head
+  {.5em} % Space after theorem head
+  {} % Theorem head spec (can be left empty, meaning `normal')
+
+
 %\spnewtheorem{thm}{Theorem}{\bfseries}{\normalfont}
 %\spnewtheorem{defn}{Definition}{\bfseries}{\normalfont}
 %\spnewtheorem{inv}{Invariant}{\bfseries}{\normalfont}
@@ -10,7 +22,8 @@
 \newtheorem{corollary}{Corollary}
 \newtheorem{lemma}{Lemma}
 \newtheorem{inv}{Invariant}
-\theoremstyle{definition}
+%\theoremstyle{definition}
+\theoremstyle{exampstyle}
 \newtheorem{defn}{Definition}
 
 \newcommand{\qs}{\mathit{qs}}
