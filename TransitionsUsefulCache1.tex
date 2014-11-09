@@ -20,14 +20,14 @@
 \vspace{.1in}
 \inference[Load]
 {\inp(c) = \{(t, \ld, a)\} \uplus \rs & \s(c,a) \geq S}
-{\ioxe{$M_c$}
+{\ioe{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
 {\dt, \ch, \s, \dst, \wt, \dwt, \inp[c \coloneqq \rs], 
 \outp[c \coloneqq \outp(c) \uplus \{(t, \ld, \dt(c, a))\}]}}
 \vspace{.1in}
 \inference[Store]
 {\inp(c) = \{(\st, a, v)\} \uplus \rs & \s(c,a) \geq M}
-{\ioxe{$M_c$}
+{\ioe{$M_c$}
 {\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
 {\dt[(c, a) \coloneqq v], \ch, \s, \dst, \wt, \dwt, \inp[c \coloneqq \rs],
 \outp[c \coloneqq \outp(c) \uplus \{(\st)\}]}}
