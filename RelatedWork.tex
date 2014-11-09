@@ -1,31 +1,46 @@
-\section{Related Work}
+﻿\section{Related Work}
 \label{relatedWork}
 
-%Formal verification has been used to verify multiprocessor
-%systems, especially with model checking
-%\cite{burch1994automatic,mcmillan1998verification}.
+Hardware verification is dominated by model-checking; for instance, processor
+verification ~\cite{burch1994automatic, mcmillan1998verification} and more
+recently, Intel's execution cluster verification~\cite{kaivola2009replacing}.
+Many abstraction techniques are used to reduce designs to finite state spaces,
+which can be explored exhaustively. There are limits to the construction of
+sound abstractions, so verifications of, e.g., cache-coherence protocols have
+almost always treated systems with concrete topologies, involving particular
+finite numbers of caches and processors. For instance, explicit-state model
+checking tools like Murphi~\cite{murphi} or TLC~\cite{tlc} are only able to
+handle small and simplified systems, \eg{} a single-level cache hierarchy with
+three CPUs, two addresses, and one bit of data. Symbolic model checking
+techniques have fared better: McMillan \etal{} have verified a 2-level MSI
+protocol based on the Gigamax distributed multiprocessor using
+SMV~\cite{gigamax}. Optimizations on these techniques (\eg{} partial order
+reduction~\cite{part}, symmetry reduction~\cite{sym1, sym2}, compositional
+reasoning~\cite{comp, Mccomp, mcc}, \etc{}) scale the approach further, but
+they are still unable to handle realistic hierarchical protocols. We might hope
+to achieve higher assurance and understanding of design ideas by verifying
+\emph{infinite families} of hardware designs, which resist reduction to
+finite-state models.  A potential related benefit is reducing the computational
+resources required to formally verify a new design in the family, applying a
+more general theorem without much new analysis.
 
-%More recently, Intel's execution cluster (\ie{} the ALU and its
-%interface) has been formally verified using model checking
-%\cite{kaivola2009replacing}.
-
-Theorem provers have also been used to verify microprocessors, \eg{} HOL has been
-used to verify an academic microprocessor AVI-1 \cite{windley1995formal}.
+Theorem provers have also been used to verify microprocessors, \eg{} HOL has
+been used to verify an academic microprocessor AVI-1 \cite{windley1995formal}.
 Term-rewriting based techniques have been used to specify microprocessors, with
 the goal of making them more amenable to verification \cite{shen1999using}.
 
-Theorem provers have also been used in verifying cache coherence protocols.
-The correctness of the FLASH cache coherence protocol~\cite{flash} for a
+Theorem provers have also been used in verifying cache coherence protocols. The
+correctness of the FLASH cache coherence protocol~\cite{flash} for a
 single-level hierarchy was proven with PVS~\cite{park} using a mapping, called
 ``aggregation of transactions,'' from multiple localized transactions to a
-single global transaction, and finally using model checking to prove the correctness of
-the global transactions model. However, they do not provide a methodology to
-prove the aggregation of transactions for other protocols, which is where, we
-believe, the difficulty lies; in contrast, our modular proof relies on generic
-invariants, making it more adaptable to different protocols.
+single global transaction, and finally using model checking to prove the
+correctness of the global transactions model. However, they do not provide a
+methodology to prove the aggregation of transactions for other protocols, which
+is where, we believe, the difficulty lies; in contrast, our modular proof
+relies on generic invariants, making it more adaptable to different protocols.
 Cachet~\cite{StoyShenArvind:Proofs}, another single-level cache coherence
-protocol, was verified to be obey the CRF memory
-model~\cite{Shen:CRF}, and parts of the proof were implemented using PVS.
+protocol, was verified to be obey the CRF memory model~\cite{Shen:CRF}, and
+parts of the proof were implemented using PVS.
 
 % Shen \etal{} provided a paper-and-pencil proof showing
 %Cachet does not violate the CRF memory model, while Stoy \etal{} implemented
@@ -117,3 +132,4 @@ TSO to operational semantics \cite{x86tsocacm10}.
 %difficult; in contrast, our modular proof relies on generic invariants making it
 %more naturally adaptable to different protocols.
 %>>>>>>> 96e9880a190d9acb6201b10e2b105d18c72f56aa
+

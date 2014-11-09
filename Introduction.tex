@@ -1,133 +1,82 @@
-\section{Introduction}
+ \section{Introduction}
 \label{sec:Introduction}
 
-A modern high-performance, cache-coherent, distributed-memory hardware system is
-inherently complex. Such a system implements memory models like sequential
-consistency (SC)~\cite{lamport1979make}, Total Store Order (TSO), and
-Relaxed Memory Order (RMO)~\cite{weaver1994sparc}, each
-of which characterizes how loads and stores may be issued by a processor and
-how the shared-memory component responds to these requests.  These systems by
-their nature are highly concurrent and nondeterministic.
-
-The goal of this work is to provide a framework for full verification of such
-complex hardware systems. Hardware designers already recognize the challenge of
-implementing these systems, to such an extent that they have already become some
-of the most serious real-world adopters of formal methods.  Hardware
-verification is dominated by model-checking; for instance, processor
-verification ~\cite{burch1994automatic, mcmillan1998verification} and 
-more recently, Intel's execution cluster verification~\cite{kaivola2009replacing}.
-Many abstraction techniques are
-used to reduce designs to finite state spaces, which can be explored
-exhaustively.
- There are limits to the construction of sound abstractions, so
-verifications of, e.g., cache-coherence protocols have almost always treated
-systems with concrete topologies, involving particular finite numbers of caches
-and processors. For instance, explicit-state model checking tools like
-Murphi~\cite{murphi} or TLC~\cite{tlc} are only able to handle small and
-simplified systems, \eg{} a single-level cache hierarchy with three CPUs, two
-addresses, and one bit of data. Symbolic model checking techniques have fared
-slightly better: McMillan \etal{} have verified a 2-level MSI protocol based on
-the Gigamax distributed multiprocessor using SMV~\cite{gigamax}. Optimizations
-on these techniques (\eg{} partial order reduction~\cite{part}, symmetry
-reduction~\cite{sym1, sym2}, compositional reasoning~\cite{comp, Mccomp, mcc}, \etc{}) scale
-the approach further, but they are still unable to handle realistic
-hierarchical protocols. We might hope to achieve higher assurance and
-understanding of design ideas by verifying \emph{infinite families} of hardware
-designs, which resist reduction to finite-state models.  A potential related
-benefit is reducing the computational resources required to formally verify a
-new design in the family, applying a more general theorem without much new
-analysis.
+A modern high-performance, cache-coherent, distributed-memory hardware system
+is inherently complex. Such a system implements memory models like sequential
+consistency (SC)~\cite{lamport1979make}, Total Store Order (TSO), and Relaxed
+Memory Order (RMO)~\cite{weaver1994sparc}, each of which characterizes how
+loads and stores may be issued by a processor and how the shared-memory
+component responds to these requests.  These systems by their nature are highly
+concurrent and nondeterministic.  The goal of this work is to provide a
+framework for full verification of such complex hardware systems.  
 
 Modularity has long been understood as a key property for effective design and
 verification of such complex systems. For the designer, it allows a separation
 of concerns, increasing robustness by allowing the behavior encapsulated by a
-modular boundary to be realized by multiple implementations, any of which may be
-dropped into the system safely. It also allows a greater
-parallelization of human design effort, improving development time. Similarly, verification is
+modular boundary to be realized by multiple implementations, any of which may
+be dropped into the system safely. It also allows a greater parallelization of
+human design effort, improving development time. Similarly, verification is
 simplified, as modular interface agreements provide a natural lemma structure.
-This leads us towards a decomposition of the whole system verification
-task into lemmas of subsystems, which can be composed in a black-box manner to
+This leads us towards a decomposition of the whole system verification task
+into lemmas of subsystems, which can be composed in a black-box manner to
 produce full-system theorems.
 
-%\xxx{\textbf{Murali's version in red} This works introduces an interface enabling true modular implementation and
-%verification of shared memory systems. We want our modular system to permit
-%\emph{black-box refinement}, that is, nothing beyond the interface contract can
-%be assumed about other modules.  That is, we should be able to describe a
-%modular decomposition where we may replace either the processor nodes, the
-%memory with locally verified alternatives without changing the correctness of
-%our whole system.  To this end, we identify a key property called \emph{store
-%atomicity} shared by the memory component of every memory model. This property
-%effectively restricts the behavior of the memory sub-system to that of an
-%\emph{atomic instantaneous memory}. We prove that this property is in fact what
-%is guaranteed using the cache coherence protocols in a multi-processor system
-%containing a hierarchy of caches, enabling replacement of the cache hierarchy
-%with an atomic instantaneous memory. Similarly, on the processor side, we
-%define what is meant to be a correct single processor. These invariants about
-%the processor and the memory sub-system remains constant across memory models.
-%We show a concrete instance of this framework by proving that a highly
-%speculative multi-processor system connected to a coherent cache hierarchy
-%implements the sequential consistency memory model.}
+In this paper, we introduce \emph{a new approach to modular, deductive
+verification of hardware designs} at the highest level of rigor, backed by
+proofs using the Coq proof assistant.  As a challenging case study, we focus on
+\textbf{verifying that a particular infinite family of multicore, shared-memory
+systems implements sequential consistency}.  The proof is parametrized over an
+unknown number of processors connected to an arbitrary memory hierarchy with an
+unknown number of caches in an unknown number of layers (e.g., L1, L2).  In our
+design, processors and memory systems both independently employ intricate
+optimizations that exploit opportunities for parallelism.  We are able to prove
+that each of those two main components still provides strong enough guarantees
+to support SC, and then we compose those theorems into a result for the full
+system.  Either component may be optimized further without requiring any
+changes to the implementation, specification, or proof of the other.
 
-
-In this paper, we introduce \textbf{a new approach to modular,
-  deductive verification of hardware designs} at the highest level of
-rigor, backed by proofs using the Coq proof assistant.  As a
-challenging case study, we focus on \textbf{verifying that a
-  particular infinite family of multicore, shared-memory systems
-  implements sequential consistency}.  The proof is parametrized over
-an unknown number of processors connected to an arbitrary memory
-hierarchy with an unknown number of caches in an unknown number of
-layers (e.g., L1, L2).  In our design, processors and memory systems
-both independently employ intricate optimizations that exploit
-opportunities for parallelism.  We are able to prove that each of
-those two main components still implements strong enough semantics to
-support SC, and then we compose those theorems into a result for the
-full system.  Either component may be optimized further without
-requiring any changes to the implementation, specification, or proof
-of the other.
-
-To structure our hardware verification framework, we import
-\emph{labeled transition systems (LTSes)}, a well-studied approach from the
-world of concurrent software modeling.  As our unified notion of
-specification and proof, we adopt \emph{trace refinement}, which
-captures when one concurrent system can only produce observable IO
-behaviors that another system could also produce.  Each of our
-realistic hardware components is associated with a simpler ``reference
-implementation'' that serves as a specification, and we prove that
-each realistic component refines its spec.  Thereafter, it is sound to
-use the simpler spec component in reasoning about the behavior of the
+To structure our hardware verification framework, we use \emph{labeled
+transition systems (LTSes)}, a well-studied approach in the world of
+concurrent software modeling.  As our unified notion of specification and
+proof, we adopt \emph{trace refinement}, which captures when one concurrent
+system can only produce observable IO behaviors that another system could also
+produce.  Each of our realistic hardware components is associated with a
+simpler ``reference implementation'' that serves as a specification, and we
+prove that each realistic component refines its spec.  Thereafter, it is sound
+to use the simpler spec component in reasoning about the behavior of the
 system.
 
-Each key component of our case-study system has a simple spec: the
-ideal memory responds instantly and atomically to each load or store
-request, and the ideal processor executes instructions in order with
-no speculation.  The optimized implementation of each is much more
-complicated: the cache-hierarchy memory system potentially allows
-every cache to be busy simultaneously computing and sending messages,
-and the optimized speculative processor sends multiple load requests
-to the memory at once, without waiting for responses first.  The meat
-of the verification is in showing that each optimized component
-refines its simpler counterpart.  After each such proof, we may in
-effect substitute the optimized version for the simple version in a
-black-box way within a design, with a full guarantee of soundness.
+Each key component of our case-study system has a simple spec: the ideal memory
+responds instantly and atomically to each load or store request, and the ideal
+processor executes instructions in order with no speculation.  The optimized
+implementation of each is much more complicated: the cache-hierarchy memory
+system potentially allows every cache to be busy simultaneously computing and
+sending messages, and the optimized speculative processor sends multiple load
+requests to the memory concurrently, without waiting for responses first.  The meat
+of the verification is in showing that each optimized component refines its
+simpler counterpart.  After each such proof, we may in effect substitute the
+optimized version for the simple version in a black-box way within a design,
+with a full guarantee of soundness.
 
 LTSes as hardware descriptions are an established
-idea~\cite{HoeArvind:TRSSynthesis1, Hoe:TCAD}, and there are
-compilers that convert LTSes into efficient hardware.  Our work is
-based on the Bluespec language~\cite{BSV:LangRef, Bluespec:TFRG},
-which served as the model for the formalism of this paper.  Bluespec
-models hardware components as atomic rules of a transition system over
-state elements, and there is a commercial compiler from such code into
-register transfer-level circuits (i.e., Verilog code) with competitive
-performance.  Our cache-coherent memory system is directly
+idea~\cite{HoeArvind:TRSSynthesis1, Hoe:TCAD}, and there are compilers that
+convert LTSes into efficient hardware.  Our work is based on the Bluespec
+language~\cite{BSV:LangRef, Bluespec:TFRG}, which served as the model for the
+formalism of this paper.  Bluespec models hardware components as atomic rules
+of a transition system over state elements, and there is a commercial compiler
+to synthesize such codes into register transfer-level circuits (i.e., Verilog code) with
+competitive performance.  Our cache-coherent memory system is directly
 transliterated from a Bluespec
-implementation~\cite{DNA:CoherenceImplementation} used to
-implement a multi-processor PowerPC system~\cite{Khan:PowerPc}. The
-hardware synthesized from that implementation is rather efficient:
-an 8-core system can run 55 million instructions per second on
-the BEE FPGA board\cite{}, with a 2-level cache hierarchy. Figure \ref{both} gives an example
-of an LTS inference rule transliterated directly from an actual Bluespec rule used
-in the PowerPC system.
+implementation~\cite{DNA:CoherenceImplementation} used to implement a
+cycle-accurate simulator for a multi-processor PowerPC system~\cite{Khan:PowerPc}. The hardware synthesized
+from that implementation is rather efficient: an 8-core system with a 2-level
+cache hierarchy can run 55 million instructions per second on the BEE FPGA
+board\cite{bee2}. Figure \ref{both} gives an example of an LTS inference rule
+transliterated directly from an actual Bluespec rule used in the PowerPC
+system. In Bluespec notation, only those state elements whose value changes are
+mentioned on the RHS of a rule; in
+contrast LTSes employ a more functional notation. (The meaning of this rule
+will become clear in Section \ref{sec:caches})
 
 \begin{figure}[t]
 \centering
@@ -161,38 +110,35 @@ components of a multi-processor system that enables modular implementation and
 verification.
 
 \item A general \emph{modular verification methodology} applicable to hardware
-  algorithms, based on \emph{labeled transition systems}.
-We are able to verify
-  the several components of a modern processor 
-%\adam{(Figure~\ref{zoom} OK to have a forward reference to this figure?}
-against general formal interfaces,
-  enabling mixing and matching of different realizations of each interface,
-  without doing any new proofs that peek beneath abstraction boundaries.
+algorithms, based on \emph{labeled transition systems}.  We are able to verify
+the several components of a modern processor against general formal interfaces,
+enabling mixing and matching of different realizations of each interface,
+without doing any new proofs that peek beneath abstraction boundaries.
 
 \item The \emph{first machine-checked proof} of an implementation of sequential
-  consistency involving speculative processors and cache-coherent distributed
-  memory.
+consistency involving speculative processors and cache-coherent distributed
+memory.
 
 \item The \emph{first machine-checked proof} of an invalidation-based
-  cache-coherence protocol for distributed memories comprised of arbitrary
-  cache hierarchies. We believe such a memory is also the correct abstraction for
-  implementing relaxed memory models.
+cache-coherence protocol for distributed memories comprised of arbitrary cache
+hierarchies. We believe such a memory is also the correct abstraction for
+implementing relaxed memory models.
 \end{itemize}
 
-\paragraph{Paper Organization:} In Section~\ref{sec:lts} we introduce our
-flavor of the labeled transition systems formalism, including a definition of
-trace refinement. In Section~\ref{sec:store-atomicity}, we show a generic
+\paragraph{Paper Organization:} We begin with a discussion of related work in
+Section~\ref{relatedWork}. In Section~\ref{sec:lts} we introduce our flavor of
+the labeled transition systems formalism, including a definition of trace
+refinement. In Section~\ref{sec:store-atomicity}, we show a generic
 decomposition of any multi-processor system independently of the memory model
 that it implements, and we discuss the store-atomicity property of the memory
-sub-component. In Section~\ref{sec:sc} we
-give a simple formal model of sequential consistency.  The
-following sections refine the two main subcomponents of our multi-processor system.
-Section~\ref{sec:ooo} discusses definition and verification of a speculative
-processor model, and Section~\ref{sec:cc}
-defines and proves our hierarchical cache-coherence protocol.  Finally, in
-Section~\ref{sec:finalresult} we show the whole-system modular proof of our
-complex system, finishing with discussion of related work and other conclusions in
-Sections~\ref{relatedWork} and \ref{sec:conclusion}.
+sub-component. In Section~\ref{sec:sc} we give a simple formal model of
+sequential consistency.  The following sections refine the two main
+subcomponents of our multi-processor system.  Section~\ref{sec:ooo} discusses
+definition and verification of a speculative processor model, and
+Section~\ref{sec:cc} defines and proves our hierarchical cache-coherence
+protocol.  Finally, in Section~\ref{sec:finalresult} we show the whole-system
+modular proof of our complex system, and end with some conclusions in
+Sections~\ref{sec:conclusion}.
 
 %% The goal of this work is to introduce an interface enabling true modular
 %% implementation and verification of shared memory systems. That is, we should be
@@ -364,3 +310,6 @@ Sections~\ref{relatedWork} and \ref{sec:conclusion}.
 %% and their proof automatically from the modularly.
 
 %%  LocalWords:  Modularity modularity
+
+
+
