@@ -13,9 +13,13 @@ The goal of this work is to provide a framework for full verification of such
 complex hardware systems. Hardware designers already recognize the challenge of
 implementing these systems, to such an extent that they have already become some
 of the most serious real-world adopters of formal methods.  Hardware
-verification is dominated by model-checking, where abstraction techniques are
+verification is dominated by model-checking; for instance, processor
+verification ~\cite{burch1994automatic, mcmillan1998verification} and 
+more recently, Intel's execution cluster verification~\cite{kaivola2009replacing}.
+Many abstraction techniques are
 used to reduce designs to finite state spaces, which can be explored
-exhaustively.  There are limits to the construction of sound abstractions, so
+exhaustively.
+ There are limits to the construction of sound abstractions, so
 verifications of, e.g., cache-coherence protocols have almost always treated
 systems with concrete topologies, involving particular finite numbers of caches
 and processors. For instance, explicit-state model checking tools like

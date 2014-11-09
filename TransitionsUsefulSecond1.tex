@@ -449,8 +449,9 @@ system's transitions for speculative loads.
 If $P_\text{so}$ reaches a state $(s, \pc, \wait, \rob, \ppc)$, \ie{}
 
 $\io{P$_\text{so}^{*}$}{s_0,\pc_0,\bot,\phi,\ppc_0}{s,\pc,\wait,\rob,\ppc}{\eta} \Rightarrow$
-\begin{displaymath}
-\left\{
+
+\begin{math}
+\;\;\;\;\;\;\;\;\left\{
 \begin{array}{ll}
 \commit(\rob) = (\pc, \pc', (\nm, s')) &\Rightarrow
 \exists x. \; \dec(s,\pc) = (\nm, x) \wedge \exec(s,\pc, (\nm,x)) =
@@ -463,7 +464,7 @@ $\io{P$_\text{so}^{*}$}{s_0,\pc_0,\bot,\phi,\ppc_0}{s,\pc,\wait,\rob,\ppc}{\eta}
 \commit(\rob) = H & \Rightarrow
 \dec(s, \pc) = H\\
 \end{array}
-\right.\end{displaymath}
+\right.\end{math}
 \label{rob}
 \end{inv}
 \vspace{-.5cm}

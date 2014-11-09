@@ -1,13 +1,13 @@
 \section{Related Work}
 \label{relatedWork}
 
-Formal verification has been used to verify multiprocessor
-systems, especially with model checking
-\cite{burch1994automatic,mcmillan1998verification}.
+%Formal verification has been used to verify multiprocessor
+%systems, especially with model checking
+%\cite{burch1994automatic,mcmillan1998verification}.
 
-More recently, Intel's execution cluster (\ie{} the ALU and its
-interface) has been formally verified using model checking
-\cite{kaivola2009replacing}.
+%More recently, Intel's execution cluster (\ie{} the ALU and its
+%interface) has been formally verified using model checking
+%\cite{kaivola2009replacing}.
 
 Theorem provers have also been used to verify microprocessors, \eg{} HOL has been
 used to verify an academic microprocessor AVI-1 \cite{windley1995formal}.
@@ -23,14 +23,15 @@ the global transactions model. However, they do not provide a methodology to
 prove the aggregation of transactions for other protocols, which is where, we
 believe, the difficulty lies; in contrast, our modular proof relies on generic
 invariants, making it more adaptable to different protocols.
-
 Cachet~\cite{StoyShenArvind:Proofs}, another single-level cache coherence
-protocol, was proven to be implementable in the CRF memory
-model~\cite{Shen:CRF}. Shen \etal{} provided a paper-and-pencil proof showing
-Cachet does not violate the CRF memory model, while Stoy \etal{} implemented
-portions of the paper-and-pencil proof using PVS. However, neither proof
-establishes that the protocol is store atomic. Rather, they show that Cachet
-obeys the CRF memory model, which is not restricted to store-atomic behavior.
+protocol, was verified to be obey the CRF memory
+model~\cite{Shen:CRF}, and parts of the proof were implemented using PVS.
+
+% Shen \etal{} provided a paper-and-pencil proof showing
+%Cachet does not violate the CRF memory model, while Stoy \etal{} implemented
+%portions of the paper-and-pencil proof using PVS. However, neither proof
+%establishes that the protocol is store atomic. Rather, they show that Cachet
+%obeys the CRF memory model, which is not restricted to store-atomic behavior.
 
 There has been a lot of work in providing frameworks for axiomatic
 specifications of memory models based on empirically observed behavior of
