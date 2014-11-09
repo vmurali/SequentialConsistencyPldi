@@ -41,7 +41,7 @@ to the processors and are exactly the same as in the simple memory LTS
 We use $\parent(c,p)$ to denote that $p$ is the parent of $c$ and $\leaf(c)$ to 
 denote that $c$ is a leaf or L1 cache.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tabular}{|l|p{6cm}|}
 \hline
@@ -156,7 +156,7 @@ by not dequeuing the request.
 
 \input{TransitionsUsefulCache1}
 
-\subsection{Proof that the MSI Protocol Preserves Store Atomicity}\label{sec:ccproof}
+\subsection{Proving $M_c$ is Store Atomicity}\label{sec:ccproof}
 \label{safety}
 
 We must prove the following theorem, \ie{} the cache-based system is sound with
@@ -173,9 +173,9 @@ the specified state.
 
 \begin{defn}
 Store atomicity is defined as the following property:
-For a load (or speculative load) request $\toM(\ld, a)$ (or $\toM(\spc\ld, t, a)$)
+For a load request $\toM(t, \ld, a)$
 from any processor, the response sent at time $T$
-$\toP(\ld, v)$ (or $\toP(\spc\ld, t, v)$) should be such that
+$\toP(t, \ld, v)$ should be such that
 \begin{enumerate}
 \item $v = v_0$ (the initial value of any memory address) and no store
   request $\toM(\st, a, v')$ has been processed at any time $T'$ such

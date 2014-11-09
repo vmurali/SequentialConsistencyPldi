@@ -272,10 +272,10 @@ to how the program runs in the SC system, and running it must really cause
 those state changes.
 
 When this condition holds, we may conclude the correctness theorem for
-out-of-order processors.  We use a trace-transformation function
+out-of-order processors. We use a trace-transformation function
 $\noSpec$ that drops all speculative-load requests and responses.
 See Definition~\ref{refines} for a review of how we use such
-functions in framing trace refinement.  Intuitively, we prove that any
+functions in framing trace refinement. Intuitively, we prove that any
 behavior by the speculating processor can be matched by the simple
 processor, with speculative messages erased.
 

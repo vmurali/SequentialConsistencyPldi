@@ -202,30 +202,32 @@ Now we can compose these LTSes to produce an implementation of SC.
 For a system of $n$ processors, our decoupled SC implementation is
 $\text{P$^n_{\text{ref}}$} + M_m$.
 
-\begin{figure*}[t]
+\begin{figure}[h]
+\begin{boxedminipage}{\columnwidth}
 \small
+$\upd((s, \pc, \_), \mathit{rs}) =$
+
 \begin{math}
-\upd((s, \pc, \_), \mathit{rs}) =
-\left\{
+\;\;\;\;\;\left\{
 \begin{array}{ll}
-s', \pc' &: (\ld, v) \in \mathit{rs} \wedge \dec(pc, s) = (\ld, x, a) \wedge
-\exec(pc, s, (\ld, x, v)) = (\pc', s'))\\
-s', \pc' &: (\st) \in \mathit{rs} \wedge \dec(pc, s) = (\st, a, v) \wedge
-\exec(pc, s, (\st)) = (\pc', s')\\
+s', \pc' &: (\ld, v) \in \mathit{rs} \wedge \dec(pc, s) = (\ld, x, a) \wedge\\
+\multicolumn{2}{r}{\exec(pc, s, (\ld, x, v)) = (\pc', s'))}\\
+s', \pc' &: (\st) \in \mathit{rs} \wedge \dec(pc, s) = (\st, a, v) \wedge\\
+\multicolumn{2}{r}{\exec(pc, s, (\st)) = (\pc', s')}\\
 s, \pc &: \text{otherwise if } \dec(pc,s) \neq H\\
 H &: \text{otherwise}
 \end{array}
 \right.
 \end{math}
+\end{boxedminipage}
 \caption{Mapping of states from $(\text{P$^n_\text{ref}$} + M_m)$ to SC}
 \label{smap}
-\end{figure*}
+\end{figure}
 
 \begin{theorem}
 $\text{P$^n_{\text{ref}}$} + M_m \sqsubseteq SC$\label{scthm}
 \end{theorem}
 \begin{prf}
-%\vspace{-.1cm}
 By induction on traces of the decoupled system.  We need to choose an
 abstraction function $f$ from states of the complex system to states of
 the simple system.  This function must be inductive in the
@@ -270,22 +272,21 @@ resolving conditional jumps; and a
 are worth issuing at which moments (in effect \emph{reordering} later
 instructions to happen before earlier instructions have finished).
 
-The branch predictor is the simpler of the two components.
-We indicate branch-predictor state with metavariable $\ppc$.
+The branch predictor is the simpler of the two components, whose state
+is indicated with metavariable $\ppc$.
 The operations on such state are $\curPpc(\ppc)$, to extract the
-current program-counter prediction; $\nextPpc(\ppc)$, to ask the
-predictor to get the program-counter for the next instruction; and $\setBp(\ppc, \pc)$,
-to reset prediction to begin at a known-accurate position $\pc$.  It
-turns out that we need to impose no explicit correctness criterion on
-branch predictors.  The processor uses predictions only as hints, and
+current program-counter prediction; $\nextPpc(\ppc)$, to get the predicted
+program-counter for the next instruction; and $\setBp(\ppc, \pc)$,
+to reset prediction to begin at a known-accurate position $\pc$. We need to impose no explicit correctness criterion on
+branch predictors; the processor uses predictions only as hints, and
 it always resets the predictor using $\setBp$ after detecting an
 inaccurate hint.
 
 The interface and formal contract of a reorder buffer are more
 involved.  We write $\rob$ as a metavariable for reorder buffer
-state.  The associated operations are:
+state. $\phi$ denotes the state of an empty buffer. The operations associated with $\rob$ are:
 \begin{itemize}
-\item $\phi$, the state of an empty buffer.
+%\item $\phi$, the state of an empty buffer.
 \item $\add(\pc, \rob)$, which appends the program instruction at location $\pc$ to the list of instructions that the buffer is allowed to consider executing.
 \item $\compute(\rob)$, which models a
 step of computation inside the buffer, returning both an updated state
@@ -458,7 +459,7 @@ See Definition~\ref{refines} for a review of how we use such
 functions in framing trace refinement.  Intuitively, we prove that any
 behavior by the speculating processor can be matched by the simple
 processor, with speculative messages erased.
-
+%\vspace{-.6cm}
 \begin{theorem}
 \label{ocorrect}
 $\text{P$_\text{so}$} \sqsubseteq_\noSpec$ P$_\text{ref}$
