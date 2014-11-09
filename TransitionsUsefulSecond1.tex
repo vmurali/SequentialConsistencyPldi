@@ -137,43 +137,6 @@ Buffer} component and composing the three components simultaneously.
 \label{Pref$}
 \end{figure}
 
-\begin{figure*}
-\small
-\centering
-\begin{boxedminipage}[c]{.48\textwidth}
-\inference
-[Insert]
-{}
-{\iorn{$M_m$}{\inp, \outp, m}{\inp[i \coloneqq \{q\} \uplus \inp(i)], \outp, m}{i}{q}}
-
-\inference
-[Remove]
-{\outp(i) = \mathit{rs} \uplus \{r\}}
-{\ioln{$M_m$}{\inp, \outp, m}{\inp, \outp[i \coloneqq \mathit{rs}], m}{i}{r}}
-
-%\inference
-%[SpLoad]
-%{\inp(i) = \mathit{qs} \uplus \{\spc\ld,t,a\}}
-%{\io{$M_m$}{\inp, \outp, m}{i, \inp[i \coloneqq \mathit{qs}], \outp[i \coloneqq
-%(\spc\ld, t, m(a)) \uplus \outp(i)], m}{}}
-
-\inference
-[Load]
-{\inp(i) = \mathit{qs} \uplus \{t, \ld,a\}}
-{\io{$M_m$}{\inp, \outp, m}{i, \inp[i \coloneqq \mathit{qs}], \outp[i \coloneqq
-(t, \ld, m(a)) \uplus \outp(i)], m}{}}
-
-\inference
-[Store]
-{\inp(i) = \mathit{qs} \uplus \{\st,a,v\}}
-{\io{$M_m$}{\inp, \outp, m}{i, \inp[i \coloneqq \mathit{qs}], \outp[i \coloneqq
-(\st) \uplus \outp(i)], m[a\coloneqq v]}{}}%i, (\st, a,v)}}
-
-\end{boxedminipage}
-\caption{LTS for a simple memory}
-\label{$M_m$}
-\end{figure*}
-
 
 \section{Respecifying Sequential Consistency with Communication}\label{sec:ref}
 
@@ -203,9 +166,9 @@ As initial state for system $P_\text{ref}$, we use $(s_0, \pc_0, \bot)$.
 
 %\medskip
 
-Figure~\ref{$M_m$} defines a simple memory, meant to be composed with P$_{\text{ref}}$
-processors.  The input-output interface of this memory $M_m$ is largely what
-one would expect from the P$_{\text{ref}}$ definition. 
+The simple memory defined earlier in Figure~\ref{$M_m$} is meant to be composed with P$_{\text{ref}}$
+processors.  %The input-output interface of this memory $M_m$ is largely what
+%one would expect from the P$_{\text{ref}}$ definition. 
 %However, in anticipation of the
 %more complex processor we will define later, we add requests and responses for
 %\emph{speculative loads}.  These are load operations that a processor may
@@ -218,7 +181,7 @@ processor can use to match responses to requests.  Those responses take the
 form $(t, \ld, v)$, giving the value $v$ of the requested memory address.
 
 A memory state is a triple $(\inp, \outp, m)$, giving not just the
-memory $m$ itself, but also queues $\inp$ and $\outp$ for receiving
+memory $m$ itself, but also buffers $\inp$ and $\outp$ for receiving
 processor requests and batching up responses to processors,
 respectively.  We define the initial state of the $M_m$ LTS as
 $(\emptyset, \emptyset, m_0)$, with empty queues.

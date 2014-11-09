@@ -218,24 +218,24 @@ compared to that of accessing a much smaller cache. The component between each
 processor and the global memory sub-system contains local buffers, $B_i$, specific to
 the processor $P_i$ they are connected to. 
 
-\begin{figure}
-\small
-\centering
-\begin{boxedminipage}[c]{.48\textwidth}
-\inference
-[Load]
-{}
-{\io{$M_m$}{m}{m}{p, ((\ld\req,a),(\ld\resp,m(a)), \_)}}
-
-\inference
-[Store]
-{}
-{\io{$M_m$}{m}{m[a\coloneqq v]}{p, (\st, a, v)}}
-
-\end{boxedminipage}
-\caption{LTS for a simple memory}
-\label{M_m}
-\end{figure}
+%\begin{figure}
+%\small
+%\centering
+%\begin{boxedminipage}[c]{.48\textwidth}
+%\inference
+%[Load]
+%{}
+%{\io{$M_m$}{m}{m}{p, ((\ld\req,a),(\ld\resp,m(a)), \_)}}
+%
+%\inference
+%[Store]
+%{}
+%{\io{$M_m$}{m}{m[a\coloneqq v]}{p, (\st, a, v)}}
+%
+%\end{boxedminipage}
+%\caption{LTS for a simple memory}
+%\label{M_m}
+%\end{figure}
 
 Popular instruction set architectures do not guarantee sequential
 consistency.  That is, their behavior makes it unsound to imagine that
@@ -253,15 +253,46 @@ value from the store buffer, then one can establish that such a
 multi-processor system implements the TSO~\cite{x86tsocacm10} memory
 model.
 
-So, we focus on this opportunity to simplify proof decomposition.  We
-will prove that our main memory component satisfies an intuitive
-\emph{store atomicity} property.  Despite the potential red herring of
-the word ``atomicity,'' this specification is appropriate even for
-implementation of weaker memory models than SC.  Store atomicity can
-be understood via the operational semantics of Figure \ref{M_m},
-describing an LTS that receives load and store requests ($\ld$ and
-$\st$) from processors and sends back load responses ($\ld\resp$);
-$p$ is the processor which sends and receives the request.
+\begin{figure}
+\small
+\centering
+\begin{boxedminipage}[c]{.48\textwidth}
+\inference
+[Ins]
+{}
+{\iorn{$M_m$}{\inp, \outp, m}{\inp[p \coloneqq \{q\} \uplus \inp(p)], \outp, m}{p}{q}}
+
+\inference
+[Rm]
+{\outp(p) = \mathit{rs} \uplus \{r\}}
+{\ioln{$M_m$}{\inp, \outp, m}{\inp, \outp[p \coloneqq \mathit{rs}], m}{p}{r}}
+
+\inference
+[Ld]
+{\inp(p) = \mathit{qs} \uplus \{t, \ld,a\}}
+{\ioxe{$M_m$}{\inp, \\\outp, m}{\inp[p \coloneqq \mathit{qs}], \outp[p \coloneqq\\
+\;\;\;(t, \ld, m(a)) \uplus \outp(p)], m}{}}
+
+\inference
+[St]
+{\inp(p) = \mathit{qs} \uplus \{\st,a,v\}}
+{\ioxe{$M_m$}{\inp, \\\outp, m}{\inp[p \coloneqq \mathit{qs}], \outp[p \coloneqq
+(\st) \\\;\;\;\uplus \outp(p)], m[a\coloneqq v]}{}}%p, (\st, a,v)}}
+
+\end{boxedminipage}
+\caption{LTS for a simple memory}
+\label{$M_m$}
+\end{figure}
+
+So, we focus on this opportunity to simplify proof decomposition.  We will
+prove that our main memory component satisfies an intuitive \emph{store
+atomicity} property.  Despite the potential red herring of the word
+``atomicity,'' this specification is appropriate even for implementation of
+weaker memory models than SC.  Store atomicity can be understood via the
+operational semantics of Figure \ref{$M_m$}, describing an LTS that receives
+load and store requests ($\ld$ and $\st$) from processors and sends back load
+responses ($\ld\resp$). The transfer happens via input buffers $\inp(p)$ from
+processor $p$ and output buffers $\outp(p)$ to processor $p$.
 
 The memory component is composed of a \emph{hierarchy of caches}, where each
 cache node (labeled like ``L1,'' ``L2,'' etc.) communicates only with its
