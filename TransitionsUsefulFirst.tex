@@ -1,27 +1,29 @@
 \section{Labeled Transition Systems}\label{sec:lts}
 
-\begin{figure*}
+\begin{figure}
 \centering
-\begin{boxedminipage}{.53\textwidth}
+\begin{boxedminipage}{\columnwidth}
+\small
 \noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==$None$);$
 
 \hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
 
 \textbf{endrule}
 \end{boxedminipage}
-\begin{boxedminipage}{\textwidth}
+\begin{boxedminipage}{\columnwidth}
 \small
 \inference[]
 {\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
-{\io{$M_c$}
-{\dt, \ch, \s, \dst, \wt, \dwt, \inp, \outp}
-{\dt, \ch[ (c, p, \req) \coloneqq
-(a, \s(c, a), x) \uplus \ch(c,p,\req)], \s, \dst,
-\wt[(c,a)\coloneqq x], \dwt, \inp, \outp}{}}
+{\ioxe{$M_c$}
+{\dt, \ch, \s,\\ \dst, \wt, \\\dwt,\\ \inp, \outp}
+{\dt, \ch[ (c, p, \req) \coloneqq\\
+\;\;\;(a, \s(c, a),x)
+\\\uplus \ch(c,p,\req)], \s, \dst,\\
+\wt[(c,a)\coloneqq x], \dwt,\inp, \outp}{}}
 \end{boxedminipage}
 \caption{Rule in Bluespec and its corresponding LTS transliteration}
 \label{both}
-\end{figure*}
+\end{figure}
 
 We make extensive use of the general theory of labeled transition
 systems, a semantics approach especially relevant to communicating
