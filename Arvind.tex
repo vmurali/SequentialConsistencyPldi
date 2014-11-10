@@ -8,7 +8,9 @@ system preserves almost any aspect of processor behavior from a model
 like SC.  To focus our theorems, we pick the time-honored property of
 \emph{termination}.  An optimized system should terminate or diverge
 iff the reference system could also terminate or diverge,
-respectively.  Our basic definitions of transition systems build in
+respectively.  All sorts of other interesting program properties are
+reducible to this one, in the style of computability theory.
+Our basic definitions of transition systems build in
 special treatment of halting, so that we need not mention it
 explicitly in most contexts to come.
 
@@ -125,7 +127,7 @@ set $\mathcal L$. We say that
 \end{multline*}
 Each label in the trace is replaced by the mapping of $f$ on it, and
 labels mapped to $\epsilon$ by $f$ are dropped. $f$ is overloaded
-to denote that multi-label version when applied to $\eta$.
+to denote that multilabel version when applied to $\eta$.
 \end{defn}
 
 As a shorthand, we write $A \sqsubseteq B$ for $A \sqsubseteq_\mathsf{id} B$,
@@ -196,7 +198,7 @@ system $A+B$ will be sound with respect to $A'+B'$.
 %corresponding code in Bluespec in Figure \ref{both}. This code was actually
 %written for the PowerPC system \cite{Khan:PowerPc} (we will be using this rule
 %later in the paper when we describe the coherent caches).
-\section{Decomposing a Share Memory Multi-Processor System}
+\section{Decomposing a Shared-Memory Multiprocessor System}
 \label{sec:store-atomicity}
 
 \begin{figure}
