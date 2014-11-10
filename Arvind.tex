@@ -359,8 +359,9 @@ work.
 
 Our final theorem in this paper establishes that a particular complex hardware
 system implements sequential consistency (SC) properly.  We state the theorem
-in terms of the trace refinement relation $\sqsubseteq$ developed in the prior
-section.  Therefore, we need to define an LTS embodying SC.  The simpler this
+in terms of the trace refinement relation $\sqsubseteq$ developed in
+Section~\ref{sec:lts}.
+Therefore, we need to define an LTS embodying SC.  The simpler this
 system, the better.  We do not need to worry about its performance properties,
 since we will prove that an optimized system remains faithful to it.
 
@@ -419,8 +420,8 @@ precondition-postcondition pair does that job in a partial-correctness
 Hoare logic.  Our SC LTS fully constrains observable behavior of a
 system to remain consistent with simple interleaving.  Similar
 operational models are possible as top-level specifications for
-systems following weaker memory models, by giving the LTS for the \emph{Local
-Buffer} component and composing the three components simultaneously.
+systems following weaker memory models, by giving the LTS for the \emph{local
+buffer} component and composing the three components simultaneously.
 
 \begin{figure}
 \small
@@ -500,9 +501,9 @@ processors.  %The input-output interface of this memory $M_m$ is largely what
 %However, in anticipation of the
 %more complex processor we will define later, we add requests and responses for
 %\emph{speculative loads}.  These are load operations that a processor may
-a%ttempt, before it knows that the program will actually need the result.  Many
-s%peculative loads from a single processor may be in flight at once, improving
-p%erformance via parallelism. 
+%attempt, before it knows that the program will actually need the result.  Many
+%speculative loads from a single processor may be in flight at once, improving
+%performance via parallelism. 
 A request to memory like $(t, \ld, a)$ asks
 for the value of memory cell $a$, associating a \emph{tag} $t$ that the
 processor can use to match responses to requests.  Those responses take the
@@ -585,11 +586,11 @@ response to $rs$; one has to show that the SC system can lead to the same
 In this section we divided a multiprocessor system into two rather simple
 components, processor represented by $P_\text{ref}$ and memory represented by
 $M_m$. In the following two sections we will develop more complex, optimized
-versions of each piece and prove their correctness, that is, $P_\text{so}$, the
-speculative out-of-order processor, is sound with respect to $P_\text{ref}$ and
-$M_c$, the cache memory, is sound with respect to $M_m$. In proving the
+versions of each piece and prove their correctness.  That is, we define $P_\text{so}$, the
+speculative out-of-order processor, and prove it sound with respect to $P_\text{ref}$;
+and we define $M_c$, the cache memory, and prove it sound with respect to $M_m$. In proving the
 soundness of $P_\text{so}$ with respect to $P_\text{ref}$, we need to focus
-only on non-speculative communications. The main theorem we are after is to
+only on nonspeculative communications. The main theorem we are after is to
 show that P$^n_\text{so}+ M_c$ is SC, by showing that it is sound with respect
 to P$^n_\text{ref}+ M_m$. Figure~\ref{proofs} gives the overall proof structure
 that we will employ.
