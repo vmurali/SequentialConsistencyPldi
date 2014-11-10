@@ -237,8 +237,7 @@ reordering of memory instructions by the core $P_i$ and/or (2) the
 properties of the local buffers $B_i$ connected to each processor
 $P_i$.  For instance, if $B_i$ were a store buffer, into which the
 committed stores from an in-order processor $P_i$ are enqueued, and if
-any ``subsequent'' load from the same processor $P_i$ is allowed to read and commit the latest value from the store buffer, then such a multiprocessor system is said to implement the TSO~\cite{x86tsocacm10} memory
-model. 
+any ``subsequent'' load from the same processor $P_i$ is allowed to read and commit the latest value from the store buffer, then such a multiprocessor system is said to implement the TSO memory model \cite{x86tsocacm10}.
 
 \begin{figure}
 \small

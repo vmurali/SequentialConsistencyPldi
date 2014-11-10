@@ -24,7 +24,7 @@ produce full-system theorems.
 In this paper, we introduce \emph{a new approach to modular, deductive
 verification of hardware designs} at the highest level of rigor, backed by
 proofs using the Coq proof assistant.  As a challenging case study, we focus on
-\textbf{verifying that a particular infinite family of multicore, shared-memory
+\emph{verifying that a particular infinite family of multicore, shared-memory
 systems implements sequential consistency}.  The proof is parametrized over an
 unknown number of processors connected to an arbitrary memory hierarchy with an
 unknown number of caches in an unknown number of layers (e.g., L1, L2).  In our
@@ -68,10 +68,12 @@ to synthesize such codes into register-transfer-level circuits (i.e., Verilog co
 competitive performance.  Our cache-coherent memory system is directly
 transliterated from a Bluespec
 implementation \cite{DNA:CoherenceImplementation} used to implement a
-cycle-accurate simulator for a multiprocessor PowerPC system \cite{Khan:PowerPc}. The hardware synthesized
+cycle-accurate simulator for a cache-coherent multiprocessor PowerPC system \cite{Khan:PowerPc}. The hardware synthesized
 from that implementation is rather efficient: an 8-core system with a 2-level
 cache hierarchy can run 55 million instructions per second on the BEE FPGA
-board \cite{bee2}. Figure \ref{both} gives an example of an LTS inference rule
+board \cite{bee2}.
+
+Figure \ref{both} gives an example of an LTS inference rule
 transliterated directly from an actual Bluespec rule used in the PowerPC
 system.  Its meaning will become clear in Section \ref{sec:cc};
 for now we just note that, while Bluespec rules employ Boolean \emph{guard}
@@ -145,11 +147,13 @@ Section~\ref{sec:conclusion}.
 \small
 \inference[]
 {\parent(c,p) & \s(c,a) < x & \wt(c,a) = \epsilon}
-{\ioxe{$M_c$}
-{\dt, \ch, \s,\\ \dst, \wt, \dwt,\\ \inp, \outp}
-{\dt, \ch[ (c, p, \req) \coloneqq(a, \s(c, a),x)\\
-\;\;\uplus \ch(c,p,\req)], \s, \dst,\\
-\wt[(c,a)\coloneqq x], \dwt,\inp, \outp}{}}
+{\hspace{-.4cm}\ioxe{$M_c$}
+{\hspace{-.2cm}\dt, \ch, \s,\hspace{-.2cm}\\
+\hspace{-.2cm}\dst, \wt, \dwt,\hspace{-.2cm}\\
+\hspace{-.2cm}\inp, \outp\hspace{-.2cm}}
+{\hspace{-.2cm}\dt, \ch[ (c, p, \req) \coloneqq(a, \s(c, a),x)\hspace{-.2cm}\\
+\;\;\;\;\;\;\uplus \ch(c,p,\req)], \s, \dst,\hspace{-.2cm}\\
+\hspace{-.2cm}\wt[(c,a)\coloneqq x], \dwt,\inp, \outp\hspace{-.2cm}}{}\hspace{-.4cm}}
 \end{boxedminipage}
 \caption{Bluespec rule and its corresponding LTS rule}
 \label{both}
