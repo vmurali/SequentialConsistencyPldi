@@ -620,15 +620,15 @@ instructions to happen before earlier instructions have finished).
 The branch predictor is the simpler of the two components, whose state
 is indicated with metavariable $\ppc$.
 The operations on such state are $\curPpc(\ppc)$, to extract the
-current program-counter prediction; $\nextPpc(\ppc)$, to get the predicted
-program-counter for the next instruction; and $\setBp(\ppc, \pc)$,
+current program-counter prediction; $\nextPpc(\ppc)$, to advance to predicting
+the next instruction; and $\setBp(\ppc, \pc)$,
 to reset prediction to begin at a known-accurate position $\pc$. We need to impose no explicit correctness criterion on
 branch predictors; the processor uses predictions only as hints, and
 it always resets the predictor using $\setBp$ after detecting an
 inaccurate hint.
 
 The interface and formal contract of a reorder buffer are more
-involved.  We write $\rob$ as a metavariable for reorder buffer
+involved.  We write $\rob$ as a metavariable for reorder-buffer
 state. $\phi$ denotes the state of an empty buffer. The operations associated with $\rob$ are:
 \begin{itemize}
 %\item $\phi$, the state of an empty buffer.
@@ -711,7 +711,7 @@ present the LTS for speculating processors.
 
 \inference[LdRpBad]
 {\commit(\rob) = (\pc,\pc',(\ld,x,a,v',s')) \\ v' \neq v & \exec(s,\pc,(\ld,x,v)) = (s'',\pc'')}
-{\iox{\text{P$_\text{so}$}}{s,\pc,\top,\\\rob,\ppc}{s'',\pc'',\bot,\phi,\\\setBp(\ppc,\pc)}{\text{ToP}(\epsilon, \ld, v)}}
+{\iox{\text{P$_\text{so}$}}{s,\pc,\top,\\\rob,\ppc}{s'',\pc'',\bot,\phi,\\\setBp(\ppc,\pc'')}{\text{ToP}(\epsilon, \ld, v)}}
 
 
 \end{boxedminipage}
@@ -747,8 +747,8 @@ time'' or ``correct before, but not anymore.'')
 A full processor state is $(s, \pc, \wait, \rob, \ppc)$, comprising
 architectural state, the program counter, a Boolean flag indicating
 whether the processor is waiting for a memory response about an
-instruction being committed, and the reorder buffer and branch
-predictor states. Its initial state is given by $(s_0, \pc_0, \bot, \phi, \ppc_0)$.
+instruction being committed, and the reorder-buffer and branch-predictor
+states. Its initial state is given by $(s_0, \pc_0, \bot, \phi, \ppc_0)$.
 The interface of this processor with memory (\ie{}
 communication labels with $\toM, \toP$) is identical
 to that of the reference processor.
@@ -821,7 +821,7 @@ execution of P$_\text{ref}$.
 $\text{P$^n_\text{so}$} \sqsubseteq_{\noSpec^n}$ P$_\text{ref}^n$
 \end{corollary}
 \begin{prf}
-Direct consequence of Theorems~\ref{ocorrect},~\ref{liftn} (the
+Direct consequence of Theorems~\ref{ocorrect} and \ref{liftn} (the
 latter is one of our preliminary results about $n$-repetition).
 \end{prf}
 
