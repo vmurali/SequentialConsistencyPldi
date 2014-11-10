@@ -204,13 +204,12 @@ system $A+B$ will be sound with respect to $A'+B'$.
 \begin{figure}
 \centering
 \includegraphics[scale=.43]{zoom}
-\caption{Components of a multi-processors system}
+\caption{Components of a multiprocessor system}
 \label{zoom}
 \end{figure}
 
-Any conventional multi-processor system can be logically divided into 3 components as shown in Figure \ref{zoom}. 
-The top-level system design is shown at top right, while the details of its components, the memory system and the processor ($P_i$), are shown in the magnified boxes. The processor component $P_i$ can be implemented in a variety of ways, from one which executes instructions one-by-one in program order, to a complex one which speculatively executes many instructions concurrently to exploit parallelism. The memory component is normally implemented using a hierarchy of caches, in order to increase the performance of the overall system, since the latency of accessing memory directly is large compared to that of accessing a much smaller cache. The component between each processor and the global memory sub-system contains local buffers, $B_i$, specific to
-the processor $P_i$. 
+Any conventional multiprocessor system can be divided logically into 3 components as shown in Figure \ref{zoom}. 
+The top-level system design is shown at top right, while the details of its components, the memory system and the processor ($P_i$), are shown in the magnified boxes. The processor component $P_i$ can be implemented in a variety of ways, from one executing instructions one-by-one in program order, to a complex one speculatively executing many instructions concurrently to exploit parallelism. The memory component is normally implemented using a hierarchy of caches, in order to increase the performance of the overall system, since the latency of accessing memory directly is large compared to that of accessing a much smaller cache. The component between each processor and the global memory subsystem contains local load/store buffers, $B_i$, each specific to a processor $P_i$. 
 
 %\begin{figure}
 %\small
@@ -231,14 +230,14 @@ the processor $P_i$.
 %\label{M_m}
 %\end{figure}
 
-Popular instruction set architectures, such as Intel x86, ARM, PowerPC, do not guarantee sequential consistency.  That is, their behavior makes it unsound to imagine that
+Popular instruction set architectures, such as Intel x86, ARM, and PowerPC, do not guarantee sequential consistency.  That is, their behavior makes it unsound to imagine that
 the different processors of a shared-memory system are running
 according to simple interleaving of instructions, where each instruction executes atomically.  However, we want to emphasize that, in every weak-memory system we are aware of, \emph{the main memory still exposes atomic loads and stores}!  The weaker semantics arises only because of (1)
 reordering of memory instructions by the core $P_i$ and/or (2) the
 properties of the local buffers $B_i$ connected to each processor
 $P_i$.  For instance, if $B_i$ were a store buffer, into which the
 committed stores from an in-order processor $P_i$ are enqueued, and if
-any ``subsequent'' load from the same processor $P_i$ is allowed to read and commit the latest value from the store buffer, then such a multi-processor system is said to implement the TSO~\cite{x86tsocacm10} memory
+any ``subsequent'' load from the same processor $P_i$ is allowed to read and commit the latest value from the store buffer, then such a multiprocessor system is said to implement the TSO~\cite{x86tsocacm10} memory
 model. 
 
 \begin{figure}
@@ -280,7 +279,11 @@ weaker memory models than SC.  Store atomicity can be understood via the
 operational semantics of Figure \ref{$M_m$}, describing an LTS that receives
 load and store requests ($\ld$ and $\st$) from processors and sends back load
 responses ($\ld\resp$). The transfer happens via input buffers $\inp(p)$ from
-processor $p$ and output buffers $\outp(p)$ to processor $p$.
+processor $p$ and output buffers $\outp(p)$ to processor $p$.  Note that this
+model allows the memory system to answer pending memory requests in any order,
+even potentially reordering requests from a single processor,
+so long as, whenever it does process a request, that action appears to take
+place \emph{atomically}.
 
 The memory component is composed of a \emph{hierarchy of caches}, where each
 cache node (labeled like ``L1,'' ``L2,'' etc.) communicates only with its
@@ -289,14 +292,14 @@ do our best to satisfy all memory requests, to avoid the latency of a
 round-trip with main memory.  With an L1 cache miss, we may still find a hit in
 a parent cache below the level of main memory, realizing a smaller but still
 significant speedup.  Therefore it is the responsibility of the hierarchy of
-caches, which forms the memory sub-component, to implement the store atomicity
+caches, which forms the memory subcomponent, to implement the store atomicity
 property. In fact, as we will prove in Section \ref{sec:cc}, the purpose of the
 cache-coherence protocol is to establish this invariant for the memory
-sub-component.  Concretely, we have verified a \emph{directory-based} protocol
+subcomponent.  Concretely, we have verified a \emph{directory-based} protocol
 for coordinating an arbitrary tree of caches, where each node stores a
 conservative approximation of its children's states.
 
-As an instance of the above decomposition, we will prove that a multi-processor
+As an instance of the above decomposition, we will prove that a multiprocessor
 system with no local buffering in between the processor and the memory
 components indeed implements sequential consistency. We implement a highly
 speculative processor that executes instructions and issues loads out of order,
