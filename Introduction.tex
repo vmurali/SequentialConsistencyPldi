@@ -17,8 +17,8 @@ modular boundary to be realized by multiple implementations, any of which may
 be dropped into the system safely. It also allows a greater parallelization of
 human design effort, improving development time. Similarly, verification is
 simplified, as modular interface agreements provide a natural lemma structure.
-This leads us towards a decomposition of the whole system verification task
-into lemmas of subsystems, which can be composed in a black-box manner to
+They lead us towards a decomposition of the whole-system verification task
+into lemmas about subsystems, which can be composed in a black-box manner to
 produce full-system theorems.
 
 In this paper, we introduce \emph{a new approach to modular, deductive
@@ -64,24 +64,33 @@ convert LTSes into efficient hardware.  Our work is based on the Bluespec
 language \cite{BSV:LangRef, Bluespec:TFRG}, which served as the model for the
 formalism of this paper.  Bluespec models hardware components as atomic rules
 of a transition system over state elements, and there is a commercial compiler
-to synthesize such codes into register transfer-level circuits (i.e., Verilog code) with
+to synthesize such codes into register-transfer-level circuits (i.e., Verilog code) with
 competitive performance.  Our cache-coherent memory system is directly
 transliterated from a Bluespec
 implementation \cite{DNA:CoherenceImplementation} used to implement a
-cycle-accurate simulator for a multi-processor PowerPC system \cite{Khan:PowerPc}. The hardware synthesized
+cycle-accurate simulator for a multiprocessor PowerPC system \cite{Khan:PowerPc}. The hardware synthesized
 from that implementation is rather efficient: an 8-core system with a 2-level
 cache hierarchy can run 55 million instructions per second on the BEE FPGA
 board \cite{bee2}. Figure \ref{both} gives an example of an LTS inference rule
 transliterated directly from an actual Bluespec rule used in the PowerPC
-system; its meaning will become clear in Section \ref{sec:cc}. In Bluespec
-notation, only those state elements whose values change are mentioned in the
-rule; in contrast LTSes employ a more functional notation.
+system.  Its meaning will become clear in Section \ref{sec:cc};
+for now we just note that, while Bluespec rules employ Boolean \emph{guard}
+conditions paired with sequences of imperative \emph{actions} to update state,
+our (equivalent) formalization follows a natural-deduction inference-rule style,
+where we explain a state transition as a relation between two tuples of state
+elements, using rule premises where Bluespec uses guards.  The high-level point
+is that the natural-deduction style is a semantically trivial rephrasing of the
+Bluespec notation, which has been demonstrated as practical for synthesizing
+realistic, high-performance hardware.  Inference rules like the one in
+Figure \ref{both} fit naturally with the inductive-definition mechanisms of
+proof systems like Coq, providing an effective starting point for formal
+verification of hardware designs.
 
 The main contributions of this paper are:
 \vspace{-.3cm}
 \begin{itemize} 
 \item Identification of an interface between the processor and the memory
-components of a multi-processor system that enables modular implementation and
+components of a multiprocessor system that enables modular implementation and
 verification.
 
 \item A general \emph{modular verification methodology} applicable to hardware
@@ -104,22 +113,22 @@ implementing relaxed memory models.
 Section~\ref{relatedWork}. In Section~\ref{sec:lts} we introduce our flavor of
 the labeled transition systems formalism, including a definition of trace
 refinement. In Section~\ref{sec:store-atomicity}, we show a generic
-decomposition of any multi-processor system independently of the memory model
+decomposition of any multiprocessor system independently of the memory model
 that it implements, and we discuss the store-atomicity property of the memory
-sub-component. In Section~\ref{sec:sc} we give a simple formal model of
+subcomponent. In Section~\ref{sec:sc} we give a simple formal model of
 sequential consistency.  The following sections refine the two main
-subcomponents of our multi-processor system.  Section~\ref{sec:ooo} discusses
+subcomponents of our multiprocessor system.  Section~\ref{sec:ooo} discusses
 definition and verification of a speculative processor model, and
 Section~\ref{sec:cc} defines and proves our hierarchical cache-coherence
 protocol.  Finally, in Section~\ref{sec:finalresult} we show the whole-system
-modular proof of our complex system, and end with some conclusions in
-Sections~\ref{sec:conclusion}.
+modular proof of our complex system, and we end with some conclusions in
+Section~\ref{sec:conclusion}.
 
 \begin{figure}[t]
 \centering
 \begin{boxedminipage}{\columnwidth}
 \small
-\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]==$None$);$
+\noindent \textbf{rule} $(c.\parent == p \; \mathit{\&\&} \; c.\s[a] < x \; \mathit{\&\&} \; c.\wt[a]== \textrm{None});$
 
 \hspace{1cm} $\ch[c][p][\req].\enq(a,c.\s[a],x); c.\wt[a] \Leftarrow x;$
 

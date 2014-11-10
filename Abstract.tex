@@ -4,14 +4,14 @@ in a hardware design, with well-defined input and output channels; and we show
 how to specify and verify components individually, with machine-checked proofs
 in the Coq proof assistant.  As a demonstration, we verify a fairly realistic
 implementation of a multicore shared-memory system with two types of
-components:  memory-system and processor.  Both components include nontrivial
+components: memory system and processor.  Both components include nontrivial
 optimizations, with the memory system employing an arbitrary hierarchy of cache
 nodes that communicate with each other concurrently, and with the processor
 doing speculative execution of many concurrent read operations.  Nonetheless,
 we prove that the combined system implements sequential consistency.  One
 interesting aspect of the proof is that the memory component is well-specified
 to be reusable for systems implementing a variety of weak memory models.  To
-our knowledge, our memory-system system proof is the first machine verification
+our knowledge, our memory-system proof is the first machine verification
 of a cache-coherence protocol parameterized over an arbitrary cache hierarchy,
 and our full-system proof is the first machine verification of sequential
 consistency for a multicore hardware design that includes caches and
