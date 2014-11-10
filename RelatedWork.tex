@@ -2,7 +2,7 @@
 \section{Related Work}
 \label{relatedWork}
 
-Hardware verification is dominated by model-checking; for instance, processor
+Hardware verification is dominated by model checking; for instance, processor
 verification ~\cite{burch1994automatic, mcmillan1998verification} and more
 recently, Intel's execution cluster verification~\cite{kaivola2009replacing}.
 Many abstraction techniques are used to reduce designs to finite state spaces,
@@ -12,7 +12,7 @@ almost always treated systems with concrete topologies, involving particular
 finite numbers of caches and processors. For instance, explicit-state model
 checking tools like Murphi~\cite{murphi} or TLC~\cite{tlc} are only able to
 handle small and simplified systems, \eg{} a single-level cache hierarchy with
-three CPUs, two addresses, and one bit of data. Symbolic model checking
+three CPUs, two addresses, and one bit of data. Symbolic model-checking
 techniques have fared better: McMillan \etal{} have verified a 2-level MSI
 protocol based on the Gigamax distributed multiprocessor using
 SMV~\cite{gigamax}. Optimizations on these techniques (\eg{} partial order
@@ -27,11 +27,11 @@ more general theorem without much new analysis.
 
 Theorem provers have also been used to verify microprocessors, \eg{} HOL has
 been used to verify an academic microprocessor AVI-1 \cite{windley1995formal}.
-Term-rewriting based techniques have been used to specify microprocessors, with
+Term-rewriting techniques have been used to specify microprocessors, with
 the goal of making them more amenable to verification \cite{shen1999using}.
 
-Theorem provers have also been used in verifying cache coherence protocols. The
-correctness of the FLASH cache coherence protocol~\cite{flash} for a
+Cache-coherence proofs have also been done with mechanized theorem provers. The
+correctness of the FLASH cache-coherence protocol~\cite{flash} for a
 single-level hierarchy was proven with PVS~\cite{park} using a mapping, called
 ``aggregation of transactions,'' from multiple localized transactions to a
 single global transaction, and finally using model checking to prove the
@@ -49,16 +49,17 @@ parts of the proof were implemented using PVS.
 %establishes that the protocol is store atomic. Rather, they show that Cachet
 %obeys the CRF memory model, which is not restricted to store-atomic behavior.
 
-There has been a lot of work in providing frameworks for axiomatic
-specifications of memory models based on empirically observed behavior of
+Before verifying that a hardware design implements an ISA-level semantics, it
+is necessary to decide what the correct semantics is.  Much recent work has
+studied widely deployed hardware platforms empirically to derive formal
+semantics.  While our case study in this paper hews to the uncontroversial
+sequential-consistency model, the empirical challenges arise in characterizing
+weaker memory models.  Approaches have included building axiomatic
+memory-model specifications based on empirically observed behavior on
 certain ``litmus
-tests''\cite{Alglave11,Alglave:FMSD,alglave2012formal,Alglave:2010,Alglave:TACAS,alglave2014herding}.
-There has been some work in providing operational and axiomatic semantics that
-describes the observed behavior (based on certain ``litmus tests'' of real
-hardware
-\cite{mador2012axiomatic,sarkar2011understanding,sarkar2012synchronising}.
-Finally, there has been work formally relating the axiomatic specification of
-TSO to operational semantics \cite{x86tsocacm10}.
+tests''~\cite{Alglave11,Alglave:FMSD,alglave2012formal,Alglave:2010,Alglave:TACAS,alglave2014herding},
+building models that include operational semantics~\cite{mador2012axiomatic,sarkar2011understanding,sarkar2012synchronising}, and relating the axiomatic specification of
+TSO to operational semantics~\cite{x86tsocacm10}.
 
 %There has been a lot of work in providing frameworks for axiomatic
 %specifications of memory models \cite{alglave2012formal,alglave2014herding}
