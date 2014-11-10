@@ -848,15 +848,15 @@ Figure~\ref{cache} formalizes as an LTS $M_c$ the algorithm we implemented,
 for providing the memory abstraction on top of a cache hierarchy.
 We have what is called an \emph{invalidating directory-based hierarchical
 cache-coherence protocol}.  It is a transliteration of a realistic
-algorithm implemented in the Bluespec hardware description
-language~\cite{Bluespec:TFRG}. 
+algorithm~\cite{DNA:CoherenceImplementation} implemented in the
+Bluespec hardware description language~\cite{Bluespec:TFRG}. 
 
 We now try to explain aspects of this transition system at an
 intuitive level.  Thanks to the overall modular proof structure in
 this paper, it is not essential to understand the details of the cache
 system, to understand any other part of our development.  Therefore,
 some readers may want to skip this explanation upon first reading,
-skipping to the next section for a key theorem relating $M_c$ and $M_m$.
+advancing to the next subsection for a key theorem relating $M_c$ and $M_m$.
 
 We describe a state of the system using 8 fields: $\dt$, $\ch$, $\s$, $\dst$,
 $\wt$, $\dwt$, $\inp$, $\outp$. The $\inp$ and $\outp$ sets are the interfaces
@@ -876,7 +876,7 @@ $\dt(c,a)$ & Data in cache $c$ for address $a$\\
 $\s(c,a)$ & Coherence state of cache $c$ for address $a$\\
 $\dst(p,c,a)$ & Directory state of cache $p$ for child $c$ and address $a$\\
 $\wt(c,a)$ & State that cache $c$ is waiting to upgrade to, for address $a$, or $\epsilon$\\ %Gives cache $c$'s desired coherence state to upgrade to (for address $a$), or $\epsilon$ if none\\
-$\dwt(p,c,a)$ & State that cache $p$ is waiting its child $c$ to downgrade to, for address $a$, or $\epsilon$\\
+$\dwt(p,c,a)$ & State that cache $p$ is waiting for its child $c$ to downgrade to, for address $a$, or $\epsilon$\\
 %$\dwt(p,c,a)$ & Gives cache $p$'s desired coherence state for its child $c$ to downgrade to (for address $a$), or $\epsilon$ if none\\
 $\ch$ & Channels between nodes in the system\\
 \hline
@@ -889,9 +889,9 @@ A coherence state is $M, S$ or $I$, broadly representing permissions to modify,
 read, or do nothing with an address, respectively, the decreasing permissions
 denoted by $M > S > I$. This interpretation of permissions is accurate at the
 leaf caches connected to the processors, but the
-interpretation is subtly different at the higher level caches.
+interpretation is subtly different at the higher-level caches.
 
-$\wt$ denotes what permission the cache is waiting for,
+$\wt$ stores what permission a cache is waiting for,
 if any.  That is, a cache has decided to \emph{upgrade} its
 coherence state for some address to a more permissive value, but
 it is waiting for acknowledgment from its parent before
@@ -955,20 +955,20 @@ $\compat(p, c, x, a) =$
 \end{math}
 \end{defn}
 
-The reason for having separate request and response channels for the same
-child-parent pair is to avoid deadlocks. Throughout the protocol, we maintain
-the invariant that a downgrade request from the parent always gets priority,
-\ie{} if a child is waiting for an upgrade response, it must still try to
-satisfy a downgrade request from the parent. If both the parent and the child
-are waiting for their respective responses, there will be a deadlock. This tie
-cannot be broken arbitrarily: if the parent concedes and starts processing a
-child's request, then it may have to send downgrade requests to other children
-to make the states compatible, but the other children may have sent upgrade
-requests and remain waiting, leading to a deadlock. The only way to break the
-vicious waiting cycle is for the children to concede and respond when they get
-downgrade requests. Of course, they have to downgrade the states of their own
-children first, and this process goes on recursively until the downgrade
-requests reach the leaf caches, which can respond immediately.
+%% The reason for having separate request and response channels for the same
+%% child-parent pair is to avoid deadlocks. Throughout the protocol, we maintain
+%% the invariant that a downgrade request from the parent always gets priority,
+%% \ie{} if a child is waiting for an upgrade response, it must still try to
+%% satisfy a downgrade request from the parent. If both the parent and the child
+%% are waiting for their respective responses, there will be a deadlock. This tie
+%% cannot be broken arbitrarily: if the parent concedes and starts processing a
+%% child's request, then it may have to send downgrade requests to other children
+%% to make the states compatible, but the other children may have sent upgrade
+%% requests and remain waiting, leading to a deadlock. The only way to break the
+%% vicious waiting cycle is for the children to concede and respond when they get
+%% downgrade requests. Of course, they have to downgrade the states of their own
+%% children first, and this process goes on recursively until the downgrade
+%% requests reach the leaf caches, which can respond immediately.
 
 A complication arises because a cache can voluntarily decide to downgrade its
 state.  This transition is used to model invalidation of cache lines to make
@@ -1020,8 +1020,8 @@ the property of a memory, \viz{} that if a store happens, then that location
 gets updated such that any subsequent load gets back the updated value.
 
 The proof that $M_c$ obeys store atomicity is involved enough that we will only
-state the lemmas used to prove this. The proofs in Coq for each theorem and
-lemma in this section can be found in our supplementary material.
+state key lemmas that we used. The proofs in Coq for each theorem and
+lemma in this section are available in our implementation.
 
 \begin{lemma}
 \textit{latestValue}:
@@ -1077,7 +1077,7 @@ $a$, and the data must be sent from a \textit{clean} cache.
 \end{lemma}
 
 \begin{lemma}%[Conservative directory] 
-$\forall p, \forall c, \forall a\;\s(c, a) \le \dst(p, c, a)$
+$\forall p, \forall c, \forall a.\;\s(c, a) \le \dst(p, c, a)$
 \label{conservative}
 \end{lemma}
 
