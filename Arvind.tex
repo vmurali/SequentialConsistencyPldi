@@ -203,7 +203,7 @@ system $A+B$ will be sound with respect to $A'+B'$.
 
 \begin{figure}
 \centering
-\includegraphics[scale=.43]{zoom}
+\includegraphics[scale=.4]{zoom}
 \caption{Components of a multiprocessor system}
 \label{zoom}
 \end{figure}
@@ -304,7 +304,11 @@ system with no local buffering in between the processor and the memory
 components indeed implements sequential consistency. We implement a highly
 speculative processor that executes instructions and issues loads out of order,
 but commits instructions (once some ``verification'' is done) in order. This idea
-of verification loads for a speculative processor is not new \cite{cain}.
+of verification loads for a speculative processor is not new \cite{cain}.  In
+common cases, performance of executing loads twice (first to speculate and then
+to check the answers in program order) is good, because it is likely that the
+second load finds the address already in a local cache, thanks to the recent
+processing of the first load.
 
 The processor itself can be decomposed into several components. In the
 zoomed-in version of Figure \ref{zoom}, we show a highly speculative,
@@ -395,24 +399,7 @@ $\pc_0$.
 \medskip
 
 This LTS encodes Lamport's notion of SC, where processors take turns executing
-nondeterministically in a simple interleaving.  We need know very few details
-of the ISA to define the SC model.  Our final, optimized system is parametrized
-over an ISA in the same way.  In the course of the rest of this paper, we will
-define an optimized system $O$ and prove $O \sqsubseteq \text{SC}$.
-
-However, we are not interested merely in verifying the particular system $O$.
-Instead, we want to structure our proof \emph{modularly}, so that different
-common hardware components can be verified separately, and, in a black-box
-manner, we may assemble a correctness proof for any composition of these
-components.  For instance, we want to verify CPUs and memory systems
-separately, picking any realization of each to produce a verified system, with
-minimal new proof effort. As a more concrete example, memory systems should be
-verifiable independently of which weak memory model processors assume; we want
-to reuse memory proofs for different kinds of processors.
-
-To support this style of modular decomposition, we need to introduce a few
-intermediate systems.
-
+nondeterministically in a simple interleaving.
 Note that, in this setting, an operational specification like the LTS
 for SC is precisely the right characterization of \emph{full functional
   correctness} for a hardware design, much as a
@@ -422,6 +409,14 @@ system to remain consistent with simple interleaving.  Similar
 operational models are possible as top-level specifications for
 systems following weaker memory models, by giving the LTS for the \emph{local
 buffer} component and composing the three components simultaneously.
+
+Our final, optimized system is parametrized over an ISA in the same way as SC is.
+In the course of the rest of this paper, we will
+define an optimized system $O$ and prove $O \sqsubseteq \text{SC}$.
+To support a modular proof decomposition, however, we need to introduce a few
+intermediate systems first.
+
+
 
 \begin{figure}
 \small
@@ -736,13 +731,15 @@ previously issued speculative load instruction, the associated speculative
 memory load response is verified against the new commit load response. If the
 resulting values do not match, the processor terminates all past uncommitted
 speculation, by emptying the reorder buffer and resetting the
-next predicted program counter in the branch predictor to the correct next value. This step mimics
-the mechanism implemented in most modern-day processors, operating on the
-conservative assumption that the processor may have performed arbitrary
-incorrect speculation after receiving the inaccurate response from
-memory.  (Note that here ``inaccurate'' does not mean ``wrong at
-the time the response was received,'' but rather ``wrong at commit
-time'' or ``correct before, but not anymore.'')
+next predicted program counter in the branch predictor to the correct next value.
+
+%% This step mimics
+%% the mechanism implemented in most modern-day processors, operating on the
+%% conservative assumption that the processor may have performed arbitrary
+%% incorrect speculation after receiving the inaccurate response from
+%% memory.  (Note that here ``inaccurate'' does not mean ``wrong at
+%% the time the response was received,'' but rather ``wrong at commit
+%% time'' or ``correct before, but not anymore.'')
 
 A full processor state is $(s, \pc, \wait, \rob, \ppc)$, comprising
 architectural state, the program counter, a Boolean flag indicating
@@ -799,7 +796,7 @@ those state changes.
 
 When this condition holds, we may conclude the correctness theorem for
 out-of-order processors.  We use a trace-transformation function
-$\noSpec$ that drops all speculative-load requests and responses (\ie{} those load requests and responses whose tags are $\epsilon$).
+$\noSpec$ that drops all speculative-load requests and responses (\ie{} those load requests and responses whose tags are not $\epsilon$).
 See Definition~\ref{refines} for a review of how we use such
 functions in framing trace refinement.  Intuitively, we prove that any
 behavior by the speculating processor can be matched by the simple
@@ -827,20 +824,11 @@ latter is one of our preliminary results about $n$-repetition).
 
 \section{Cache-Based Memory System}\label{sec:cc}
 
-We now turn our attention toward a more efficient implementation of
-memory.  It is physically infeasible to connect many processors
-directly to a single memory with low enough latency to handle most
-memory requests quickly enough.  Instead, each processor will have its
-own \emph{L1 cache} of recently used memory cells.  Whenever possible, we
-want to service memory requests from processors' own caches, only
-contacting memory for addresses not found in the caches.  To further
-avoid contacting main memory, we create additional higher-level
-caches, connecting each L1 cache to an L2 cache, potentially
-connecting L2 caches to L3, etc., bottoming out in main memory at the
-root of our tree. The zoomed-in portion of the memory in Figure~\ref{zoom}
-diagrams the basic layout.
+\input{TransitionsUsefulCache1}
 
-Now we have concurrent interaction of many processors with many caches
+We now turn our attention toward a more efficient implementation of
+memory.  With the cache hierarchy of Figure~\ref{zoom}, we have concurrent
+interaction of many processors with many caches
 with main memory, and the relationship with the original $M_m$ system
 is far from direct.  However, this intricate concurrent execution is
 crucial to hiding the latency of main-memory access.
@@ -852,11 +840,8 @@ algorithm~\cite{DNA:CoherenceImplementation} implemented in the
 Bluespec hardware description language~\cite{Bluespec:TFRG}. 
 
 We now try to explain aspects of this transition system at an
-intuitive level.  Thanks to the overall modular proof structure in
-this paper, it is not essential to understand the details of the cache
-system, to understand any other part of our development.  Therefore,
-some readers may want to skip this explanation upon first reading,
-advancing to the next subsection for a key theorem relating $M_c$ and $M_m$.
+intuitive level, though the rest of the paper may be understood starting just
+from the final theorem of the next subsection.
 
 We describe a state of the system using 8 fields: $\dt$, $\ch$, $\s$, $\dst$,
 $\wt$, $\dwt$, $\inp$, $\outp$. The $\inp$ and $\outp$ sets are the interfaces
@@ -916,14 +901,8 @@ request and response channels, thus indexed by tuples (child name, parent name,
 request or response).  These channels need not maintain the FIFO order for
 messages between the same child-parent pair (notice the use of $\coloncolon$ to
 add and remove elements from the parent to child channel, as opposed to
-$\uplus$ for the child to parent channel). The reason is that only one request
-or one response is sent for a particular address between a child-parent pair --
-this invariant can be proved for the LTS in  Figure \ref{cache}. The order
-between a request and response message sent from the same child to its parent
-is lost, but our protocol ensures that they are processed in order by the parent, by
-comparing the previous coherence state of the incoming messages with the
-parent's directory state (in rules ParentRecvRsp
-and ParentRecvReq).
+$\uplus$ for the child to parent channel). This asymmetry is motivated by subtle
+concerns of avoiding deadlock and taking advantage of communication regularities.
 
 Here is an intuition on how the transitions work in the common case.  A cache
 can decide, spontaneously, to upgrade its coherence state, in which case it
@@ -936,9 +915,8 @@ upgrade, it makes sure that the rest of its children are ``compatible'' with
 the requested upgrade (given by $\compat$ definition below).  If not, the
 parent must send requests to the incompatible children to downgrade. Finally, when
 the $\s$'s upgrade and children's downgrade responses are all received, the
-original request can be responded to. The transitions for sending requests are
-allowed to happen spontaneously without any trigger. $P_\text{ref}$ issues speculative
-loads only for addresses which are in \Sh{} or \Mo{} state in L1; otherwise L1
+original request can be responded to. $P_\text{ref}$ issues speculative
+loads only for addresses in \Sh{} or \Mo{} state in L1; otherwise L1
 spontaneously requests an upgrade for that address.
 
 \begin{defn}
@@ -972,16 +950,14 @@ $\compat(p, c, x, a) =$
 
 A complication arises because a cache can voluntarily decide to downgrade its
 state.  This transition is used to model invalidation of cache lines to make
-room for a different location (we permit a cache to downgrade from $M$ to $S$
-instead of only to $I$).
+room for a different location.
+%(we permit a cache to downgrade from $M$ to $S$ instead of only to $I$)
 As a result, the parent's $\dst$ and the
 corresponding $\s$ of the child may go out of sync, leading to the parent
 requesting a child to downgrade when it already has. To handle this situation,
 the child has to drop the downgrade request when it has already downgraded to
 the required state (Rule DropReq in Figure \ref{cache}), to avoid deadlocks
 by not dequeuing the request.
-
-\input{TransitionsUsefulCache1}
 
 \subsection{Proving $M_c$ is Store Atomicity}\label{sec:ccproof}
 \label{safety}
@@ -1050,7 +1026,7 @@ It is pretty intuitive to prove the store atomicity property given
 Lemma~\ref{latestValue}. A leaf cache can respond to a request only when it
 has the required permission, at which point it is guaranteed to have the latest
 value, because it is \textit{clean} (as it has no children). To prove Lemma
-\ref{latestValue}, it has to be decomposed futher into the following, each of
+\ref{latestValue}, it has to be decomposed further into the following, each of
 which holds at any time.
 
 %\begin{lemma}
