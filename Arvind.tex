@@ -294,12 +294,32 @@ sub-component.  Concretely, we have verified a \emph{directory-based} protocol
 for coordinating an arbitrary tree of caches, where each node stores a
 conservative approximation of its children's states.
 
-As an instance of the above decomposition, we will prove that a multi-processor system with no local buffering in between the processor and the memory components indeed implements sequential consistency. We implement a highly speculative processor that executes instructions and issues loads out of order, but commits instructions (once some ``verification'' is done) in order.
+As an instance of the above decomposition, we will prove that a multi-processor
+system with no local buffering in between the processor and the memory
+components indeed implements sequential consistency. We implement a highly
+speculative processor that executes instructions and issues loads out of order,
+but commits instructions (once some ``verification'' is done) in order. This idea
+of verification loads for a speculative processor is not new \cite{cain}.
 
-The processor itself can be decomposed into several components. In the zoomed-in version of Figure \ref{zoom}, we show a highly speculative, out-of-order issue processor. We have the normal architectural state, such as values of registers.  Our proofs are generic over \emph{a family of instruction set architectures}, with parameters for opcode sets and functions for executing opcodes and decoding them from memory.  Other key components are a \emph{branch predictor}, which guesses at the control-flow path that a processor will follow, to facilitate speculation; and a \emph{reorder buffer (ROB)}, which decides which instructions along that path to try executing ahead of schedule. Our proofs apply to an arbitrary branch predictor, and they work for any reorder buffer satisfying a simple semantic condition.
+The processor itself can be decomposed into several components. In the
+zoomed-in version of Figure \ref{zoom}, we show a highly speculative,
+out-of-order issue processor. We have the normal architectural state, such as
+values of registers.  Our proofs are generic over \emph{a family of instruction
+set architectures}, with parameters for opcode sets and functions for executing
+opcodes and decoding them from memory.  Other key components are a \emph{branch
+predictor}, which guesses at the control-flow path that a processor will
+follow, to facilitate speculation; and a \emph{reorder buffer (ROB)}, which
+decides which instructions along that path to try executing ahead of schedule.
+Our proofs apply to an arbitrary branch predictor, and they work for any
+reorder buffer satisfying a simple semantic condition.
 
 
-Our framework establishes theorems of the form ``if system $A$ has a run with some particular observable behavior, then system $B$ also has a run with the same behavior.''  In this sense, we say that $A$ correctly implements $B$. Other important properties, such as \emph{deadlock freedom} for $A$ (which might get stuck without producing any useful behavior), we leave for future work.
+Our framework establishes theorems of the form ``if system $A$ has a run with
+some particular observable behavior, then system $B$ also has a run with the
+same behavior.''  In this sense, we say that $A$ correctly implements $B$.
+Other important properties, such as \emph{deadlock freedom} for $A$ (which
+might get stuck without producing any useful behavior), we leave for future
+work.
 
 \section{Specifying Sequential Consistency}\label{sec:sc}
 
