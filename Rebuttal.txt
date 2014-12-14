@@ -1,0 +1,81 @@
+Some of the questions raised by the first three reviewers are addressed in the
+comments of the Reviewer D.
+
+We have submitted the source code of our Coq development as a suplement to our
+paper in the submission website. It can also be obtained from the public repository
+http://github.com/vmurali/SeqConsistency.
+
+In terms of code-reuse, we have structured the proofs modularly as described in
+the paper. Thus, the proofs of the different components can be reused while
+changing the other components. For example, the proof of the cache-coherence
+protocol can be reused as is for verifying other (non-sequentially consistent)
+systems. Moreover, the proof of the cache-coherence is itself modular and can
+be adopted to other protocols (like MESI, MOSI); The proofs for Lemmas 2 to 5
+will change, but the lemmas correspond to at most 3 components (and states) and
+hence can be easily proved (even using techniques like model-checking).
+
+We agree with Reviewer-D that liveness is an important non-trivial property
+that has to be proven for a cache-coherence protocol. The example of
+ParentSendReq is an example of a voluntary rule, and the policy to fire such a
+rule does indeed affect the liveness. In our development, we haven't proved
+full liveness (which includes the liveness of the processor), but we have
+proved the following (stated informally):
+a) Any request (or response) that a cache wants to send can eventually be sent
+(either to its parent or to its children)
+b) Under the assumption that ParentSendReq rule (sending downgrade request from
+a parent to its children) will fire eventually, whenever the parent has an
+upgrade request from a child, every request will eventually get a response.
+
+Thus, the only extraneous condition we impose is that a parent should "decide"
+to send a downgrade request to (some of) its children whenever it sees an
+upgrade request from one of its children. Eventually, such a request will be
+sent via ParentSendReq rule.
+
+We believe such a modular technique for verifying full-system correctness with
+respect to SC will be useful for hardware designers/verification-engineers to
+independently verify different components of the system. We do not model non-SC
+systems (like ARM/POWER), which exhibit behaviors described by Reviewer-C
+(involving shared store buffers, committing non-verified load values, etc).
+Reviewer-C, please note that the idea of verification loads does indeed ensure
+correctness, even if there were stores to that address in between the
+speculative load and the verification load, as long as the final store read by
+the verification load writes the same value as the speculative load. In fact,
+our final theorem ensures that this is indeed the case, otherwise the
+speculative system will not be an implementation of the SC reference system.
+
+Reviewer-B please note that our SC model is exactly as specified by Lamport.
+Also please note that by local buffers in Figure 2, we do not mean just store
+buffers; it includes all local data accessible to the processor.
+
+Thanks for notifying us of other related work (Hu et.al.'s "Decidable SC"
+SPAA'03, Qadeer's "Verifying SC by model-checking" TPDS'03, Sorin's
+"Verification-aware Architectures" PACT'07, "Lamport Clocks: Verifying
+Directory Cache-Coherence Protocol" SPAA'98 and Moore's "ACL2 proof of cache
+coherence" CAV'98), and for pointing the other bugs in our related work
+section.
+
+Reviewer-B's concerns:
+- Ideal processor and memory: as described in that paragraph - memory responds
+  instantaneously and processor executes atomically without speculation
+- Bluespec served as the model: The motivation for LTS comes from using
+  Bluespec to describe hardware, which is similar to our LTS formalization.
+- Bluespec's competitive performance can be seen from [Dave et al. 2005], and
+  other papers using Bluespec designs.
+- Peek-beneath abstraction boundaries: To prove the full-system, the
+  individual components are treated as black-boxes, completely captured by their
+  interface specification.
+- Good-ideas from worlds of PL semantics: Using LTSes as a precise hardware
+  specification.
+- Infinite families of hardware design ... resist reduction to finite-state
+  models: reduction is applied to 'infinite families'
+- Figure 2: logical view of system as 3-components: It is more-or-less accepted
+  in the architecture community.
+- Refining vs Equivalent: Throughout the paper, we are showing only refinement
+  in one direction, though you are correct that in this particular example they
+  are equivalent.
+- Finer-grained architectural details: as mentioned in that paragraph (like
+  register-renaming)
+- Main-memory still exposes atomic loads and stores: Most architectures (including
+  POWER and ARM) can be modeled using a memory that responds to loads and stores
+  instantaneously, though the response (or request) can sit in a buffer between
+  the memory and the processor, leading to relaxed memory models.
