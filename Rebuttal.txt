@@ -1,8 +1,8 @@
-Some of the questions raised by the reviewers are addressed by Reviewer-D.
+Some of the questions raised by the reviewers (including the justification of
+modularization advantages) are addressed by Reviewer-D.
 
 We have submitted the source code of our Coq development as a supplement to our
-paper in the submission website (we didn't give any link to preserve
-anonymity).
+paper in the submission website.
 
 We have structured the proofs modularly as described in the paper. Thus, the
 proofs of the different components can be reused while changing the other
