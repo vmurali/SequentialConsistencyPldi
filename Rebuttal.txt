@@ -13,8 +13,7 @@ everything will generalize effortlessly to the trickiest relaxed memory models
 verification loads and/or shared store buffers), but it would have been hard to
 figure out the basic framework if we started on more complex examples first.
 We still think our example is quite complex and interesting, which Reviewer-D
-seems to agree with, and our focus is on developing a general framework,
-not this particular specification or proof.
+seems to agree with.
 
 Reviewer-C, please note that verification loads do indeed ensure SC correctness.
 This is true even if there were stores to that address in between the
@@ -23,23 +22,13 @@ the verification load writes the same value as the speculative load. Our final
 theorem ensures this; otherwise the speculative system will not be an
 implementation of the reference SC.
 
-Reviewer-B, please note that our SC model is exactly as specified by Lamport
-(though it may be written in different notation).  Also please note that by local
-buffers in Figure 2, we do not mean just store buffers; it includes all local
-data accessible to the processor.
-
->>>> QUESTION FOR MURALI: What in the reviews does the following paragraph respond to?
-     Is it just about the Coq proofs?  (If so, apologies for reordering)
-     To me it seems perilously close to just restating our paper abstract. <<<<<
-     
-We have structured the proofs modularly as described in the paper. Thus, the
-proofs of the different components can be reused while changing the other
-components. For example, the proof of the cache-coherence protocol can be
-reused as is for verifying other (non-sequentially consistent) systems.
-Moreover, the proof of the cache-coherence is itself modular and can be adopted
-to other protocols (like MESI, MOSI); The proofs for Lemmas 2 to 5 will change,
-but the lemmas correspond to at most 3 components (and states) and hence can be
-easily proved (even using techniques like model-checking).
+Regarding Reviewer-D's question about reusability of our proofs and framework,
+the proof of the cache-coherence protocol can be reused as is for verifying
+other (relaxed memory) systems. Moreover, the proof of the cache-coherence is
+itself modular and can be adopted to other protocols (like MESI, MOSI); The
+proofs for Lemmas 2 to 5 will change, but the lemmas correspond to at most 3
+components (and states) and hence can be easily proved (even using techniques
+like model-checking).
 
 We agree with Reviewer-D that proving liveness is important and non-trivial.
 The example of ParentSendReq is an example of a voluntary rule, and the policy
@@ -59,6 +48,11 @@ We chose "halting" for pedagogical purposes; in our actual Coq-code we use the
 traditional trace-equivalence definition requiring inter-convertible states. It
 is worth noting that any safety property can be reduced to the problem of
 halting.
+
+Reviewer-B, please note that our SC model is exactly as specified by Lamport
+(though it may be written in different notation).  Also please note that by local
+buffers in Figure 2, we do not mean just store buffers; it includes all local
+data accessible to the processor.
 
 Thanks for notifying us of other related work (Hu et.al.'s "Decidable SC"
 SPAA'03, Qadeer's "Verifying SC by model-checking" TPDS'03, Sorin's
