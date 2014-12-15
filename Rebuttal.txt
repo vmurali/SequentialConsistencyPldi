@@ -13,7 +13,8 @@ everything will generalize effortlessly to the trickiest relaxed memory models
 verification loads and/or shared store buffers), but it would have been hard to
 figure out the basic framework if we started on more complex examples first.
 We still think our example is quite complex and interesting, which Reviewer-D
-seems to agree with.
+seems to agree with, and our focus is on developing a general framework,
+not this particular specification or proof.
 
 Reviewer-C, please note that verification loads do indeed ensure SC correctness.
 This is true even if there were stores to that address in between the
@@ -43,16 +44,15 @@ will eventually get a response.
 
 We chose "halting" for pedagogical purposes; in our actual Coq-code we use the
 traditional trace-equivalence definition requiring inter-convertible states. It
-is worth noting that any safety property can be reduced to the problem of
-halting.
+is worth noting that any safety property can be reduced to the halting problem.
 
-Thanks for notifying us of other related work (Hu et.al.'s "Decidable SC"
-SPAA'03, Qadeer's "Verifying SC by model-checking" TPDS'03, Sorin's
-"Verification-aware Architectures" PACT'07, "Lamport Clocks: Verifying
-Directory Cache-Coherence Protocol" SPAA'98 and Moore's "ACL2 proof of cache
-coherence" CAV'98), and for pointing out the other bugs in our related work
-section.
+Thanks for notifying us of other related work (Hu's "Decidable SC" SPAA'03,
+Qadeer's "Verifying SC by model-checking" TPDS'03, Sorin's "Verification-aware
+Architectures" PACT'07, "Lamport Clocks: Verifying Directory Protocol" SPAA'98
+and Moore's "ACL2 cache coherence proof" CAV'98), and for pointing out other
+bugs in our related work section.
 
+Beyond 500 words:
 Reviewer-B's concerns:
 - Ideal processor and memory: As described in that paragraph - memory responds
   instantaneously and processor executes atomically without speculation
