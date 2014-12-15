@@ -58,8 +58,8 @@ Thanks for notifying us of other related work (Hu et.al.'s "Decidable SC"
 SPAA'03, Qadeer's "Verifying SC by model-checking" TPDS'03, Sorin's
 "Verification-aware Architectures" PACT'07, "Lamport Clocks: Verifying
 Directory Cache-Coherence Protocol" SPAA'98 and Moore's "ACL2 proof of cache
-coherence" CAV'98), and to Reviewer-B for pointing the other bugs in our
-related work section.
+coherence" CAV'98), and for pointing the other bugs in our related work
+section.
 
 Reviewer-B's concerns:
 - Ideal processor and memory: As described in that paragraph - memory responds
