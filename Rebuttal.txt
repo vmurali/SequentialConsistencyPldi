@@ -62,7 +62,7 @@ coherence" CAV'98), and to Reviewer-B for pointing the other bugs in our
 related work section.
 
 Reviewer-B's concerns:
-- Ideal processor and memory: as described in that paragraph - memory responds
+- Ideal processor and memory: As described in that paragraph - memory responds
   instantaneously and processor executes atomically without speculation
 - Bluespec served as the model: The motivation for LTS comes from using
   Bluespec to describe hardware, which is similar to our LTS formalization.
@@ -71,7 +71,7 @@ Reviewer-B's concerns:
 - Peek-beneath abstraction boundaries: To prove the full-system, the
   individual components are treated as black-boxes, completely captured by their
   interface specification.
-- Good-ideas from worlds of PL semantics: Using LTSes as a precise hardware
+- Good-ideas from the world of PL semantics: Using LTSes as a precise hardware
   specification.
 - Infinite families of hardware design resist reduction to finite-state
   models: reduction is applied to 'infinite families'
@@ -80,8 +80,8 @@ Reviewer-B's concerns:
 - Refining vs Equivalent: Throughout the paper, we are showing only refinement
   in one direction, though you are correct that in this particular example they
   are equivalent.
-- Finer-grained architectural details: as mentioned in that paragraph (like
-  register-renaming)
+- Finer-grained architectural details: As mentioned in that paragraph (like
+  register-renaming).
 - Main-memory still exposes atomic loads and stores: Most architectures (including
   POWER and ARM) can be modeled using a memory that responds to loads and stores
   instantaneously, though the response (or request) can sit in a buffer between
