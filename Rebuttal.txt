@@ -4,6 +4,34 @@ modularization advantages) are addressed by Reviewer-D.
 We have submitted the source code of our Coq development as a supplement to our
 paper in the submission website.
 
+In response to "points against" by Reviews B and C:
+We believe such a modular technique for verifying full-system correctness with
+respect to SC will be useful for hardware designers/verification-engineers to
+independently verify different components of the system. We can't be sure that
+everything will generalize effortlessly to the trickiest relaxed memory models
+(like those exhibited by ARM/POWER as pointed by Reviewer-C because of no
+verification loads and/or shared store buffers), but it would have been hard to
+figure out the basic framework if we started on more complex examples first.
+We still think our example is quite complex and interesting, which Reviewer-D
+seems to agree with, and our focus is on developing a general framework,
+not this particular specification or proof.
+
+Reviewer-C, please note that verification loads do indeed ensure SC correctness.
+This is true even if there were stores to that address in between the
+speculative load and the verification load, as long as the final store read by
+the verification load writes the same value as the speculative load. Our final
+theorem ensures this; otherwise the speculative system will not be an
+implementation of the reference SC.
+
+Reviewer-B, please note that our SC model is exactly as specified by Lamport
+(though it may be written in different notation).  Also please note that by local
+buffers in Figure 2, we do not mean just store buffers; it includes all local
+data accessible to the processor.
+
+>>>> QUESTION FOR MURALI: What in the reviews does the following paragraph respond to?
+     Is it just about the Coq proofs?  (If so, apologies for reordering)
+     To me it seems perilously close to just restating our paper abstract. <<<<<
+     
 We have structured the proofs modularly as described in the paper. Thus, the
 proofs of the different components can be reused while changing the other
 components. For example, the proof of the cache-coherence protocol can be
@@ -32,33 +60,11 @@ traditional trace-equivalence definition requiring inter-convertible states. It
 is worth noting that any safety property can be reduced to the problem of
 halting.
 
-We believe such a modular technique for verifying full-system correctness with
-respect to SC will be useful for hardware designers/verification-engineers to
-independently verify different components of the system. We can't be sure that
-everything will generalize effortlessly to the trickiest relaxed memory models
-(like those exhibited by ARM/POWER as pointed by Reviewer-C because of no
-verification loads and/or shared store buffers), but it would have been hard to
-figure out the basic framework if we started on more complex examples first.
-We still think our example is quite complex and interesting, which Reviewer-D
-seems to agree with. Moreover, the performance benefits of a relaxed memory
-model over SC is being actively debated in the architecture community.
-
-Reviewer-C, please note that verification loads do indeed ensure correctness.
-This is true even if there were stores to that address in between the
-speculative load and the verification load, as long as the final store read by
-the verification load writes the same value as the speculative load. Our final
-theorem ensures this; otherwise the speculative system will not be an
-implementation of the reference SC.
-
-Reviewer-B, please note that our SC model is exactly as specified by Lamport.
-Also please note that by local buffers in Figure 2, we do not mean just store
-buffers; it includes all local data accessible to the processor.
-
 Thanks for notifying us of other related work (Hu et.al.'s "Decidable SC"
 SPAA'03, Qadeer's "Verifying SC by model-checking" TPDS'03, Sorin's
 "Verification-aware Architectures" PACT'07, "Lamport Clocks: Verifying
 Directory Cache-Coherence Protocol" SPAA'98 and Moore's "ACL2 proof of cache
-coherence" CAV'98), and for pointing the other bugs in our related work
+coherence" CAV'98), and for pointing out the other bugs in our related work
 section.
 
 Reviewer-B's concerns:
@@ -70,7 +76,8 @@ Reviewer-B's concerns:
   other papers using Bluespec designs.
 - Peek-beneath abstraction boundaries: To prove the full-system, the
   individual components are treated as black-boxes, completely captured by their
-  interface specification.
+  interface specification.  Peeking beneath boundaries would instead look inside
+  implementations.
 - Good-ideas from the world of PL semantics: Using LTSes as a precise hardware
   specification.
 - Infinite families of hardware design resist reduction to finite-state
