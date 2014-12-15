@@ -1,5 +1,4 @@
-Some of the questions raised by the first three reviewers are addressed in the
-comments of the Reviewer D.
+Some of the questions raised by the reviewers are addressed by Reviewer-D.
 
 We have submitted the source code of our Coq development as a supplement to our
 paper in the submission website (we didn't give any link to preserve
@@ -17,9 +16,9 @@ easily proved (even using techniques like model-checking).
 We agree with Reviewer-D that proving liveness is important and non-trivial.
 The example of ParentSendReq is an example of a voluntary rule, and the policy
 to fire such a rule does indeed affect the liveness. In our development, we
-haven't proved full liveness of the system (which includes the liveness of the
-processor), but we have proved the following which specifies the liveness of
-the cache-coherence protocol:
+haven't proved full-system liveness (which includes the liveness of the
+processor), but we have proved the liveness of the cache-coherence protocol, in
+particular, the following:
 a) Any request (or response) that a cache wants to send can eventually be sent
 (either to its parent or to its children)
 b) Under the assumption that a parent will eventually "decide" to send a
@@ -28,10 +27,10 @@ an upgrade request from a child (as opposed to ignoring such an upgrade request
 from a child forever), every request sent to either the parent or to a child
 will eventually get a response.
 
-We chose "halting" for pedagogical reasons in the paper; in our actual Coq
-development, we use the more traditional trace-equivalence definition requiring
-inter-convertible states. It is worth noting that any safety property can be
-reduced to the problem of halting.
+We chose "halting" for pedagogical purposes; in our actual Coq-code we use the
+traditional trace-equivalence definition requiring inter-convertible states. It
+is worth noting that any safety property can be reduced to the problem of
+halting.
 
 We believe such a modular technique for verifying full-system correctness with
 respect to SC will be useful for hardware designers/verification-engineers to
@@ -41,16 +40,17 @@ everything will generalize effortlessly to the trickiest relaxed memory models
 verification loads and/or shared store buffers), but it would have been hard to
 figure out the basic framework if we started on more complex examples first.
 We still think our example is quite complex and interesting, which Reviewer-D
-seems to agree with.
+seems to agree with. Moreover, the performance benefits of a relaxed memory
+model over SC is being actively debated in the architecture community.
 
 Reviewer-C, please note that verification loads do indeed ensure correctness.
 This is true even if there were stores to that address in between the
 speculative load and the verification load, as long as the final store read by
 the verification load writes the same value as the speculative load. Our final
 theorem ensures this; otherwise the speculative system will not be an
-implementation of the SC reference system.
+implementation of the reference SC.
 
-Reviewer-B please note that our SC model is exactly as specified by Lamport.
+Reviewer-B, please note that our SC model is exactly as specified by Lamport.
 Also please note that by local buffers in Figure 2, we do not mean just store
 buffers; it includes all local data accessible to the processor.
 
