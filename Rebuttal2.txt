@@ -1,0 +1,150 @@
+1. Why waste time describing LTSes:
+We introduced LTSes mainly to define the notion of refinement that we
+are using, as well as to define the combination operators.
+
+2. The user of a theorem-prover has to walk the "protocol space" through case analysis:
+The theorem-prover has to walk the protocol space through case analysis, but
+the proof-script automation in Coq significantly reduces the burden. One can
+write proof-scripts that performs a proof-search, i.e. tries to apply
+previously proven basic lemmas on each of the cases and leaves the user with
+very few actual proof obligations that are complex or unique so as to not be
+discharged using automated proof-search.
+
+3. Invariants are the hardest part in parametric verification of a cache
+coherence protocol, and we do not mention it:
+We do mention the high level theorems that we use in the paper.  While we
+restrict ourselves to the verification of the MSI protocol's implementation,
+the proof is modular, and a large portion of the proof can be used, as is, for
+verification of other protocols (like MESI, MOSI and MOESI), as we discuss in
+the previous rebuttal. The theorem prover helps construct and prove the high
+level theorems that make these protocols correct. These theorems depend on a
+few basic properties pertaining that can be established easily, but were not
+mentioned in the paper due to lack of space. These properties include a) state
+changes occuring when and only when response messages are sent, b) absence of
+response messages from the parent to a child and from the same child to the
+parent simultaneously in the network, for the same address and c) FIFO
+properties of the messages. These basic properties seem to be the foundation
+over which the other cache coherence protocols lie -- they eliminate the corner
+cases which make the proof difficult. For example, since responses from a child
+to its parent and from the parent to the same child for the same address cannot
+be present simultaneously, an upgrade response from the parent cannot cross a
+downgrade response from the child, which would have eventually led to the
+upgrade of the child and downgrade of the parent violating Lemma 3. As pointed
+out by Reviewer-E, the theorems and these properties serve as a method to
+derive a correct protocol (the different protocols are different system
+instances which obey these properties).
+
+4. Pipelining protocol engines and Bluespec:
+Though the semantics of the atomic transitions in our paper execute one at a
+time, different independent transitions can be made to occur in parallel in the
+actual implementation without changing the semantics; Bluespec already does
+this optimization. One can take this further, where each atomic transition can
+be spread across multiple hardware clock cycles, while ensuring that the
+overall atomic transaction semantics are obeyed. Bluespec currently does not
+implement this, though there has been work in this area [Karczmarek et.al.].
+
+5. Nirav's point: I don't see that Reviewer-E's scathing concern fall
+into the core of what we're addressing; our focus on modularity is to
+allow verification to be (mostly) carried over to different
+microarchitectural variants, which is a bare minimum if one wants
+architects to have any lateral freedom to design a working
+implementation with a low-cost path to verification. I don't see why
+there's any fundamental reason that "scalable" approaches he's pointed to
+can't be fit into our methodology directly? I've only glanced at the
+papers, but it seems like it should be so.
+--- Note sure how to condense it and incorporate -Murali
+
+Reviewer-F:
+1. Evidence of proofs being machine-checked:
+We have submitted the source code of our Coq development as a supplement to our
+paper in the submission website.
+
+2. Figure 3, Tags in Figures 5 & 6:
+Both these points are valid and we could indicate these points explicitly.
+
+3. Figure 6: The third case:
+Reviewer-F's assertion is not true. The "upd" function merely determines if the
+"real" state of the system is as dictated by the state (s,pc) or if it should
+be modified to take into account the responses from the memory system. If the
+processor is not waiting for the memory system response, then the state is
+exactly (s,pc). We made an optimization in the fourth case where we make the
+real state H whenever we know that the next instruction we decode is H; instead
+the state can be left as (s,pc) in the fourth case.
+
+4. Figure 8: Tags for non-speculative loads:
+Our invariant is that there can be only one outstanding non-speculative load,
+though there can be several outstanding speculative loads along with the
+outstanding non-speculative load. Thus, anything without a tag is the
+non-speculative load and there is only one of them, and anything with a tag is
+a speculative load.
+
+Reviewer-E's related work summary:
+
+FM methodology: The methodology used for proving that the memory system
+realizes cache coherence is not new. A theorem-proving approach to
+verifying memory systems has been tacit in many publications. Researchers
+preferred model checking, as opposed to pushing through theorem-proving
+based proofs largely because of the daunting complexity of realistic
+memory system protocols. One can find several approaches that address
+specific aspects of memory system verification in, say, Wim Hesselink's
+work : http://www.informatik.uni-trier.de/~ley/pers/hd/h/Hesselink:Wim_H=.
+
+@@@ Murali response
+Lots of PVS-based proofs for concurrent algorithms, mutual exclusion, etc...
+(Needs to be read further, but it's just a bunch of mechanized proofs for
+a lot of concurrent algorithms)
+***
+
+There has of course been recent trends to simplify protocols thru the DeNoVo
+project:
+http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:8k81kl-MbHgC
+The authors have not cited such related pieces of work and justified the
+simplicity of their design. 
+
+@@@ Murali response
+A new non-conventional cache coherence protocol that produces sequentially
+consistent results for data-rate free programs. There's no formal proof that
+this protocol is correct...
+(Needs to be read further, but doesn't seem relevant)
+***
+
+The authors claim that they are achieving their proof for an arbitrary number
+of processors. They do not mention anything about the invariants involved
+in their parametric proofs. This leads me to suspect that these invariants
+are pretty straightforward.  If one harks back to work addressing real
+protocols, the Chou, Mannava, Park work
+(http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:qjMakFHDy7sC) shows how exceedingly hard
+it is to discover these invariants. In fact, the CMP approach is an
+incremental CEGAR-style method for discovering these invariants. Stating these
+invariants explicitly would be virtually impossible - even for FLASH-like
+protocols.  In fact, a whole series of papers have tried to address invariant
+discovery in this space : http://dl.acm.org/citation.cfm?id=1517434
+
+@@@ Murali response
+Chou, Mannava, Park [CMP-method] approach uses three paradigms: a) symmetry of
+cache coherence protocols b) abstraction of several nodes which behaves as just
+another node and c) counter-example guided abtraction refinement (CEGAR) for
+refining the abstraction's properties. Using CEGAR, they get invariants for the
+rest of the system while concentrating on a finite number of nodes (2).  Each
+refinement will not restrict the behavior, but will help towards proving a
+safety property. Specifically, let P be an invariant for the abstract
+transition system, and we should prove that it satisfies safety property X. We
+start out with a P that doesn't satisfy X. Then we add constraints on P, while
+permitting the same transitions. Eventually P will satisfy X. The manual
+portion of this procedure is in strengthening P.
+***
+
+@@@ Murali response
+The second paper tries to formulate better invariants in the first place using
+the notion of "flows". It says what other messages can interfere when the other
+message is being processed...
+(Needs to be read further -- I don't understand "flows" clearly; can't say
+anything more before I undestand that properly)
+***
+
+For hierarchical protocols, this work has been extended in e.g.,
+http://link.springer.com/article/10.1007%2Fs10703-010-0092-y
+
+@@@ Murali response
+Same approach as [CMP-method] to hierarchical protocols.
+***

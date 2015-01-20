@@ -537,7 +537,7 @@ s', \pc' &: (\ld, v) \in \mathit{rs} \wedge \dec(s, \pc) = (\ld, x, a) \wedge\\
 \multicolumn{2}{r}{\exec(s, \pc, (\ld, x, v)) = (s',\pc'))}\\
 s', \pc' &: (\st) \in \mathit{rs} \wedge \dec(s, \pc) = (\st, a, v) \wedge\\
 \multicolumn{2}{r}{\exec(s, \pc, (\st)) = (s',\pc')}\\
-s, \pc &: \text{otherwise if } \dec(pc,s) \neq H\\
+s, \pc &: \text{otherwise if } \dec(s,\pc) \neq H\\
 H &: \text{otherwise}
 \end{array}
 \right.
