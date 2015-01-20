@@ -1,19 +1,83 @@
-1. Why waste time describing LTSes:
-We introduced LTSes mainly to define the notion of refinement that we are
-using, as well as to define the operators to combine LTSes.
+Reviewer-E
 
-adamc suggests: This description here sounds like the wrong level of detail.  If we respond to the point, IMO it should be just to say that we wanted to review standard material for the benefit of readers unfamiliar with it; the point wasn't to present novel concepts.
+1. On Describing LTSes:
 
-2. The user of a theorem-prover has to walk the "protocol space" through case
-analysis:
-The theorem-prover has to walk the protocol space through case analysis, but
-the proof-script automation in Coq significantly reduces the burden. One can
-write proof-scripts that perform a proof-search, i.e. try to apply previously
-proven basic lemmas on each of the cases and leave the user with very few
-actual proof obligations that are complex or unique so as to not be discharged
-using automated proof-search.
+We include the LTS description for the benefit of readers unfamiliar with it;
+the point wasn't to present novel concepts.
 
-3. Invariants are the hardest part in parametric verification of a cache
+2. Modularity
+
+ One of the major benefits of our approach is that it unifies the
+ modularization of the design and its verification task which enables
+ verification to be done in tandem with mircoarchitectural design as noted by
+ Reviewer-E.  Further, this allows us to require only incremental verification
+ effort for an incremental microarchitectural change, enabling scaling of the
+ verification task.
+ 
+3. Model Checking vs. Theorem Proving
+
+a. Finding invariants is fundamentally hard. In [PAPER], 
+
+Finding invariants is fundamentally hard. We are equivalent in complexity but
+  because of our modularization we have a free source of abstraction from the
+  designer.
+
+   - In comparision, Quote paper. Invariants were dervied manually, took one
+  month, and relied on a manual abstraction of the system space based on
+  symettry. Our work is similar save that we do not require an abstraction. 
+
+  In comparision to the <PAPER>, our invariants of similar complexity. In
+  general, we believe that such invariants relatively simple but subtle and
+  generally intuitively understood by the designers. 
+
+b. On Case-Analysis: 
+
+Much of the requisite protocol case analysis is done automatically via
+proof-script automation in Coq. In our experience, cases where proof-script
+automation fail required an additional invariant; we strongly believe that
+manually providing a similiar invariant are necessary in a model checking
+approach.
+
+c. Benefits of TP-based parameterization: It should also be noted that their
+  work while hierarchical is only 2-level while ours applies to arbitrary
+  levels of hierarchy.
+
+
+4. Pipelining protocol engines and Bluespec:
+
+While atomic transitions in our paper have one-at-a-time semantics, the
+Bluespec compiler generates hardware which executes independant transitions
+concurrently in a clock cycle. The Bluespec compiler excels at this
+optimization. Atomic transition can also be spread across multiple clock
+cycles, while maintaining atomic transaction semantics [Karczmarek,
+MEMOCODE'14].
+
+Reviewer-F:
+
+1. Evidence of proofs being machine-checked:
+
+We submitted the source code of our Coq development as a supplement to our
+paper in the submission website.
+
+2. Figure 3, tags in Figures 5 & 6:
+Both these points are valid and we should have indicated them explicitly.
+
+3. Figure 6: Clarification of the third case: The "upd" function merely
+determines if the "real" state of the system is as dictated by (s,pc) or if it
+should be modified to take into account memory responses. If the processor
+is not waiting for a memory response, then the state is exactly (s,pc). We made
+an optimization in the fourth case where we make the real state H whenever we
+know that the next instruction we decode is H; we could have it as (s,pc)
+instead.
+
+4. Figure 8: Tags for non-speculative loads: Our invariant is that there can be
+only one outstanding non-speculative load, though there can be several
+outstanding speculative loads concurrently. Anything without a tag is the
+current non-speculative load, and anything with a tag is a speculative load.
+
+========================
+
+4. Invariants are the hardest part in parametric verification of a cache
 coherence protocol, and we do not mention it:
 We do mention the high level theorems that we use in the paper.  While we
 restrict ourselves to the verification of the MSI protocol's implementation,
@@ -37,50 +101,13 @@ Reviewer-E, the theorems and these properties serve as a method to derive a
 correct protocol (the different protocols are different system instances which
 obey these properties).
 
-4. Pipelining protocol engines and Bluespec:
-Though the semantics of the atomic transitions in our paper execute one at a
-time, different independent transitions can be made to occur in parallel in the
-actual implementation without changing the semantics; Bluespec compiler excels
-at this optimization.  One can take this further, where each atomic transition
-can be spread across multiple hardware clock cycles, while ensuring that the
-overall atomic transaction semantics are obeyed. Bluespec implementation
-currently does not include this optimization, though detailed algorithms to
-accomplish this have been published [Karczmarek, MEMOCODE'14].
 
-5. Nirav's point: I don't see that Reviewer-E's scathing concern fall
-into the core of what we're addressing; our focus on modularity is to
-allow verification to be (mostly) carried over to different
-microarchitectural variants, which is a bare minimum if one wants
-architects to have any lateral freedom to design a working
-implementation with a low-cost path to verification. I don't see why
-there's any fundamental reason that "scalable" approaches he's pointed to
-can't be fit into our methodology directly? I've only glanced at the
-papers, but it seems like it should be so.
---- Note sure how to condense it and incorporate -Murali
 
-Reviewer-F:
-1. Evidence of proofs being machine-checked:
-We have submitted the source code of our Coq development as a supplement to our
-paper in the submission website.
 
-2. Figure 3, Tags in Figures 5 & 6:
-Both these points are valid and we should have indicated them explicitly.
+=====================================================================================================
+= Our Notes
+=====================================================================================================
 
-3. Figure 6: The third case:
-Reviewer-F's assertion is not true. The "upd" function merely determines if the
-"real" state of the system is as dictated by the state (s,pc) or if it should
-be modified to take into account the responses from the memory system. If the
-processor is not waiting for the memory system response, then the state is
-exactly (s,pc). We made an optimization in the fourth case where we make the
-real state H whenever we know that the next instruction we decode is H; instead
-the state can be left as (s,pc) in the fourth case.
-
-4. Figure 8: Tags for non-speculative loads:
-Our invariant is that there can be only one outstanding non-speculative load,
-though there can be several outstanding speculative loads along with the
-outstanding non-speculative load. Thus, anything without a tag is the
-non-speculative load and there is only one of them, and anything with a tag is
-a speculative load.
 
 Reviewer-E's related work summary:
 
