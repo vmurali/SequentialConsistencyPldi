@@ -2,6 +2,8 @@
 We introduced LTSes mainly to define the notion of refinement that we are
 using, as well as to define the operators to combine LTSes.
 
+adamc suggests: This description here sounds like the wrong level of detail.  If we respond to the point, IMO it should be just to say that we wanted to review standard material for the benefit of readers unfamiliar with it; the point wasn't to present novel concepts.
+
 2. The user of a theorem-prover has to walk the "protocol space" through case
 analysis:
 The theorem-prover has to walk the protocol space through case analysis, but
@@ -25,12 +27,12 @@ when and only when response messages are sent, b) the absence of response
 messages from the parent to a child and from the same child to the parent
 simultaneously in the network, for the same address and c) FIFO properties of
 the responses. These basic properties seem to be the foundation over which the
-other cache coherence protocols are built -- they eliminate the corner cases
+other cache coherence protocols are built -- they eliminate the corner cases,
 simplifying the proof. For example, since responses from a child to its parent
 and from the parent to the same child for the same address cannot be present
 simultaneously, an upgrade response from the parent cannot cross a downgrade
 response from the child, which would have eventually led to the upgrade of the
-child and downgrade of the parent violating Lemma 3. As pointed out by
+child and downgrade of the parent, violating Lemma 3. As pointed out by
 Reviewer-E, the theorems and these properties serve as a method to derive a
 correct protocol (the different protocols are different system instances which
 obey these properties).
@@ -43,7 +45,7 @@ at this optimization.  One can take this further, where each atomic transition
 can be spread across multiple hardware clock cycles, while ensuring that the
 overall atomic transaction semantics are obeyed. Bluespec implementation
 currently does not include this optimization, though detailed algorithms to
-accomplish this have been published have been published [Karczmarek, MEMOCODE'14].
+accomplish this have been published [Karczmarek, MEMOCODE'14].
 
 5. Nirav's point: I don't see that Reviewer-E's scathing concern fall
 into the core of what we're addressing; our focus on modularity is to
@@ -85,7 +87,7 @@ Reviewer-E's related work summary:
 FM methodology: The methodology used for proving that the memory system
 realizes cache coherence is not new. A theorem-proving approach to verifying
 memory systems has been tacit in many publications. Researchers preferred model
-checking, as opposed to pushing through theorem-proving based proofs largely
+checking, as opposed to pushing through theorem-proving based proofs, largely
 because of the daunting complexity of realistic memory system protocols. One
 can find several approaches that address specific aspects of memory system
 verification in, say, Wim Hesselink's work :
