@@ -148,5 +148,5 @@ For hierarchical protocols, this work has been extended in e.g.,
 http://link.springer.com/article/10.1007%2Fs10703-010-0092-y
 
 @@@ Murali response
-Same approach as [CMP-method] to hierarchical protocols.
+Same approach as [CMP-method] to hierarchical protocols. It models only 2 level hierarchies!
 ***
