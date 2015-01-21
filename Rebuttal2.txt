@@ -1,5 +1,5 @@
 One of the major benefits of our approach is that it unifies the modularization
-of the design and its verification task which enables verification to be done
+of the design and its verification task, which enables verification to be done
 in tandem with micro-architectural design (as noted by Reviewer-E). Further,
 this allows us to require only incremental verification effort for an
 incremental micro-architectural change, enabling scaling of the verification
@@ -15,12 +15,12 @@ symmetry to abstract the system, and then inserts "non-interference-lemmas"
 manually to eliminate counter-examples that violate the required property.
 Flow-based methodology [1] gives yet another way of manually specifying
 invariants. In general, we believe that the level of complexity of the lemmas
-in the two approaches are similar.  For example, for the FLASH protocol, one of
-the non-interference-lemma (Lemma-5 in [2]) says that whenever a cache is in
-E-state, then its data is up-to-date which is similar to our Lemma-1. The
+between those approaches and ours are similar.  For example, for the FLASH protocol, one of
+the non-interference-lemmas (Lemma-5 in [2]) says that whenever a cache is in
+E-state, then its data is up-to-date, which is similar to our Lemma-1. The
 invariants are subtle but are intuitively understood at the time of design of
 each module, making the task of formalizing them during the module's
-verification straightforward. 
+verification straightforward.
 
 The verification of the hierarchical protocol in [3] is restricted to 2-levels
 whereas our work applies to arbitrary levels of hierarchy. We are not sure if
@@ -30,7 +30,7 @@ hierarchical system.
 
 b) Case-Analysis:
 Much of the requisite case-analysis is done automatically via proof-script
-automation in Coq. In our experience, cases where proof-script automation fail
+automation in Coq. In our experience, cases where proof-script automation fails
 required an additional invariant; we believe that manually providing a similar
 invariant is necessary even in a model-checking approach.
 
@@ -38,7 +38,7 @@ Pipelining protocol-engines:
 While atomic transitions in our paper have one-at-a-time semantics, the
 Bluespec compiler generates hardware which executes independent transitions
 concurrently in a clock cycle (as the semantics aren't violated); the compiler
-excels at this optimization. Atomic transition can also be spread across
+excels at this optimization. Atomic transitions can also be spread across
 multiple clock cycles, while maintaining the semantics [4].
 
 On Describing LTSes:
@@ -64,8 +64,8 @@ H; we could have it as (s,pc) instead.
 
 Figure-8: tags for non-speculative loads:
 Our invariant is that there can be only one outstanding non-speculative load
-(ie. loads without tags), though there can be several outstanding speculative
-loads (ie. loads with tags) concurrently.
+(i.e. loads without tags), though there can be several outstanding speculative
+loads (i.e. loads with tags) concurrently.
 
 Beyond 500 words:
 References:
