@@ -27,10 +27,10 @@ that CMP-method exploits in a one or two-level system is not present in a
 hierarchical system.
 
 b) Case-Analysis:
-Much of the requisite protocol case analysis is done automatically via
-proof-script automation in Coq. In our experience, cases where proof-script
-automation fail required an additional invariant; we believe that manually
-providing a similiar invariant is necessary even in a model-checking approach.
+Much of the requisite case-analysis is done automatically via proof-script
+automation in Coq. In our experience, cases where proof-script automation fail
+required an additional invariant; we believe that manually providing a similiar
+invariant is necessary even in a model-checking approach.
 
 Reviewer-F:
 
