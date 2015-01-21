@@ -10,19 +10,19 @@ Reviewer-E:
 Our approach vs. Model-Checking-based:
 
 a) Deriving Invariants:
-Finding invariants is fundamentally hard. The CMP-method (Reviewer-E) uses
-symmetry to abstract the system, and then inserts "non-interference-lemmas"
-manually to eliminate counter-examples that violate the required property.
-Flow-based methodology [1] gives yet another way of manually specifying
-invariants. In general, we believe that the level of complexity of the lemmas
-between those approaches and ours are similar.  For example, for the FLASH protocol, one of
-the non-interference-lemmas (Lemma-5 in [2]) says that whenever a cache is in
+Finding invariants is fundamentally hard. The CMP-method [1] uses symmetry to
+abstract the system, and then inserts "non-interference-lemmas" manually to
+eliminate counter-examples that violate the required property.  Flow-based
+methodology [2] gives yet another way of manually specifying invariants. In
+general, we believe that the level of complexity of the lemmas between those
+approaches and ours are similar. For example, for the FLASH protocol, one of
+the non-interference-lemmas (Lemma-5 in [3]) says that whenever a cache is in
 E-state, then its data is up-to-date, which is similar to our Lemma-1. The
 invariants are subtle but are intuitively understood at the time of design of
 each module, making the task of formalizing them during the module's
 verification straightforward.
 
-The verification of the hierarchical protocol in [3] is restricted to 2-levels
+The verification of the hierarchical protocol in [4] is restricted to 2-levels
 whereas our work applies to arbitrary levels of hierarchy. We are not sure if
 it's a fundamental restriction on the CMP-method, since the kind of symmetry
 that CMP-method exploits in a one/two-level system is not present in a
@@ -39,7 +39,7 @@ While atomic transitions in our paper have one-at-a-time semantics, the
 Bluespec compiler generates hardware which executes independent transitions
 concurrently in a clock cycle (as the semantics aren't violated); the compiler
 excels at this optimization. Atomic transitions can also be spread across
-multiple clock cycles, while maintaining the semantics [4].
+multiple clock cycles, while maintaining the semantics [5].
 
 On Describing LTSes:
 We include the LTS description for the benefit of readers unfamiliar with it;
@@ -63,18 +63,20 @@ make the real state H whenever we know that the next instruction we decode is
 H; we could have it as (s,pc) instead.
 
 Figure-8: tags for non-speculative loads:
-Our invariant is that there can be only one outstanding non-speculative load
+Our invariant ensures there can be only one outstanding non-speculative load
 (i.e. loads without tags), though there can be several outstanding speculative
 loads (i.e. loads with tags) concurrently.
 
 Beyond 500 words:
 References:
-[1] Parameterized Verification using Message Flows: An Industrial Experience,
+[1] A simple method for parameterized verification of cache coherence protocols,
+Ching-Tsun Chou, Phanindra K Mannava, Seungjoon Park, FMCAD'04
+[2] Parameterized Verification using Message Flows: An Industrial Experience,
 John O'Leary, Murali Talupur, Mark R. Tuttle, FMCAD'09
-[2] A Simple Method for Parameterized Verification of Cache Coherence Protocols,
+[3] A Simple Method for Parameterized Verification of Cache Coherence Protocols,
 Ching-Tsun Chou, Phanindra K. Mannava, Seungjoon Park, FMCAD'04
-[3] Efficient methods for formally verifying safety properties of hierarchical
+[4] Efficient methods for formally verifying safety properties of hierarchical
 cache coherence protocol, Xiaofang Chen, Yu Yang, Ganesh Gopalakrishnan,
 Ching-Tsun Chou, FMSD'10
-[4] A new synthesis procedure for atomic rules containing multi-cycle function
+[5] A new synthesis procedure for atomic rules containing multi-cycle function
 blocks, Michal Karczmarek, Arvind, Muralidaran Vijayaraghavan, MEMOCODE'14
