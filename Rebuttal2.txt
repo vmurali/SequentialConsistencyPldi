@@ -64,6 +64,7 @@ Evidence of machine-checked proofs:
 We submitted our Coq source code as a supplement to our paper in the submission
 website.
 
+Beyond 500 words:
 On Describing LTSes:
 We include the LTS description for the benefit of readers unfamiliar with it;
 the point wasn't to present novel concepts.
