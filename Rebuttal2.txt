@@ -12,7 +12,7 @@ Finding invariants is fundamentally hard. The CMP-method (referred by
 Reviewer-E) uses symmetry to abstract the system, and then inserts invariants
 (called non-interference-lemmas) manually to eliminate counter-examples that
 violate the required property (the flow-based methodology [1] specifies these
-non-interference-lemmas in the form of properties of action sequences that
+non-interference-lemmas in the form of properties of traces that
 takes place for any high-level transaction.) All these invariants are
 relatively simple but very subtle and are well understood by the designers. For
 example, for the FLASH protocol, one of the non-interference-lemma (Lemma-5 in
