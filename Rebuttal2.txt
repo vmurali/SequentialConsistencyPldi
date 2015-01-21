@@ -5,6 +5,8 @@ this allows us to require only incremental verification effort for an
 incremental micro-architectural change, enabling scaling of the verification
 task.
  
+Reviewer-E:
+
 Our approach vs. Model-Checking-based:
 
 a) Deriving Invariants:
@@ -32,7 +34,22 @@ automation in Coq. In our experience, cases where proof-script automation fail
 required an additional invariant; we believe that manually providing a similar
 invariant is necessary even in a model-checking approach.
 
+Pipelining protocol-engines:
+While atomic transitions in our paper have one-at-a-time semantics, the
+Bluespec compiler generates hardware which executes independent transitions
+concurrently in a clock cycle (as the semantics aren't violated); the compiler
+excels at this optimization. Atomic transition can also be spread across
+multiple clock cycles, while maintaining the semantics [4].
+
+On Describing LTSes:
+We include the LTS description for the benefit of readers unfamiliar with it;
+the point wasn't to present novel concepts.
+
 Reviewer-F:
+
+Evidence of machine-checked proofs:
+We submitted our Coq source code as a supplement to our paper in the submission
+website.
 
 Figure-3, no tags in Figures-5,6:
 Both these points are valid and we should have indicated them explicitly.
@@ -49,23 +66,6 @@ Figure-8: tags for non-speculative loads:
 Our invariant is that there can be only one outstanding non-speculative load
 (ie. loads without tags), though there can be several outstanding speculative
 loads (ie. loads with tags) concurrently.
-
-Reviewer-E:
-
-Pipelining protocol-engines:
-While atomic transitions in our paper have one-at-a-time semantics, the
-Bluespec compiler generates hardware which executes independent transitions
-concurrently in a clock cycle (as the semantics aren't violated); the compiler
-excels at this optimization. Atomic transition can also be spread across
-multiple clock cycles, while maintaining the semantics [4].
-
-Evidence of machine-checked proofs:
-We submitted our Coq source code as a supplement to our paper in the submission
-website.
-
-On Describing LTSes:
-We include the LTS description for the benefit of readers unfamiliar with it;
-the point wasn't to present novel concepts.
 
 Beyond 500 words:
 References:
