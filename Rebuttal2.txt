@@ -8,22 +8,24 @@ task.
 Our approach vs. Model-Checking-based:
 
 a) Deriving Invariants:
-Finding invariants is fundamentally hard. The CMP-method (referred by
-Reviewer-E) uses symmetry to abstract the system, and then inserts invariants
-(called non-interference-lemmas) manually to eliminate counter-examples that
-violate the required property (the flow-based methodology [1] specifies these
-non-interference-lemmas in the form of properties of traces that
-takes place for any high-level transaction.) All these invariants are
-relatively simple but very subtle and are well understood by the designers. For
-example, for the FLASH protocol, one of the non-interference-lemma (Lemma-5 in
-[2]) says that whenever a cache is in E state, then the data it has is
-up-to-date. This is very similar to our Lemma-1. In general, we believe that
-the level of complexity of the lemmas in the two approaches are similar.
+Finding invariants is fundamentally hard. The CMP-method referred by Reviewer-E
+uses symmetry to abstract the system, and then inserts invariants, called
+non-interference-lemmas, manually to eliminate counter-examples that violate
+the required property (the flow-based methodology [1] specifies invariants in
+the form of properties of traces that take place for any high-level
+transaction.) All these invariants are relatively simple but very subtle in
+terms of their efficacy. For example, for the FLASH protocol, one of the
+non-interference-lemma (Lemma-5 in [2]) says that whenever a cache is in E
+state, then the data it has is up-to-date. This is very similar to our Lemma-1.
+In general, we believe that the level of complexity of the lemmas in the two
+approaches are similar. The invariants are intuitively understood at the time
+of design of each module, making the task of formalizing them during the
+module's verification manageable. 
 
 The verification of the hierarchical protocol in [3] is restricted to 2-levels
 whereas our work applies to arbitrary levels of hierarchy. We are not sure if
 it's a fundamental restriction on the CMP-method, since the kind of symmetry
-that CMP-method exploits in a one or two-level system is not present in a
+that CMP-method exploits in a one/two-level system is not present in a
 hierarchical system.
 
 b) Case-Analysis:
@@ -60,11 +62,11 @@ concurrently in a clock cycle (as the semantics aren't violated); the compiler
 excels at this optimization. Atomic transition can also be spread across
 multiple clock cycles, while maintaining the semantics [4].
 
+Beyond 500 words:
 Evidence of machine-checked proofs:
 We submitted our Coq source code as a supplement to our paper in the submission
 website.
 
-Beyond 500 words:
 On Describing LTSes:
 We include the LTS description for the benefit of readers unfamiliar with it;
 the point wasn't to present novel concepts.
