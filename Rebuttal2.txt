@@ -1,26 +1,24 @@
 One of the major benefits of our approach is that it unifies the modularization
 of the design and its verification task which enables verification to be done
-in tandem with mirco-architectural design (as noted by Reviewer-E). Further,
+in tandem with micro-architectural design (as noted by Reviewer-E). Further,
 this allows us to require only incremental verification effort for an
-incremental microarchitectural change, enabling scaling of the verification
+incremental micro-architectural change, enabling scaling of the verification
 task.
  
 Our approach vs. Model-Checking-based:
 
 a) Deriving Invariants:
-Finding invariants is fundamentally hard. The CMP-method referred by Reviewer-E
-uses symmetry to abstract the system, and then inserts invariants, called
-non-interference-lemmas, manually to eliminate counter-examples that violate
-the required property (the flow-based methodology [1] specifies invariants in
-the form of properties of traces that take place for any high-level
-transaction.) All these invariants are relatively simple but very subtle in
-terms of their efficacy. For example, for the FLASH protocol, one of the
-non-interference-lemma (Lemma-5 in [2]) says that whenever a cache is in E
-state, then the data it has is up-to-date. This is very similar to our Lemma-1.
-In general, we believe that the level of complexity of the lemmas in the two
-approaches are similar. The invariants are intuitively understood at the time
-of design of each module, making the task of formalizing them during the
-module's verification manageable. 
+Finding invariants is fundamentally hard. The CMP-method (Reviewer-E) uses
+symmetry to abstract the system, and then inserts "non-interference-lemmas"
+manually to eliminate counter-examples that violate the required property.
+Flow-based methodology [1] gives yet another way of manually specifying
+invariants. In general, we believe that the level of complexity of the lemmas
+in the two approaches are similar.  For example, for the FLASH protocol, one of
+the non-interference-lemma (Lemma-5 in [2]) says that whenever a cache is in
+E-state, then its data is up-to-date which is similar to our Lemma-1. The
+invariants are subtle but are intuitively understood at the time of design of
+each module, making the task of formalizing them during the module's
+verification straightforward. 
 
 The verification of the hierarchical protocol in [3] is restricted to 2-levels
 whereas our work applies to arbitrary levels of hierarchy. We are not sure if
@@ -31,7 +29,7 @@ hierarchical system.
 b) Case-Analysis:
 Much of the requisite case-analysis is done automatically via proof-script
 automation in Coq. In our experience, cases where proof-script automation fail
-required an additional invariant; we believe that manually providing a similiar
+required an additional invariant; we believe that manually providing a similar
 invariant is necessary even in a model-checking approach.
 
 Reviewer-F:
@@ -39,7 +37,7 @@ Reviewer-F:
 Figure-3, no tags in Figures-5,6:
 Both these points are valid and we should have indicated them explicitly.
 
-Figure-6, third case:
+Figure-6, third-case:
 The "upd" function merely determines if the "real" state of the system is as
 dictated by (s,pc) or if it should be modified to take into account memory
 responses. If the processor is not waiting for a memory response, then the
@@ -48,21 +46,19 @@ make the real state H whenever we know that the next instruction we decode is
 H; we could have it as (s,pc) instead.
 
 Figure-8: tags for non-speculative loads:
-Our invariant is that there can be only one outstanding non-speculative load,
-though there can be several outstanding speculative loads concurrently.
-Anything without a tag is the current non-speculative load, and anything with a
-tag is a speculative load.
+Our invariant is that there can be only one outstanding non-speculative load
+(ie. loads without tags), though there can be several outstanding speculative
+loads (ie. loads with tags) concurrently.
 
 Reviewer-E:
 
 Pipelining protocol-engines:
 While atomic transitions in our paper have one-at-a-time semantics, the
-Bluespec compiler generates hardware which executes independant transitions
+Bluespec compiler generates hardware which executes independent transitions
 concurrently in a clock cycle (as the semantics aren't violated); the compiler
 excels at this optimization. Atomic transition can also be spread across
 multiple clock cycles, while maintaining the semantics [4].
 
-Beyond 500 words:
 Evidence of machine-checked proofs:
 We submitted our Coq source code as a supplement to our paper in the submission
 website.
@@ -71,6 +67,7 @@ On Describing LTSes:
 We include the LTS description for the benefit of readers unfamiliar with it;
 the point wasn't to present novel concepts.
 
+Beyond 500 words:
 References:
 [1] Parameterized Verification using Message Flows: An Industrial Experience,
 John O'Leary, Murali Talupur, Mark R. Tuttle, FMCAD'09
