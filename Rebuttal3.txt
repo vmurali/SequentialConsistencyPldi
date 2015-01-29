@@ -1,0 +1,68 @@
+Store-atomicity, weaker memory models and modern processors:
+
+We did provide the definition of store atomicity (Definition 7). As discussed
+near the Definition 7, any system obeying store atomicity will be sound with
+respect to instantaneous memory of Figure 3.  We agree that memory models in
+general do not obey this property of memory. But most (if not all) weaker
+memory models have a "coherence point" beyond which memory is store atomic,
+i.e., if you treat some portion of the memory sub-system as a black box, then
+requests and responses to this black box will obey Definition 7 (replacing
+processor with the entity making the request). This is somewhat agreed upon in
+the architecture community with respect to weaker memory models, and proving
+this for, say, POWER architecture, is beyond the scope of this paper.
+
+
+Novel insights gained from this work and hard/intriguing aspects of our proof
+effort:
+
+a) Modeling hardware in terms of labeled-transition system is a good way to
+prove properties about the hardware in a modular fashion.
+b) One can modularly prove the correctness of a single core, (in other words
+design the reorder buffer, etc) without knowing about the details of the memory
+subsystem, be it SC or weaker memory models. This was somewhat of a surpise to
+us.
+
+Further, we came up with the right invariants for the proof of our cache
+coherence protocol implementation, that, we believe, can be easily extended to
+verify more complex realistic protocol implementations (like MESI, MOSI, MOESI,
+etc). This was in fact the most significant portion of our Proof Effort.
+
+
+Synthesizing Coq model into hardware:
+
+We have been working on automating the transliteration process since the paper
+has been submitted. Suffice to say that good amount of progress has been made
+on establishing an embedded DSL for writing LTSes in Coq which can be
+synthesized into Bluespec/Verilog in exactly the same manner suggested by
+Reviewer-G as well as write proofs for the designs written using the embedded
+DSL.
+
+
+Our approach vs. Model-Checking-based:
+
+We agree that it is not push-button yet, though we have been making
+use of the proof-scripting capabilities of Coq to automate most of the
+mundane reasoning tasks, leaving the designer to prove only reasonably
+complicated theorems. We are also copying our response in Rebuttal-2 for
+a similar question:
+
+a) Deriving Invariants:
+Finding invariants is fundamentally hard. The CMP-method [1] uses symmetry to
+abstract the system, and then inserts "non-interference-lemmas" manually to
+eliminate counter-examples that violate the required property.  Flow-based
+methodology [2] gives yet another way of manually specifying invariants. In
+general, we believe that the level of complexity of the lemmas between those
+approaches and ours are similar. For example, for the FLASH protocol, one of
+the non-interference-lemmas (Lemma-5 in [3]) says that whenever a cache is in
+E-state, then its data is up-to-date, which is similar to our Lemma-1. The
+invariants are subtle but are intuitively understood at the time of design of
+each module, making the task of formalizing them during the module's
+verification straightforward.
+
+The verification of the hierarchical protocol in [4] is restricted to 2-levels
+whereas our work applies to arbitrary levels of hierarchy. We are not sure if
+it's a fundamental restriction on the CMP-method, since the kind of symmetry
+that CMP-method exploits in a one/two-level system is not present in a
+hierarchical system.
+
+
