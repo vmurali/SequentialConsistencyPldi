@@ -1,5 +1,11 @@
 Store-atomicity, weaker memory models and modern processors:
 
+The review says "Probably over-claims that all processors provide store-atomicity."
+We indeed wouldn't want to claim that; rather, our intention was to write that
+the _memory_system_ provides store atomicity.  Usually weaker semantics comes
+from buffering in the processors, which are (or we consider to be) distinct
+from the memory system.
+
 We did provide the definition of store atomicity (Definition 7). As discussed
 near the Definition 7, any system obeying store atomicity will be sound with
 respect to instantaneous memory of Figure 3.  We agree that memory models in
@@ -19,7 +25,7 @@ a) Modeling hardware in terms of labeled-transition system is a good way to
 prove properties about the hardware in a modular fashion.
 b) One can modularly prove the correctness of a single core, (in other words
 design the reorder buffer, etc) without knowing about the details of the memory
-subsystem, be it SC or weaker memory models. This was somewhat of a surpise to
+subsystem, be it SC or weaker memory models. This was somewhat of a surprise to
 us.
 
 Further, we came up with the right invariants for the proof of our cache
