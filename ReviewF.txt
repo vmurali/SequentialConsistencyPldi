@@ -1,0 +1,44 @@
+- The paper does not contain evidence that the proofs presented are machine-checked.
+
+>>>
+We have submitted the source code of our Coq development as a supplement to our
+paper in the submission website.
++++
+
+Some parts of the paper are not easy to follow; in particular, more discussion on the LTS provided as examples would facilitate understanding. Some examples follow:
+
+- Figure 3: The authors could explain in the text that the role of the Ins and Rm LTS is to process an element from the input/output buffers.
+- Figure 5 and 6 do not make use of the tags produced by the simple memory of Figure 3 to match load requests and responses. I believe that this is because the simple processor waits on memory requests, which leads to a single pending memory request at a time. I believe that this should be indicated explictly in the paper.
+
+>>>
+Both these points are valid and well taken.
++++
+
+
+- Figure 6: The third case seems to ignore non-memory operations. In particular, it indicates "upd((s,pc,-),rs) = s,pc otherwise if dec(s,pc)<> H". Isn't this update incorrect if dec(s,pc)=(Nm,x), in which case the update will lead to s', pc'?
+
+>>>
+This is not true. The "upd" function merely determines if the "real" state of
+the system is as dictated by the state (s,pc) or if it should be modified to
+take into account the responses from the memory system. If the processor is not
+waiting for the memory system response, then the state is exactly (s,pc). We
+made an optimization in the fourth case where we make the real state H whenever
+we know that the next instruction we decode is H. We need not do that, and the
+state can be left as (s,pc) in the fourth case.
++++
+
+
+- Figure 8: The tag is used only in case of speculative loads. My understanding is that this is because multiple speculative loads may be in flight at the same time, whereas other load operations block the processor in wait state. Would it be possible for a load and a speculative laod to be in flight at the same time (in which case a tag would be required to distinguish between the two?)
+
+>>>
+Our invariant is that there can be only one outstanding non-speculative load,
+though there can be several outstanding speculative loads along with the
+outstanding non-speculative load. Thus, anything without a tag is the
+non-speculative load and there is only one of them, and anything with a tag is
+a speculative load.
++++
+
+Minor typos:
+- page 3, first column: "to be obey" -> "to obey"
+- Figure 6: dec(pc,s) <> H -> dec(s, pc) <> H
+

@@ -1,0 +1,104 @@
+===========================================================================
+                           PLDI '15 Review #11E
+                     Updated 10 Jan 2015 1:20:12pm EST
+---------------------------------------------------------------------------
+   Paper #11: Modular Deductive Verification of Multiprocessor Hardware
+              Designs
+---------------------------------------------------------------------------
+
+                      Overall merit: 1. Reject
+                         Conviction: 1. High
+
+                         ===== Paper summary =====
+
+The paper describes a Coq-based proof of correctness of a cache coherent
+memory system using trace refinement. The approach consists of modeling
+the intended behavior using LTSs in a BlueSpec-style language, performing
+verification, and obtaining the final hardware from the specs used in
+the verified proof.
+
+                        ===== Points in favor =====
+
+Clear presentation of the work done. Impressive Coq proof effort.
+
+                        ===== Points against =====
+
+From the methodology point of view, some of the real show-stoppers in
+verifying memory systems have not been addressed.
+
+                      ===== Comments for author =====
+
+The paper is very clearly written, and specifies in some detail, how an
+n-processor system interacting with the main memory refines SC, as captured
+in Figure 7.
+
+The writing is a bit long-winded. Pages 1-4 for instance introduces nothing
+new - than well-known details pertaining to LTSs that are standard.
+
+I now examine this work from the approach used (theorem proving and Formal
+Methods or FM) and from what an industry sees as valuable. I will also present
+a wishlist for theorem-proving approaches to memory system verification, trying
+to point out where theorem-proving can provide leverage.
+
+FM methodology: The methodology used for proving that the memory system
+realizes cache coherence is not new. A theorem-proving approach to
+verifying memory systems has been tacit in many publications. Researchers
+preferred model checking, as opposed to pushing through theorem-proving
+based proofs largely because of the daunting complexity of realistic
+memory system protocols. One can find several approaches that address
+specific aspects of memory system verification in, say, Wim Hesselink's
+work : http://www.informatik.uni-trier.de/~ley/pers/hd/h/Hesselink:Wim_H=.
+
+Thus, while their proof approach has been thoroughly described, I did not
+find anything novel in their use of theorem proving as used for memory
+system verification.
+
+There is one simple reason why model-checking is still the only practical
+approach put to use by the industry for memory system verification: the
+complexity of modern protocols is very very high. For instance, even
+decade-old coherent interconnects support 40 odd coherence message
+types, with very subtle semantics associated with the messages. They are
+highly intricate reactive protocols with many corner cases - e.g. when
+a message has been rendered "ghost" by the arrival of another message,
+etc.  Addressing these protocols using theorem-proving will have one benefit:
+the specifications would be very clear. However the proof effort would take
+the user of a theorem-prover walk the "protocol space" through case analysis.
+
+There has of course been recent trends to simplify protocols thru the
+DeNoVo project:
+http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:8k81kl-MbHgC
+The authors have not cited such related pieces of work and justified the
+simplicity of their design. 
+
+The authors claim that they are achieving their proof for an arbitrary number
+of processors. They do not mention anything about the invariants involved
+in their parametric proofs. This leads me to suspect that these invariants
+are pretty straightforward.  If one harks back to work addressing real
+protocols, the Chou, Mannava, Park work
+(http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:qjMakFHDy7sC) shows how exceedingly hard
+it is to discover these invariants. In fact, the CMP approach is an
+incremental CEGAR-style method for discovering these invariants. Stating these
+invariants explicitly would be virtually impossible - even for FLASH-like
+protocols.  In fact, a whole series of papers have tried to address invariant
+discovery in this space : http://dl.acm.org/citation.cfm?id=1517434
+
+Not finding details on how the complexity of parametric verification was
+tackled makes be strongly believe that finding these invariants was not
+hard - which is not the case for realistic coherence protocols I know of.
+
+For hierarchical protocols, this work has been extended in e.g.,
+http://link.springer.com/article/10.1007%2Fs10703-010-0092-y
+
+There is one very good use of the theorem-proving technology in this area: to
+generalize model-checking based verification, and then to lend help when
+protocols are specialized or adapted to new situations.
+There is also another good use: to explain the formal derivation of practical
+protocols. These would be very daunting efforts for anything realistic, and
+the effort would not be reusable the moment some design decision changes.
+
+The last level of difficulty faced in memory system verification is that the
+state machines actually realizing the hardware are often
+pipelined protocol engines. This level of difficulty also has not been
+pointed out. Perhaps the BlueSpec compiler is capable of generating
+pipelined designs automatically.
+

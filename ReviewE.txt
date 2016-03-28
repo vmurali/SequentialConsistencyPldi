@@ -1,0 +1,153 @@
+From the methodology point of view, some of the real show-stoppers in
+verifying memory systems have not been addressed.
+
+The writing is a bit long-winded. Pages 1-4 for instance introduces nothing
+new - than well-known details pertaining to LTSs that are standard.
+
+>>>
+We introduced LTSes mainly to define the notion of refinement that we
+are using, as well as to define the combination operators.
++++
+
+FM methodology: The methodology used for proving that the memory system
+realizes cache coherence is not new. A theorem-proving approach to
+verifying memory systems has been tacit in many publications. Researchers
+preferred model checking, as opposed to pushing through theorem-proving
+based proofs largely because of the daunting complexity of realistic
+memory system protocols. One can find several approaches that address
+specific aspects of memory system verification in, say, Wim Hesselink's
+work : http://www.informatik.uni-trier.de/~ley/pers/hd/h/Hesselink:Wim_H=.
+
+@@@
+Lots of PVS-based proofs for concurrent algorithms, mutual exclusion, etc...
+***
+
+Thus, while their proof approach has been thoroughly described, I did not
+find anything novel in their use of theorem proving as used for memory
+system verification.
+
+There is one simple reason why model-checking is still the only practical
+approach put to use by the industry for memory system verification: the
+complexity of modern protocols is very very high. For instance, even
+decade-old coherent interconnects support 40 odd coherence message
+types, with very subtle semantics associated with the messages. They are
+highly intricate reactive protocols with many corner cases - e.g. when
+a message has been rendered "ghost" by the arrival of another message,
+etc.  Addressing these protocols using theorem-proving will have one benefit:
+the specifications would be very clear. However the proof effort would take
+the user of a theorem-prover walk the "protocol space" through case analysis.
+
+>>>
+The theorem-prover has to walk the protocol space through case analysis, but
+the proof-script automation in Coq significantly reduces the burden. One can
+write proof-scripts that performs a proof-search, i.e. tries to apply
+previously proven basic lemmas on each of the cases and leaves the user with
+very few actual proof obligations that are complex or unique so as to not be
+discharged using automated proof-search.
++++
+
+There has of course been recent trends to simplify protocols thru the
+DeNoVo project:
+http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:8k81kl-MbHgC
+The authors have not cited such related pieces of work and justified the
+simplicity of their design. 
+
+@@@
+A new non-conventional cache coherence protocol that produces sequentially
+consistent results for data-rate free programs. There's no formal proof that
+this protocol is correct...
+***
+
+
+The authors claim that they are achieving their proof for an arbitrary number
+of processors. They do not mention anything about the invariants involved
+in their parametric proofs. This leads me to suspect that these invariants
+are pretty straightforward.  If one harks back to work addressing real
+protocols, the Chou, Mannava, Park work
+(http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:qjMakFHDy7sC) shows how exceedingly hard
+it is to discover these invariants. In fact, the CMP approach is an
+incremental CEGAR-style method for discovering these invariants. Stating these
+invariants explicitly would be virtually impossible - even for FLASH-like
+protocols.  In fact, a whole series of papers have tried to address invariant
+discovery in this space : http://dl.acm.org/citation.cfm?id=1517434
+
+@@@
+Chou, Mannava, Park [CMP-method] approach uses three paradigms: a) symmetry of
+cache coherence protocols b) abstraction of several nodes which behaves as just
+another node and c) counter-example guided abtraction refinement (CEGAR) for
+refining the abstraction's properties. Using CEGAR, they get invariants for the
+rest of the system while concentrating on a finite number of nodes (2).  Each
+refinement will not restrict the behavior, but will help towards proving a
+safety property. Specifically, let P be an invariant for the abstract
+transition system, and we should prove that it satisfies safety property X. We
+start out with a P that doesn't satisfy X. Then we add constraints on P, while
+permitting the same transitions. Eventually P will satisfy X. The manual
+portion of this procedure is in strengthening P.
+***
+
+@@@
+The second paper tries to formulate better invariants in the first place using
+the notion of "flows". It says what other messages can interfere when the other
+message is being processed...
+***
+
+Not finding details on how the complexity of parametric verification was
+tackled makes be strongly believe that finding these invariants was not
+hard - which is not the case for realistic coherence protocols I know of.
+
+For hierarchical protocols, this work has been extended in e.g.,
+http://link.springer.com/article/10.1007%2Fs10703-010-0092-y
+
+@@@
+Same approach as [CMP-method] to hierarchical protocols.
+***
+
+>>>
+We do mention the high level theorems that we use in the paper.  While we
+restrict ourselves to the verification of the MSI protocol's implementation,
+the proof is modular, and a large portion of the proof can be used, as is, for
+verification of other protocols (like MESI, MOSI and MOESI), as we discuss in
+the previous rebuttal. The theorem prover helps construct and prove the high
+level theorems that make these protocols correct. These theorems depend on a
+few basic properties pertaining to the transitions which can be proved easily
+even using model-checking techniques (the state space is restricted to just a
+single address and 3 nodes). These properties include a) state changes occuring
+when and only when response messages are sent, b) absence of response messages
+from the parent to a child and from the same child to the parent simultaneously
+in the network, for the same address and c) FIFO properties of the messages.
+These basic properties seem to be the foundation over which all the cache
+coherence protocols lie -- they eliminate the corner cases which make the proof
+difficult. For example, since responses from a child to its parent and from the
+parent to the same child for the same address cannot be present simultaneously,
+an upgrade response from the parent cannot cross a downgrade response from the
+child, which would have eventually led to the upgrade of the child and
+downgrade of the parent violating Lemma 3. As pointed out by Reviewer-E, the
+theorems and these properties serve as a method to derive a correct protocol
+(the different protocols are different system instances which obey these
+properties).
++++
+
+There is one very good use of the theorem-proving technology in this area: to
+generalize model-checking based verification, and then to lend help when
+protocols are specialized or adapted to new situations.
+There is also another good use: to explain the formal derivation of practical
+protocols. These would be very daunting efforts for anything realistic, and
+the effort would not be reusable the moment some design decision changes.
+
+The last level of difficulty faced in memory system verification is that the
+state machines actually realizing the hardware are often
+pipelined protocol engines. This level of difficulty also has not been
+pointed out. Perhaps the BlueSpec compiler is capable of generating
+pipelined designs automatically.
+
+>>>
+Though the semantics of the atomic transitions in our paper execute one at a
+time, different independent transitions can be made to occur in parallel in the
+actual implementation without changing the semantics; Bluespec already does
+this optimization. One can take this further, where each atomic transition can
+be spread across multiple hardware clock cycles, while ensuring that the
+overall atomic transaction semantics are obeyed. Bluespec currently does not
+implement this, though there has been work in this area [Karczmarek et.al.].
++++
+
+

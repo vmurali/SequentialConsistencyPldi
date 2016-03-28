@@ -1,0 +1,512 @@
+===========================================================================
+                           PLDI '15 Review #11A
+                     Updated 9 Dec 2014 7:29:02am EST
+---------------------------------------------------------------------------
+   Paper #11: Modular Deductive Verification of Multiprocessor Hardware
+              Designs
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Accept
+                         Conviction: 2. Low
+
+                         ===== Paper summary =====
+
+The paper presents a modular verification framework for hardware designs, and applies it to an SC multicore system. The processors are assumed to implement speculation and concurrent execution of loads; memory consists of multiple levels of cache.
+
+                        ===== Points in favor =====
+
+Ambitious goal of full, modular verification of hardware systems.
+Modularity enables reuse of models across systems.
+
+                        ===== Points against =====
+
+Not being well-versed in formal proofs, I personally found the paper hard to digest.
+
+                      ===== Comments for author =====
+
+For full disclosure, I'm not a formal verification person so I cannot judge the soundness of the proofs. I have a basic understanding of cache coherence and memory consistency models -- I'm not an expert though -- but as far as I can judge, I believe the paper is sound, and all the statements made regarding cache coherence and memory consistency appear to be correct. I have no expertise in verification of cache coherence and memory consistency models, so I cannot judge the significance of the contributions claimed in this paper.
+
+I'm surprised that none of the work by Dan Sorin (Duke) is referenced in the paper, see http://people.ee.duke.edu/~sorin/verif-aware/ for Sorin's work on verification-aware architectures.
+
+===========================================================================
+                           PLDI '15 Review #11B
+                     Updated 9 Dec 2014 4:31:06am EST
+---------------------------------------------------------------------------
+   Paper #11: Modular Deductive Verification of Multiprocessor Hardware
+              Designs
+---------------------------------------------------------------------------
+
+                      Overall merit: 1. Reject
+                         Conviction: 2. Low
+
+                         ===== Paper summary =====
+
+This paper presents a framework for modular verification of hardware:
+components are designed in BlueSpec, and one can prove their correctness modularly. As an illustration, the paper proposes a system that provably implements SC.
+
+                        ===== Points in favor =====
+
+I like the direction of this paper and it's quite well written.
+
+                        ===== Points against =====
+
+I found no evidence that the SC system proposed in this paper is realistic. Is that even the right question to ask? I guess what I'm asking for is a sense of who would be the target audience of
+this paper; who do you think would specify their system in your framework?
+
+                      ===== Comments for author =====
+
+More details:
+
+page 1:
+
+ideal memory: what is this?
+
+ideal processor: what is this?
+
+page 2:
+
+compilers that convert LTSes into efficient hardware: I would expect to see a cite here
+
+Bluespec [...] served as the model: what does that mean?
+
+competitive performance: do you have a bibliographical reference here, or some data?
+
+that peak beneath abstraction boundaries: what does that mean?
+
+first machine-checked proof: did you make your development available? I'd be interested in seeing it!
+
+We believe such a memory is also the correct abstraction for implementing relaxed memory models: that sounds very interesting; would you explain why that is?
+
+good ideas: such as?
+
+a simple formal model of sequential consistency: it sounds a bit like your model is going to be different from Lamport's; is that the case?
+
+page 3:
+
+infinite families of hardware designs, which resist reduction to finite-state models: I couldn't decide if reduction applied to 'infinite families' or 'hardware designs'; it might be worth making that clear
+
+to be obey: to obey
+
+the empirical challenges: which challenges?
+
+include operational semantics: you cite Mador-Haim et al here, but that paper does not include an operational semantics, so shouldn't be there
+
+relating the axiomatic specification to [....] operational semantics: Alglave et al at TOPLAS 14 does that too
+
+page 4:
+
+can be divided logically into 3 components as shown in Figure 2: is that a well-known thing? it might be worth citing something here?
+
+page 5:
+
+we are aware of, the main memory still exposes atomic loads and stores: would you explain what atomic means here? and what it means to expose accesses?
+
+the properties of local buffers: why buffers only? why not caches for example?
+
+implements sequential consistency: is your proof tied to targetting SC?
+
+page 6:
+
+a system refining: or equivalent?
+
+page 9:
+
+a transliteration: did you do this transliteration yourself? was it a big implementation effort?
+
+page 11:
+
+distributed shared-memory: I'm not sure I understand what you mean by
+distributed here
+
+cover finer-grained architectural details: would you give examples?
+
+in some cases can be transliterated directly: perhaps worth a cite here, and some details as to which cases you're thinking of?
+
+===========================================================================
+                           PLDI '15 Review #11C
+                     Updated 10 Dec 2014 2:35:56pm EST
+---------------------------------------------------------------------------
+   Paper #11: Modular Deductive Verification of Multiprocessor Hardware
+              Designs
+---------------------------------------------------------------------------
+
+                      Overall merit: 1. Reject
+                         Conviction: 1. High
+
+                         ===== Paper summary =====
+
+This paper presents a verification (within Coq) of a shared-memory
+multiprocessor design, with an arbitrary hierarchy of asynchronous
+caches and some speculative execution, which nonetheless provides
+sequential consistency.
+
+                        ===== Points in favor =====
+
+A machine-checked proof of an implementation of sequential
+consistency, that will (probably, not demonstrated) scale to some more
+relaxed consistency models.
+
+Standard LTS-refinement techniques applied (to my knowledge) in a novel 
+area.
+
+                        ===== Points against =====
+
+The value of this line of work really would appear when (if) it
+handles relaxed memory consistency, since all commercial designs are
+relaxed. I believe the approach will scale up to TSO (such as
+x86-TSO), but not further to ARM/Power/Alpha etc. Even x86-TSO would
+have been a good demonstration.
+
+There are existing proofs of sequential consistency for several
+variants of cache protocols, which should be discussed. (See below).
+
+                      ===== Comments for author =====
+
+The use of the word "atomicity" is a bit misleading. While indeed all
+popular ISAs expose a memory that responds to loads and stores
+atomically, many of the more relaxed designs can respond to loads from
+any of several buffers (which you have), and several processor threads
+can share buffers (which you don't). This can lead to so-called
+non-multi-copy-atomic designs, in particular showing the well-known
+Independent Reads of Independent Writes problem. Question: can you
+easily handle such an extension? I rather suspect not, but would be
+glad to be told otherwise.
+
+The speculative execution is perhaps too simple, restricted to
+speculating loads and then verifying answers in program order. Many
+modern processors (e.g. several ARM designs) will not throw away load
+answers just because the verification step produces a different value
+(as all that is required is that the load *could* have produced that value).
+Conversely, with several stores of the same value, merely seeing the
+same value is an insufficient check for cache-coherent designs.
+
+While the LTS formalism is intuitive and straightforward to mechanize,
+would it not be equally valid to mechanize some other styles of
+proofs, such as from TLA, or from "Lamport Clocks: Verifying a
+Directory Cache-Coherence Protocol" (SPAA'98)? (the later of which you
+should discuss). I would like a more detailed justification of the
+modularization advantages of your technique.
+
+Your reference to TLC's cache verification should cite "Checking Cache
+Coherence Protocols with TLA+". Furthermore, Moore's verification 
+"An ACL2 proof of write invalidate cache coherence" (CAV'98) also deserves
+discussion.
+
+===========================================================================
+                           PLDI '15 Review #11D
+                    Updated 14 Dec 2014 10:32:07am EST
+---------------------------------------------------------------------------
+   Paper #11: Modular Deductive Verification of Multiprocessor Hardware
+              Designs
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Accept
+                         Conviction: 1. High
+
+                         ===== Paper summary =====
+
+The authors verify correctness of a multiprocessor hardware model. 
+- The correctness criterion is the safety part of sequential consistency. 
+- The verified architecture is a modular composition of cores that communicate with a memory cache hierarchy via an asynchronous load-store interface.
+
+The proof methodology uses standard trace refinement and compositional verification to show that the implementation refines the spec (n-processor sequential consistency). The proof mechanics (labeled transition systems, refinement) are carefully introduced and explained, and the overall proof structure is very clear.
+
+The paper starts with the relatively simple "top" of the abstraction:
+- defining sequential consistency using an LTS.
+- defining a simple abstract in-order core as an LTS.
+- defining a simple atomic memory as an LTS.
+- showing that the composition of the two latter refines the first.
+
+The nontrivial parts are the two (fully independent) refinement steps for core / memory:
+
+(core) prove that the detailed model of the core (featuring branch prediction and a ROB) refines the simple in-order core. The formal model of the core is fully included in the paper (but the ROB, ISA-specifics, and the branch predictor are abstractly represented by their functional specifications, rather than by an 
+implementation) and occupies about 1/2 page.  
+
+(memory) prove that the detailed model of the memory (featuring hierarchical MSI caches and a directory-based cache coherence protocol) refines the simple atomic memory.  The formal hierachical model is included in the paper and occupies about 1 page.
+
+The detailed models are still abstract in many ways (e.g. ISA, register definitions, etc.) but are accurate representations of what is taught in computer architecture classes, and are "accurate simplifications" of real systems.
+
+The authors say they have mechanically checked the proofs in Coq.
+
+                        ===== Points in favor =====
+
+- I consider the work in this paper to be a credible, useful, not-too-tiny step within the ultimate goal of building a completely verified multiprocessor system (spanning applications, compilers,  hardware). Generally speaking, this line of work may be more of research interest than of industrial significance, but I believe it is worth the effort, because it is hard (we can learn a lot from the effort), and it will improve the quality of the systems we build.
+
+- I consider the paper to be "unusually well informed" with regards both to hardware architecture and verification methodology: 
+
+1. the model of the core and the memory represent valid architectural practices (as taught in computer architecture classes, and as used in some, but of course not all, real multiprocessor architectures, at least one of which I am familiar with from my own experience in industry)
+
+2. the refinement methodology (trace refinement), albeit standard, is "tastefully" selected from the large number of previous work on this general topic (e.g. CSP, CCS, I/O automata), getting to the point right away, without distractions. Everything needed is right there.
+
+The formalizations of the speculative ooo processor, and of the cache coherence protocol, have real value: they can serve as nice, precise, concise, verified references. For example, if I am considering writing a directory-based cache coherence protocol (which I may do in the context of distributed systems, for example), I can use Fig. 10 to bring the details back to mind and have good confidence of handling nasty race conditions correctly. 
+
+- How to decompose consistency questions into core and memory aspects (speculation/ROB on core side, atomic/nonatomic memory on the other side) is an important aspect that is not well known beyond the computer architecture community. I would love for this paper to serve as a reference for future work on relaxed memory models and weak consistency, for example.
+
+Writing quality: well above average. It was pleasant to read. I have read many papers that try to do similar things but are not remotely as readable or interesting. In particular, papers often have a hard time explaining the proof structure. Here, the formulation of what was proved, and the proof structure, are 
+abundantly clear. 
+
+The proof structure is explained well and easily consumable by anyone with a taste for manual correctness proofs: it tells us all the important things (e.g. invariants), and only the important things (other stuff is abstracted away). I believe that the formalizations and invariants may be reusable in other projects, 
+in particular because they are well explained.
+
+                        ===== Points against =====
+
+These are not so much points against, but more of a wish list for things I would like to see in future papers.
+
+- Proving liveness (progress). This seems nontrivial and important, in particular for the coherence protocol. I remain somewhat skeptic that I can trust this coherence protocol in a practical situation until I see more evidence that someone has very carefully thought about the progress problem.
+
+- There is no clear mention of where the Coq proof is... is it public? 
+
+- There is not much detail on how the mechanized verification happened, or how I could reproduce that part of the work. Could I use your framework for my own verification projects?
+
+                      ===== Comments for author =====
+
+Comments
+
+- The "halt" part seems uninteresting. What purpose does it serve? Perhaps I am missing something. Otherwise, I would suggest to completely remove it.
+
+- The coherence protocol is a bit incomplete: it does not say when a parent will actually send a demote request to a child (ParentSendReq is nondeterministic). Can you explain this a bit - it seems important for progress.
+
+
+Details
+
+- Section 1, first paragraph: citation should be [Weaver and Germond], not [Weaver and Gremond]
+
+- the bibliography could use some tightening... some entries span as much as 8 lines and contain unimportant and redundant information (urls, dois, etc)
+
+- perhaps add a citation on prior work on automatic verification of sequential consistency (e.g. the papers by Jesse Bingham, Anne Condon, Alan Hu, Shaz Qadeer)
+
+===========================================================================
+                           PLDI '15 Review #11E
+                     Updated 10 Jan 2015 1:20:12pm EST
+---------------------------------------------------------------------------
+   Paper #11: Modular Deductive Verification of Multiprocessor Hardware
+              Designs
+---------------------------------------------------------------------------
+
+                      Overall merit: 1. Reject
+                         Conviction: 1. High
+
+                         ===== Paper summary =====
+
+The paper describes a Coq-based proof of correctness of a cache coherent
+memory system using trace refinement. The approach consists of modeling
+the intended behavior using LTSs in a BlueSpec-style language, performing
+verification, and obtaining the final hardware from the specs used in
+the verified proof.
+
+                        ===== Points in favor =====
+
+Clear presentation of the work done. Impressive Coq proof effort.
+
+                        ===== Points against =====
+
+From the methodology point of view, some of the real show-stoppers in
+verifying memory systems have not been addressed.
+
+                      ===== Comments for author =====
+
+The paper is very clearly written, and specifies in some detail, how an
+n-processor system interacting with the main memory refines SC, as captured
+in Figure 7.
+
+The writing is a bit long-winded. Pages 1-4 for instance introduces nothing
+new - than well-known details pertaining to LTSs that are standard.
+
+I now examine this work from the approach used (theorem proving and Formal
+Methods or FM) and from what an industry sees as valuable. I will also present
+a wishlist for theorem-proving approaches to memory system verification, trying
+to point out where theorem-proving can provide leverage.
+
+FM methodology: The methodology used for proving that the memory system
+realizes cache coherence is not new. A theorem-proving approach to
+verifying memory systems has been tacit in many publications. Researchers
+preferred model checking, as opposed to pushing through theorem-proving
+based proofs largely because of the daunting complexity of realistic
+memory system protocols. One can find several approaches that address
+specific aspects of memory system verification in, say, Wim Hesselink's
+work : http://www.informatik.uni-trier.de/~ley/pers/hd/h/Hesselink:Wim_H=.
+
+Thus, while their proof approach has been thoroughly described, I did not
+find anything novel in their use of theorem proving as used for memory
+system verification.
+
+There is one simple reason why model-checking is still the only practical
+approach put to use by the industry for memory system verification: the
+complexity of modern protocols is very very high. For instance, even
+decade-old coherent interconnects support 40 odd coherence message
+types, with very subtle semantics associated with the messages. They are
+highly intricate reactive protocols with many corner cases - e.g. when
+a message has been rendered "ghost" by the arrival of another message,
+etc.  Addressing these protocols using theorem-proving will have one benefit:
+the specifications would be very clear. However the proof effort would take
+the user of a theorem-prover walk the "protocol space" through case analysis.
+
+There has of course been recent trends to simplify protocols thru the
+DeNoVo project:
+http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:8k81kl-MbHgC
+The authors have not cited such related pieces of work and justified the
+simplicity of their design. 
+
+The authors claim that they are achieving their proof for an arbitrary number
+of processors. They do not mention anything about the invariants involved
+in their parametric proofs. This leads me to suspect that these invariants
+are pretty straightforward.  If one harks back to work addressing real
+protocols, the Chou, Mannava, Park work
+(http://scholar.google.com/citations?view_op=view_citation&hl=en&user=ufGYoL0AAAAJ&citation_for_view=ufGYoL0AAAAJ:qjMakFHDy7sC) shows how exceedingly hard
+it is to discover these invariants. In fact, the CMP approach is an
+incremental CEGAR-style method for discovering these invariants. Stating these
+invariants explicitly would be virtually impossible - even for FLASH-like
+protocols.  In fact, a whole series of papers have tried to address invariant
+discovery in this space : http://dl.acm.org/citation.cfm?id=1517434
+
+Not finding details on how the complexity of parametric verification was
+tackled makes be strongly believe that finding these invariants was not
+hard - which is not the case for realistic coherence protocols I know of.
+
+For hierarchical protocols, this work has been extended in e.g.,
+http://link.springer.com/article/10.1007%2Fs10703-010-0092-y
+
+There is one very good use of the theorem-proving technology in this area: to
+generalize model-checking based verification, and then to lend help when
+protocols are specialized or adapted to new situations.
+There is also another good use: to explain the formal derivation of practical
+protocols. These would be very daunting efforts for anything realistic, and
+the effort would not be reusable the moment some design decision changes.
+
+The last level of difficulty faced in memory system verification is that the
+state machines actually realizing the hardware are often
+pipelined protocol engines. This level of difficulty also has not been
+pointed out. Perhaps the BlueSpec compiler is capable of generating
+pipelined designs automatically.
+
+===========================================================================
+                           PLDI '15 Review #11F
+                    Updated 11 Jan 2015 11:52:15pm EST
+---------------------------------------------------------------------------
+   Paper #11: Modular Deductive Verification of Multiprocessor Hardware
+              Designs
+---------------------------------------------------------------------------
+
+                      Overall merit: 1. Reject
+                         Conviction: 2. Low
+
+                         ===== Paper summary =====
+
+The paper proposes a framework based on labeled transition systems for the modular specification and verification of hardware systems.  As a case study, the authors use their framework to prove that a system consisting of a multicore processor (possibly performing speculative execution of load instructions) and an arbitrary memory hierarchy implements sequential consistency. In particular, they first consider a simple memory system responding instantly and an in-order processor performing blocking memory operations, and then complicate the design and consider a hierarchical memory system with multiple, concurrently active caches and a speculative processor with a branch predictor and a reorder buffer.
+
+                        ===== Points in favor =====
+
++ The proposed framework is interesting. 
++ The modular specification of the system is sound.
++ The idea of starting from the specification and the proof of a simple system and then use trace refinement to prove properties of a more complex system is powerful.
+
+                        ===== Points against =====
+
+- The paper does not contain evidence that the proofs presented are machine-checked.
+
+                      ===== Comments for author =====
+
+Some parts of the paper are not easy to follow; in particular, more discussion on the LTS provided as examples would facilitate understanding. Some examples follow:
+
+- Figure 3: The authors could explain in the text that the role of the Ins and Rm LTS is to process an element from the input/output buffers.
+- Figure 5 and 6 do not make use of the tags produced by the simple memory of Figure 3 to match load requests and responses. I believe that this is because the simple processor waits on memory requests, which leads to a single pending memory request at a time. I believe that this should be indicated explictly in the paper.
+- Figure 6: The third case seems to ignore non-memory operations. In particular, it indicates "upd((s,pc,-),rs) = s,pc otherwise if dec(s,pc)<> H". Isn't this update incorrect if dec(s,pc)=(Nm,x), in which case the update will lead to s', pc'?
+- Figure 8: The tag is used only in case of speculative loads. My understanding is that this is because multiple speculative loads may be in flight at the same time, whereas other load operations block the processor in wait state. Would it be possible for a load and a speculative laod to be in flight at the same time (in which case a tag would be required to distinguish between the two?)
+
+Minor typos:
+- page 3, first column: "to be obey" -> "to obey"
+- Figure 6: dec(pc,s) <> H -> dec(s, pc) <> H
+
+===========================================================================
+                     Response by vmurali@csail.mit.edu
+---------------------------------------------------------------------------
+Some of the questions raised by the reviewers (including the justification of
+modularization advantages) are addressed by Reviewer-D.
+
+We have submitted the source code of our Coq development as a supplement 
+to our paper in the submission website.
+
+In response to "points against" by Reviews B and C:
+We believe such a modular technique for verifying full-system correctness with
+respect to SC will be useful for hardware designers/verification-engineers to
+independently verify different components of the system. We can't be sure that
+everything will generalize effortlessly to the trickiest relaxed memory models
+(like those exhibited by ARM/POWER as pointed by Reviewer-C because of no
+verification loads and/or shared store buffers), but it would have been hard to
+figure out the basic framework if we started on more complex examples first.
+We still think our example is quite complex and interesting, which Reviewer-D
+seems to agree with, and our focus is on developing a general framework,
+not this particular specification or proof.
+
+Reviewer-C, please note that verification loads do indeed ensure SC correctness.
+This is true even if there were stores to that address in between the
+speculative load and the verification load, as long as the final store read by
+the verification load writes the same value as the speculative load. Our final
+theorem ensures this; otherwise the speculative system will not be an
+implementation of the reference SC.
+
+Reviewer-B, please note that our SC model is exactly as specified by Lamport
+(though it may be written in different notation).  Also please note that by local
+buffers in Figure 2, we do not mean just store buffers; it includes all local
+data accessible to the processor.
+
+We agree with Reviewer-D that proving liveness is important and non-trivial.
+The example of ParentSendReq is an example of a voluntary rule, and the policy
+to fire such a rule does indeed affect the liveness. In our development, we
+haven't proved full-system liveness (which includes the liveness of the
+processor), but we have proved the liveness of the cache-coherence protocol, in
+particular, the following:
+a) Any request (or response) that a cache wants to send can eventually be sent
+(either to its parent or to its children)
+b) Under the assumption that a parent will eventually "decide" to send a
+downgrade request to its children (using ParentSendReq rule) whenever it sees
+an upgrade request from a child (as opposed to ignoring such an upgrade request
+from a child forever), every request sent to either the parent or to a child
+will eventually get a response.
+
+We chose "halting" for pedagogical purposes; in our actual Coq-code we use the
+traditional trace-equivalence definition requiring inter-convertible states. It
+is worth noting that any safety property can be reduced to the halting problem.
+
+Thanks for notifying us of other related work (Hu's "Decidable SC" SPAA'03,
+Qadeer's "Verifying SC by model-checking" TPDS'03, Sorin's "Verification-aware
+Architectures" PACT'07, "Lamport Clocks: Verifying Directory Protocol" SPAA'98
+and Moore's "ACL2 cache coherence proof" CAV'98), and for pointing out other
+bugs in our related work section.
+
+Beyond 500 words:
+Reviewer-B's concerns:
+- Ideal processor and memory: As described in that paragraph - memory responds
+  instantaneously and processor executes atomically without speculation
+- Bluespec served as the model: The motivation for LTS comes from using
+  Bluespec to describe hardware, which is similar to our LTS formalization.
+- Bluespec's competitive performance can be seen from [Dave et al. 2005], and
+  other papers using Bluespec designs.
+- Peek-beneath abstraction boundaries: To prove the full-system, the
+  individual components are treated as black-boxes, completely captured by their
+  interface specification.  Peeking beneath boundaries would instead look inside
+  implementations.
+- Good-ideas from the world of PL semantics: Using LTSes as a precise hardware
+  specification.
+- Infinite families of hardware design resist reduction to finite-state
+  models: reduction is applied to 'infinite families'
+- Figure 2: logical view of system as 3-components: It is more-or-less accepted
+  in the architecture community.
+- Refining vs Equivalent: Throughout the paper, we are showing only refinement
+  in one direction, though you are correct that in this particular example they
+  are equivalent.
+- Finer-grained architectural details: As mentioned in that paragraph (like
+  register-renaming).
+- Main-memory still exposes atomic loads and stores: Most architectures (including
+  POWER and ARM) can be modeled using a memory that responds to loads and stores
+  instantaneously, though the response (or request) can sit in a buffer between
+  the memory and the processor, leading to relaxed memory models.
+
+Regarding Reviewer-D's question about reusability of our proofs and framework,
+the proof of the cache-coherence protocol can be reused as is for verifying
+other (relaxed memory) systems. Moreover, the proof of the cache-coherence is
+itself modular and can be adopted to other protocols (like MESI, MOSI); The
+proofs for Lemmas 2 to 5 will change, but the lemmas correspond to at most 3
+components (and states) and hence can be easily proved (even using techniques
+like model-checking).
+
